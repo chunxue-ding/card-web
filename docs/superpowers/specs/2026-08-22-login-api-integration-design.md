@@ -52,7 +52,7 @@ UI(login.gd / lobby.gd)
 **错误归一化规则**（ApiClient 内）：
 1. HTTPRequest result ≠ SUCCESS → `ApiError{-1, "无法连接服务器"}`（is_network_error）
 2. HTTP 401 → `ApiError{401, "登录已过期"}`
-3. body 含 `code` 且 ≠ 0 → `ApiError{code, 中文映射}`
+3. body 含 `code` 且 ≠ 0 → `ApiError{code, 中文映射}`（未映射 code 兜底显示「服务异常，请稍后再试」）
 4. 其余 → 返回 body Dictionary
 
 ## 4. 数据流
