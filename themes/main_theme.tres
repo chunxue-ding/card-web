@@ -1,0 +1,122 @@
+[gd_resource type="Theme" load_steps=13 format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="1_font"]
+[ext_resource type="Texture2D" path="res://assets/login/input_frame.png" id="2_input_frame"]
+[ext_resource type="Texture2D" path="res://assets/login/sign_in_frame.png" id="3_sign_in_frame"]
+[ext_resource type="Texture2D" path="res://assets/login/guest_frame.png" id="4_guest_frame"]
+
+[sub_resource type="StyleBoxTexture" id="LineEdit_normal"]
+texture = ExtResource("2_input_frame")
+texture_margin_left = 48.0
+texture_margin_top = 0.0
+texture_margin_right = 48.0
+texture_margin_bottom = 0.0
+content_margin_left = 72.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="LineEdit_focus"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.831373, 0.686275, 0.415686, 1)
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="Button_primary_normal"]
+texture = ExtResource("3_sign_in_frame")
+texture_margin_left = 80.0
+texture_margin_top = 0.0
+texture_margin_right = 80.0
+texture_margin_bottom = 0.0
+content_margin_left = 96.0
+content_margin_top = 8.0
+content_margin_right = 96.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="Button_primary_hover"]
+texture = ExtResource("3_sign_in_frame")
+texture_margin_left = 80.0
+texture_margin_top = 0.0
+texture_margin_right = 80.0
+texture_margin_bottom = 0.0
+content_margin_left = 96.0
+content_margin_top = 8.0
+content_margin_right = 96.0
+content_margin_bottom = 8.0
+modulate_color = Color(1.2, 1.12, 0.95, 1)
+
+[sub_resource type="StyleBoxTexture" id="Button_primary_pressed"]
+texture = ExtResource("3_sign_in_frame")
+texture_margin_left = 80.0
+texture_margin_top = 0.0
+texture_margin_right = 80.0
+texture_margin_bottom = 0.0
+content_margin_left = 96.0
+content_margin_top = 8.0
+content_margin_right = 96.0
+content_margin_bottom = 8.0
+modulate_color = Color(0.75, 0.7, 0.6, 1)
+
+[sub_resource type="StyleBoxTexture" id="Button_secondary_normal"]
+texture = ExtResource("4_guest_frame")
+texture_margin_left = 80.0
+texture_margin_top = 0.0
+texture_margin_right = 80.0
+texture_margin_bottom = 0.0
+content_margin_left = 96.0
+content_margin_top = 8.0
+content_margin_right = 96.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="Button_secondary_hover"]
+texture = ExtResource("4_guest_frame")
+texture_margin_left = 80.0
+texture_margin_top = 0.0
+texture_margin_right = 80.0
+texture_margin_bottom = 0.0
+content_margin_left = 96.0
+content_margin_top = 8.0
+content_margin_right = 96.0
+content_margin_bottom = 8.0
+modulate_color = Color(1.2, 1.12, 0.95, 1)
+
+[sub_resource type="StyleBoxTexture" id="Button_secondary_pressed"]
+texture = ExtResource("4_guest_frame")
+texture_margin_left = 80.0
+texture_margin_top = 0.0
+texture_margin_right = 80.0
+texture_margin_bottom = 0.0
+content_margin_left = 96.0
+content_margin_top = 8.0
+content_margin_right = 96.0
+content_margin_bottom = 8.0
+modulate_color = Color(0.75, 0.7, 0.6, 1)
+
+[resource]
+default_font = ExtResource("1_font")
+default_font_size = 28
+LineEdit/colors/font_color = Color(0.909804, 0.862745, 0.752941, 1)
+LineEdit/colors/font_placeholder_color = Color(0.419608, 0.392157, 0.333333, 1)
+LineEdit/colors/caret_color = Color(0.831373, 0.686275, 0.415686, 1)
+LineEdit/colors/selection_color = Color(0.690196, 0.552941, 0.290196, 0.35)
+LineEdit/styles/normal = SubResource("LineEdit_normal")
+LineEdit/styles/focus = SubResource("LineEdit_focus")
+Button/theme_type_variations = PackedStringArray("SecondaryButton")
+Button/colors/font_color = Color(0.909804, 0.862745, 0.752941, 1)
+Button/colors/font_hover_color = Color(1, 0.94902, 0.85098, 1)
+Button/colors/font_pressed_color = Color(0.74902, 0.658824, 0.45098, 1)
+Button/styles/normal = SubResource("Button_primary_normal")
+Button/styles/hover = SubResource("Button_primary_hover")
+Button/styles/pressed = SubResource("Button_primary_pressed")
+SecondaryButton/colors/font_color = Color(0.909804, 0.862745, 0.752941, 1)
+SecondaryButton/colors/font_hover_color = Color(1, 0.94902, 0.85098, 1)
+SecondaryButton/colors/font_pressed_color = Color(0.74902, 0.658824, 0.45098, 1)
+SecondaryButton/styles/normal = SubResource("Button_secondary_normal")
+SecondaryButton/styles/hover = SubResource("Button_secondary_hover")
+SecondaryButton/styles/pressed = SubResource("Button_secondary_pressed")
