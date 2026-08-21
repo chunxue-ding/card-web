@@ -40,8 +40,8 @@
 | 素材处理 | 从 SVG 壳抽取内嵌 PNG 导入 Godot | SVG 只是 base64 PNG 包装；抽 PNG 确定性最高，不依赖 SVG 栅格化 |
 | 素材目录 | `login/` 保留为设计源文件（入库）；`assets/login/` 放抽取出的游戏内资源 | 设计重导出时有固定落点，游戏资源与源分离 |
 | 按钮样式 | SIGN IN / Guest 底框 → StyleBoxTexture 九宫格（左右 margin 拉伸） | 底框无烙印文字，文字由 Godot 绘制中文；宽度变化时端部装饰不变形 |
-| 输入框样式 | 通用底框 → StyleBoxTexture；图标用 LineEdit `left_icon` / `right_icon` | 引擎原生支持，图标参与文本避让，无需自绘 |
-| 眼睛图标 | 密码框 `right_icon` 静态装饰 | 显隐切换需脚本，本版无脚本约束 |
+| 输入框样式 | 通用底框 → StyleBoxTexture；左图标用 TextureRect 子节点（锚 center-left），右图标用 LineEdit `right_icon` | 修订（2026-08-21 实施时发现）：Godot 4 LineEdit 无 `left_icon` 属性（3.x 才有），左图标只能作为控件子节点叠加；文本避让依赖主题 content_margin_left=72 |
+| 眼睛图标 | 密码框 `right_icon` 静态装饰 | 显隐切换需脚本，本版无脚本约束；注意三枚图标 PNG 为设计导出、无透明通道（不透明白底），待设计师重导出 |
 | 导入设置 | 背景：VRAM 压缩 + mipmap；UI 小图：默认 lossless | 背景省显存；带透明度的小 UI 图 VRAM 压缩会有瑕疵 |
 | 中文字体 | 打包 Noto Sans SC（OFL 许可，需下载） | 系统字体许可不可再分发；Godot 默认字体无 CJK 字形 |
 | 文件名 | 抽取 PNG 用 ASCII 名（login_bg / input_frame / sign_in_frame / guest_frame / icon_user / icon_lock / icon_eye） | 避免导出 / 工具链对 Unicode 路径的兼容问题 |
