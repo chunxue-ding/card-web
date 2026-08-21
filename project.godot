@@ -5,6 +5,7 @@ config_version=5
 
 config/name="Cthulhu Poker"
 config/features=PackedStringArray("4.7")
+run/main_scene="res://scenes/login/login.tscn"
 
 [display]
 
