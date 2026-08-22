@@ -37,6 +37,9 @@ func _ready() -> void:
 			(get_node("Background/CountCenter/PlayerCountPanel/Slot%d" % count) as TextureRect).modulate = Color(0.48, 0.48, 0.48, 0.62)
 	_setup_action_feedback(quick_match_button)
 	_setup_action_feedback(friend_play_button)
+	if Session.pending_quick_match:
+		Session.pending_quick_match = false
+		_on_quick_match_pressed()
 
 
 func _render_user() -> void:

@@ -7,6 +7,7 @@ signal prediction_submitted(rank: int)
 signal rank_selected(rank: int)
 signal next_round_requested
 signal rematch_requested
+signal quick_match_requested
 
 const SUIT_TO_ASSET_ROW := {0: 3, 1: 2, 2: 1, 3: 0}
 const CARD_BACK := "res://cards/back.png"
@@ -329,10 +330,24 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 	_refresh_prediction_buttons()
 
 	if status == "round_complete":
-		submit_label.text = "下一轮"
+		if bool(mine.get("next_ready", false)):
+			var active_humans := 0
+			var votes := 0
+			for raw_player in players:
+				var pl := raw_player as Dictionary
+				if not bool(pl.get("is_bot", false)) and not bool(pl.get("abandoned", false)):
+					active_humans += 1
+					if bool(pl.get("next_ready", false)):
+						votes += 1
+			submit_label.text = "等待其他玩家 %d/%d" % [votes, active_humans]
+		else:
+			submit_label.text = "下一轮"
 		status_label.text = "本轮成功" if bool(view.get("round_succeeded", false)) else "本轮失败"
 	elif status == "finished":
-		submit_label.text = "再来一局" if int(view.get("host_id", 0)) == my_id else "等待房主再来一局"
+		if str(view.get("source", "friend")) == "match":
+			submit_label.text = "快速匹配"
+		else:
+			submit_label.text = "再来一局" if int(view.get("host_id", 0)) == my_id else "等待房主再来一局"
 		status_label.text = "帮派获胜" if str(view.get("winner", "")) == "gang" else "警报方获胜"
 	else:
 		submit_label.text = "提交预测"
@@ -377,7 +392,10 @@ func _update_seat(seat: Control, player: Dictionary, is_me: bool, reveal_hole_ca
 	seat.get_node("NameFrame/NameLabel").text = "You" if is_me else name
 	seat.get_node("AvatarFrame/InitialLabel").text = name.left(1).to_upper()
 	seat.get_node("MoneyFrame/MoneyLabel").text = _format_number(int(player.get("balance", 0)))
-	seat.get_node("StateLabel").text = "已确认" if bool(player.get("confirmed", false)) else "预测排名"
+	var state_text := "已确认" if bool(player.get("confirmed", false)) else "预测排名"
+	if str(_state.get("status", "")) == "round_complete":
+		state_text = "已继续" if bool(player.get("next_ready", false)) else "看牌中"
+	seat.get_node("StateLabel").text = state_text
 	_update_prediction_history(seat, player)
 	_update_cards(seat.get_node("HoleCards"), player.get("hole_cards", []), not is_me and not reveal_hole_cards)
 
@@ -501,7 +519,9 @@ func _on_submit_pressed() -> void:
 		"round_complete":
 			next_round_requested.emit()
 		"finished":
-			if int(_state.get("host_id", 0)) == _my_id:
+			if str(_state.get("source", "friend")) == "match":
+				quick_match_requested.emit()
+			elif int(_state.get("host_id", 0)) == _my_id:
 				rematch_requested.emit()
 		_:
 			if _selected_rank == 0:

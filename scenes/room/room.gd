@@ -155,6 +155,16 @@ func _on_rematch_requested() -> void:
 		_socket.rematch()
 
 
+func _on_quick_match_requested() -> void:
+	_leaving = true
+	if _socket != null:
+		_socket.close()
+	Session.pending_quick_match = true
+	var error := get_tree().change_scene_to_file(LOBBY_SCENE)
+	if error != OK:
+		push_error("无法返回主页：%s" % error_string(error))
+
+
 func _on_socket_error(message: String) -> void:
 	if message == RoomSocket.CONNECT_FAIL_MESSAGE:
 		disconnect_bar.visible = true

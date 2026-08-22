@@ -7,6 +7,7 @@ var h := Helper.new()
 var submitted_rank := 0
 var selected_rank := 0
 var rematch_count := 0
+var quick_match_fired := false
 
 
 func _initialize() -> void:
@@ -164,5 +165,21 @@ func _initialize() -> void:
 	h.check(board.get_node("Background/SubmitButton/Label").text == "等待房主再来一局", "game 非房主等待再来一局")
 	board.get_node("Background/SubmitButton").pressed.emit()
 	h.check(rematch_count == 1, "game 非房主不触发再来一局")
+	board.apply_state({"status": "round_complete", "phase": "red", "host_id": 1, "players": finished_players}, 1)
+	h.check(board.get_node("Background/SubmitButton/Label").text == "下一轮", "game 轮结算页显示下一轮")
+	h.check(board.get_node("Background/LeftPlayer/StateLabel").text == "看牌中", "game 未确认玩家显示看牌中")
+	var voting_players := [
+		{"id": 2, "name": "对手甲", "balance": 2300, "next_ready": true, "hole_cards": []},
+		{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},
+		{"id": 1, "name": "本人", "balance": 1950, "next_ready": true, "hole_cards": []},
+	]
+	board.apply_state({"status": "round_complete", "phase": "red", "host_id": 1, "players": voting_players}, 1)
+	h.check(board.get_node("Background/SubmitButton/Label").text == "等待其他玩家 2/3", "game 已投票显示等待进度")
+	h.check(board.get_node("Background/LeftPlayer/StateLabel").text == "已继续", "game 已确认玩家显示已继续")
+	board.apply_state({"status": "finished", "phase": "red", "winner": "gang", "source": "match", "host_id": 1, "players": finished_players}, 1)
+	h.check(board.get_node("Background/SubmitButton/Label").text == "快速匹配", "game 匹配桌结算页显示快速匹配")
+	board.quick_match_requested.connect(func() -> void: quick_match_fired = true)
+	board.get_node("Background/SubmitButton").pressed.emit()
+	h.check(quick_match_fired, "game 匹配桌提交触发快速匹配")
 	board.queue_free()
 	h.finish(self)

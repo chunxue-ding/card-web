@@ -10,6 +10,7 @@ var user: Dictionary = {}
 var is_new_user := false
 var pending_room_code := ""
 var pending_player_count := 0
+var pending_quick_match := false
 
 var _api: AuthApi
 var _card: CardApi
@@ -75,6 +76,7 @@ func logout() -> void:
 	is_new_user = false
 	pending_room_code = ""
 	pending_player_count = 0
+	pending_quick_match = false
 
 
 func is_logged_in() -> bool:
