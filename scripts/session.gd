@@ -1,5 +1,6 @@
 extends Node
 ## 全局会话单例（autoload Session）：token/user 持有、device_id 持久化、登录/注册/游客/登出。
+## card 接入新增：card() 访问器、pending_room_code/pending_player_count 跨场景传参。
 ## 注意：不要声明 class_name Session，会与 autoload 名冲突。
 
 const DEVICE_CFG_PATH := "user://device.cfg"
@@ -7,14 +8,23 @@ const DEVICE_CFG_PATH := "user://device.cfg"
 var token := ""
 var user: Dictionary = {}
 var is_new_user := false
+var pending_room_code := ""
+var pending_player_count := 0
 
 var _api: AuthApi
+var _card: CardApi
 var _device_id := ""
 
 
 func _ready() -> void:
 	_api = AuthApi.new()
 	add_child(_api)
+	_card = CardApi.new()
+	add_child(_card)
+
+
+func card() -> CardApi:
+	return _card
 
 
 func get_device_id() -> String:
@@ -48,6 +58,8 @@ func logout() -> void:
 	token = ""
 	user = {}
 	is_new_user = false
+	pending_room_code = ""
+	pending_player_count = 0
 
 
 func is_logged_in() -> bool:
