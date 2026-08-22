@@ -33,3 +33,58 @@ static func message_for(code: int) -> String:
 			return "登录已过期，请重新登录"
 		_:
 			return ""
+
+
+# ---- card 服务（:8890）----
+const CARD_ROOMS := "/api/v1/rooms"
+const CARD_ROOM_JOIN := "/api/v1/rooms/%s/join"
+const CARD_ROOM_GET := "/api/v1/rooms/%s"
+const CARD_MATCH := "/api/v1/match"
+const CARD_MATCH_CANCEL := "/api/v1/match/cancel"
+const CARD_WS_PATH := "/api/v1/ws"
+
+
+static func card_message_for(message: String) -> String:
+	match message:
+		"insufficient balance":
+			return "金币不足（需 200 入场费）"
+		"room not found":
+			return "房间不存在"
+		"room is full":
+			return "房间已满"
+		"game already started":
+			return "对局已开始"
+		"cancel matchmaking first", "already in a room":
+			return "请先退出当前房间或取消匹配"
+		"already matched":
+			return "已匹配成功"
+		"at least 3 players required":
+			return "至少需要 3 名玩家"
+		"every player must be ready":
+			return "还有玩家未准备"
+		"account service unavailable":
+			return "账号服务暂不可用"
+		_:
+			return ""
+
+
+static func match_drop_message(reason: String) -> String:
+	match reason:
+		"insufficient balance":
+			return "金币不足"
+		"expired":
+			return "匹配超时，请重试"
+		"joined another room":
+			return "已加入其他房间"
+		_:
+			return "匹配失败，请重试"
+
+
+static func ws_error_message(error: String) -> String:
+	match error:
+		"unauthorized":
+			return "登录已过期，请重新登录"
+		"room not found or not joined":
+			return "房间不存在或未加入"
+		_:
+			return error
