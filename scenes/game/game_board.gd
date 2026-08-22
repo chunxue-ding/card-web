@@ -348,13 +348,15 @@ func _update_seat(seat: Control, player: Dictionary, is_me: bool) -> void:
 func _update_prediction_history(seat: Control, player: Dictionary) -> void:
 	var player_id := int(player.get("id", 0))
 	var values: Array = [0, 0, 0, 0]
+	var from_server := false
 	for key in ["predictions", "prediction_history", "chips"]:
 		var raw: Variant = player.get(key, null)
 		if raw is Array:
 			for index in mini(4, raw.size()):
 				values[index] = int(raw[index])
+			from_server = true
 			break
-	if _player_prediction_cache.has(player_id):
+	if not from_server and _player_prediction_cache.has(player_id):
 		var cached := _player_prediction_cache[player_id] as Array
 		for index in 4:
 			if int(values[index]) <= 0:

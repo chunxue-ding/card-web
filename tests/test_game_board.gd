@@ -53,6 +53,27 @@ func _initialize() -> void:
 	var history := board.get_node("Background/LeftPlayer/PredictionHistory") as TextureRect
 	var third_prediction := history.get_node("Round3Icon") as TextureRect
 	h.check(history.texture is AtlasTexture and third_prediction.visible and third_prediction.texture is AtlasTexture, "game 玩家四次预测使用按钮图片记录")
+	board.apply_state({
+		"status": "playing",
+		"phase": "orange",
+		"players": [
+			{"id": 2, "name": "对手甲", "balance": 2300, "chips": [3, 0, 0, 0], "hole_cards": []},
+			{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},
+			{"id": 1, "name": "本人", "balance": 1950, "hole_cards": []},
+		],
+	}, 1)
+	h.check(history.get_node("Round1Icon").visible, "game 服务端预测历史按阶段显示")
+	h.check(not history.get_node("Round3Icon").visible, "game 服务端历史不被本地缓存补齐")
+	board.apply_state({
+		"status": "playing",
+		"phase": "white",
+		"players": [
+			{"id": 2, "name": "对手甲", "balance": 2300, "chips": [0, 0, 0, 0], "hole_cards": []},
+			{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},
+			{"id": 1, "name": "本人", "balance": 1950, "hole_cards": []},
+		],
+	}, 1)
+	h.check(not history.get_node("Round1Icon").visible, "game 新一轮预测历史清空")
 	var submit := board.get_node("Background/SubmitButton") as TextureButton
 	h.check(is_equal_approx(submit.anchor_left, 0.75) and is_equal_approx(submit.anchor_bottom, 0.96), "game 提交预测按钮放大并定位右下角")
 	var prediction_art := board.get_node("Background/PredictionPanel/Artwork") as TextureRect
