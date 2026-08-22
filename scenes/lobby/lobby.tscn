@@ -1,0 +1,70 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/login/login_bg.png" id="1_bg"]
+[ext_resource type="Theme" path="res://themes/main_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="3_script"]
+
+[node name="Lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("3_script")
+
+[node name="Background" type="TextureRect" parent="."]
+texture = ExtResource("1_bg")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Center" type="CenterContainer" parent="Background"]
+layout_mode = 1
+anchors_preset = 8
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Background/Center"]
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="Background/Center/VBox"]
+theme_override_colors/font_color = Color(0.831373, 0.686275, 0.415686, 1)
+theme_override_font_sizes/font_size = 48
+text = "大 厅"
+horizontal_alignment = 1
+
+[node name="NameLabel" type="Label" parent="Background/Center/VBox"]
+theme_override_font_sizes/font_size = 32
+text = "昵称："
+horizontal_alignment = 1
+
+[node name="EmailLabel" type="Label" parent="Background/Center/VBox"]
+theme_override_font_sizes/font_size = 28
+text = "账号："
+horizontal_alignment = 1
+
+[node name="BalanceLabel" type="Label" parent="Background/Center/VBox"]
+theme_override_font_sizes/font_size = 28
+text = "余额："
+horizontal_alignment = 1
+
+[node name="Gap" type="Control" parent="Background/Center/VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LogoutButton" type="Button" parent="Background/Center/VBox"]
+custom_minimum_size = Vector2(440, 84)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = "SecondaryButton"
+text = "退出登录"
+
+[connection signal="pressed" from="Background/Center/VBox/LogoutButton" to="." method="_on_logout_pressed"]
