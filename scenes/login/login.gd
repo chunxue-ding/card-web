@@ -26,6 +26,8 @@ func _on_login_pressed() -> void:
 	_clear_error()
 	_set_loading(login_button, true)
 	var err: ApiError = await Session.login(email, password)
+	if not is_inside_tree():
+		return
 	_set_loading(login_button, false)
 	if err != null:
 		_show_error(err.message)
@@ -37,6 +39,8 @@ func _on_guest_pressed() -> void:
 	_clear_error()
 	_set_loading(guest_button, true)
 	var err: ApiError = await Session.guest_login()
+	if not is_inside_tree():
+		return
 	_set_loading(guest_button, false)
 	if err != null:
 		_show_error(err.message)

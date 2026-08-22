@@ -11,11 +11,9 @@ var h := Helper.new()
 func _initialize() -> void:
 	# 预加载 Session 脚本以避免 --script 模式下 autoload 未注册的编译错误
 	# 实际登录/游客流程由 autoload Session 驱动，此处仅验证场景接线
-	var _session := _SessionScript.new()
-	_session.queue_free()
 	_check_login()
 	_check_register()
-	_check_lobby()
+	await _check_lobby()
 	h.finish(self)
 
 
@@ -53,6 +51,16 @@ func _check_lobby() -> void:
 		return
 	var page := scene.instantiate() as Control
 	root.add_child(page)
-	h.check(page.get_node_or_null("Background/Center/VBox/LogoutButton") != null, "lobby LogoutButton 存在")
+	await process_frame
+	h.check(page.get_node_or_null("Background/Header/LogoutButton") != null, "lobby LogoutButton 存在")
+	h.check(page.get_node_or_null("Background/Actions/QuickMatchButton") != null, "lobby 快速匹配按钮存在")
+	h.check(page.get_node_or_null("Background/Actions/FriendPlayButton") != null, "lobby 好友同玩按钮存在")
+	h.check(page.get_node_or_null("Background/CountCenter/PlayerCountPanel/Count4Button") != null, "lobby 人数选择存在")
 	h.check(page.has_method("_on_logout_pressed"), "lobby 登出回调存在")
+	h.check(page.has_method("_on_quick_match_pressed"), "lobby 快速匹配回调存在")
+	h.check(page.has_method("_on_friend_play_pressed"), "lobby 好友同玩回调存在")
+	page.get_node("Background/CountCenter/PlayerCountPanel/Count6Button").pressed.emit()
+	page.get_node("Background/Actions/QuickMatchButton").pressed.emit()
+	h.check(page.player_count == 6, "lobby 人数选择会更新")
+	h.check("6 人" in page.get_node("Background/StatusLabel").text, "lobby 匹配使用已选人数")
 	page.queue_free()

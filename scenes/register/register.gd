@@ -28,6 +28,8 @@ func _on_register_pressed() -> void:
 	_clear_error()
 	_set_loading(true)
 	var err: ApiError = await Session.register(email, password)
+	if not is_inside_tree():
+		return
 	_set_loading(false)
 	if err != null:
 		_show_error(err.message)
