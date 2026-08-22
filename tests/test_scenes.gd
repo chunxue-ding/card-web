@@ -66,6 +66,9 @@ func _check_lobby() -> void:
 	h.check(page.has_method("_set_match_mode"), "lobby 匹配态切换存在")
 	page.queue_free()
 	await process_frame
+	# 等待快速匹配长轮询请求结束（真实后端在跑时 /match 会占用共享 ApiClient，同帧发
+	# 起其它请求会被单飞守卫拒绝），避免 friend_room 加入用例与环境相关的竞态。
+	await create_timer(1.0).timeout
 
 
 func _check_friend_room() -> void:
@@ -89,8 +92,9 @@ func _check_friend_room() -> void:
 	page.get_node("Background/CodeCenter/CodePanel/RoomCodeInput").text = "ABCD12"
 	page.get_node("Background/ActionCenter/Actions/JoinRoomButton").pressed.emit()
 	h.check("ABCD12" in page.get_node("Background/StatusLabel").text, "friend_room 加入会读取编号")
-	for _i in range(2):
-		await process_frame
+	# 等待上一条 join 请求落地（真实后端会快速返回 404 并释放单飞锁），避免
+	# 下一个用例仍在忙态而被跳过。
+	await create_timer(1.0).timeout
 	page.get_node("Background/CodeCenter/CodePanel/RoomCodeInput").text = "abc12"
 	page._on_join_room_pressed()
 	h.check("房间编号为 6 位字母或数字" in page.get_node("Background/StatusLabel").text, "friend_room 非法编号被拒绝")
