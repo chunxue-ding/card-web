@@ -72,6 +72,18 @@ func start_game() -> void:
 	_send_json({"type": "start_game"})
 
 
+func claim_chip(rank: int) -> void:
+	_send_json({"type": "claim_chip", "rank": rank})
+
+
+func confirm_phase() -> void:
+	_send_json({"type": "confirm_phase"})
+
+
+func next_round() -> void:
+	_send_json({"type": "next_round"})
+
+
 func close() -> void:
 	_peer.close()
 

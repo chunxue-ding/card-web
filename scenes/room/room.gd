@@ -13,6 +13,7 @@ const LOBBY_SCENE := "res://scenes/lobby/lobby.tscn"
 @onready var status_label: Label = $Background/StatusLabel
 @onready var disconnect_bar: Control = $Background/DisconnectBar
 @onready var overlay: Control = $Background/GameStartedOverlay
+@onready var game_board: GameBoard = $Background/GameStartedOverlay/GameBoard
 
 var _socket: RoomSocket
 var _view: Dictionary = {}
@@ -55,10 +56,10 @@ func _on_state(view: Dictionary) -> void:
 
 
 func _on_events(events: Array, _version: int) -> void:
+	game_board.show_events(events)
 	for event in events:
 		if str(event.get("event", "")) == "game_started":
 			overlay.visible = true
-			return
 
 
 func _render() -> void:
@@ -89,6 +90,7 @@ func _render() -> void:
 	var status := str(_view.get("status", ""))
 	if status != "" and status != "lobby":
 		overlay.visible = true
+		game_board.apply_state(_view, _my_id)
 
 
 func _is_ready(player_id: int) -> bool:
@@ -117,6 +119,18 @@ func _on_start_pressed() -> void:
 	start_button.disabled = true
 	status_label.text = "正在开局…"
 	_socket.start_game()
+
+
+func _on_prediction_submitted(rank: int) -> void:
+	if _socket == null:
+		return
+	_socket.claim_chip(rank)
+	_socket.confirm_phase()
+
+
+func _on_next_round_requested() -> void:
+	if _socket != null:
+		_socket.next_round()
 
 
 func _on_socket_error(message: String) -> void:

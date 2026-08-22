@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/room/friend_room_bg.png" id="1_bg"]
 [ext_resource type="Theme" path="res://themes/main_theme.tres" id="2_theme"]
 [ext_resource type="Script" path="res://scenes/room/room.gd" id="3_script"]
+[ext_resource type="PackedScene" path="res://scenes/game/game_board.tscn" id="4_game"]
 
 [node name="Room" type="Control"]
 layout_mode = 3
@@ -142,7 +143,7 @@ layout_mode = 2
 theme_type_variation = "SecondaryButton"
 text = "重新连接"
 
-[node name="GameStartedOverlay" type="ColorRect" parent="Background"]
+[node name="GameStartedOverlay" type="Control" parent="Background"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -150,29 +151,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.55)
 
-[node name="CenterBox" type="CenterContainer" parent="Background/GameStartedOverlay"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBox" type="VBoxContainer" parent="Background/GameStartedOverlay/CenterBox"]
-theme_override_constants/separation = 16
-
-[node name="Title" type="Label" parent="Background/GameStartedOverlay/CenterBox/VBox"]
-theme_override_colors/font_color = Color(0.831373, 0.686275, 0.415686, 1)
-theme_override_font_sizes/font_size = 48
-text = "对局已开始"
-horizontal_alignment = 1
-
-[node name="Note" type="Label" parent="Background/GameStartedOverlay/CenterBox/VBox"]
-theme_override_font_sizes/font_size = 26
-text = "对局界面下一期开放，请保持连接"
-horizontal_alignment = 1
+[node name="GameBoard" parent="Background/GameStartedOverlay" instance=ExtResource("4_game")]
 
 [connection signal="pressed" from="Background/Header/BackHomeButton" to="." method="_on_back_home_pressed"]
 [connection signal="pressed" from="Background/Actions/ReadyButton" to="." method="_on_ready_pressed"]
@@ -180,3 +160,6 @@ horizontal_alignment = 1
 [connection signal="pressed" from="Background/Actions/BotRow/RemoveBotButton" to="." method="_on_remove_bot_pressed"]
 [connection signal="pressed" from="Background/Actions/StartGameButton" to="." method="_on_start_pressed"]
 [connection signal="pressed" from="Background/DisconnectBar/ReconnectButton" to="." method="_on_reconnect_pressed"]
+[connection signal="exit_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_back_home_pressed"]
+[connection signal="next_round_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_next_round_requested"]
+[connection signal="prediction_submitted" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_prediction_submitted"]
