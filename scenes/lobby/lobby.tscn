@@ -1,11 +1,16 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Texture2D" path="res://homepage/简化主页背景底图.png" id="1_bg"]
-[ext_resource type="Texture2D" path="res://assets/homepage/quick_match_button.png" id="2_quick"]
-[ext_resource type="Texture2D" path="res://assets/homepage/friend_play_button.png" id="3_friend"]
-[ext_resource type="Texture2D" path="res://assets/homepage/player_count_panel.png" id="4_count"]
-[ext_resource type="Theme" path="res://themes/main_theme.tres" id="5_theme"]
-[ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="6_script"]
+[ext_resource type="Texture2D" path="res://assets/homepage/quick_button_frame.png" id="2_quick_frame"]
+[ext_resource type="Texture2D" path="res://assets/homepage/quick_match_icon.png" id="3_quick_icon"]
+[ext_resource type="Texture2D" path="res://assets/homepage/friend_button_frame.png" id="4_friend_frame"]
+[ext_resource type="Texture2D" path="res://assets/homepage/friend_play_icon.png" id="5_friend_icon"]
+[ext_resource type="Texture2D" path="res://assets/homepage/player_count_frame.png" id="6_count_frame"]
+[ext_resource type="Texture2D" path="res://assets/homepage/player_count_slot.png" id="7_count_slot"]
+[ext_resource type="Texture2D" path="res://assets/homepage/player_avatar_frame.png" id="8_avatar"]
+[ext_resource type="Texture2D" path="res://assets/homepage/coin_icon.png" id="10_coin"]
+[ext_resource type="Theme" path="res://themes/main_theme.tres" id="11_theme"]
+[ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="12_script"]
 
 [sub_resource type="StyleBoxFlat" id="HeaderButtonNormal"]
 bg_color = Color(0.035, 0.025, 0.025, 0.82)
@@ -61,6 +66,10 @@ shadow_size = 10
 
 [sub_resource type="ButtonGroup" id="PlayerCountGroup"]
 
+[sub_resource type="SystemFont" id="DisplayFont"]
+font_names = PackedStringArray("Songti SC", "STSong", "Noto Serif CJK SC", "serif")
+font_weight = 400
+
 [node name="Lobby" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -68,8 +77,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("5_theme")
-script = ExtResource("6_script")
+theme = ExtResource("11_theme")
+script = ExtResource("12_script")
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
@@ -82,37 +91,85 @@ texture = ExtResource("1_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Header" type="HBoxContainer" parent="Background"]
+[node name="Header" type="Control" parent="Background"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.66
-anchor_top = 0.035
-anchor_right = 0.965
-anchor_bottom = 0.115
+anchor_left = 0.661
+anchor_top = 0.025
+anchor_right = 0.936
+anchor_bottom = 0.125
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 22
-alignment = 2
+
+[node name="AvatarFrame" type="TextureRect" parent="Background/Header"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.08
+anchor_right = 0.17
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("8_avatar")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="Background/Header"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.19
+anchor_top = 0.0
+anchor_right = 0.47
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.61, 1)
-theme_override_font_sizes/font_size = 25
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 26
 text = "玩家"
 vertical_alignment = 1
 
+[node name="CoinIcon" type="TextureRect" parent="Background/Header"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.49
+anchor_top = 0.31
+anchor_right = 0.56
+anchor_bottom = 0.69
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("10_coin")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="BalanceLabel" type="Label" parent="Background/Header"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57
+anchor_top = 0.0
+anchor_right = 0.75
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 25
-text = "◉ 0"
+text = "0"
 vertical_alignment = 1
 
 [node name="LogoutButton" type="Button" parent="Background/Header"]
-custom_minimum_size = Vector2(126, 48)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_font_sizes/font_size = 22
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.77
+anchor_top = 0.27
+anchor_right = 1.0
+anchor_bottom = 0.73
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("HeaderButtonNormal")
 theme_override_styles/hover = SubResource("HeaderButtonHover")
 theme_override_styles/pressed = SubResource("HeaderButtonHover")
@@ -131,18 +188,34 @@ theme_override_constants/separation = 24
 alignment = 1
 
 [node name="QuickMatchButton" type="TextureButton" parent="Background/Actions"]
-custom_minimum_size = Vector2(500, 156)
+custom_minimum_size = Vector2(500, 140)
 layout_mode = 2
-texture_normal = ExtResource("2_quick")
-texture_hover = ExtResource("2_quick")
-texture_pressed = ExtResource("2_quick")
+size_flags_vertical = 4
+texture_normal = ExtResource("2_quick_frame")
+texture_hover = ExtResource("2_quick_frame")
+texture_pressed = ExtResource("2_quick_frame")
 ignore_texture_size = true
-stretch_mode = 0
+stretch_mode = 5
+mouse_default_cursor_shape = 2
+
+[node name="Icon" type="TextureRect" parent="Background/Actions/QuickMatchButton"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.09
+anchor_top = 0.08
+anchor_right = 0.31
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_quick_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Label" type="Label" parent="Background/Actions/QuickMatchButton"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.35
+anchor_left = 0.32
 anchor_top = 0.08
 anchor_right = 0.96
 anchor_bottom = 0.94
@@ -150,24 +223,41 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
-theme_override_font_sizes/font_size = 42
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 40
 text = "快速匹配"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="FriendPlayButton" type="TextureButton" parent="Background/Actions"]
-custom_minimum_size = Vector2(500, 156)
+custom_minimum_size = Vector2(500, 140)
 layout_mode = 2
-texture_normal = ExtResource("3_friend")
-texture_hover = ExtResource("3_friend")
-texture_pressed = ExtResource("3_friend")
+size_flags_vertical = 4
+texture_normal = ExtResource("4_friend_frame")
+texture_hover = ExtResource("4_friend_frame")
+texture_pressed = ExtResource("4_friend_frame")
 ignore_texture_size = true
-stretch_mode = 0
+stretch_mode = 5
+mouse_default_cursor_shape = 2
+
+[node name="Icon" type="TextureRect" parent="Background/Actions/FriendPlayButton"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.09
+anchor_top = 0.08
+anchor_right = 0.31
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_friend_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Label" type="Label" parent="Background/Actions/FriendPlayButton"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.35
+anchor_left = 0.32
 anchor_top = 0.08
 anchor_right = 0.96
 anchor_bottom = 0.94
@@ -175,7 +265,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
-theme_override_font_sizes/font_size = 42
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 40
 text = "好友同玩"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -202,9 +293,82 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("4_count")
+texture = ExtResource("6_count_frame")
 expand_mode = 1
 stretch_mode = 0
+
+[node name="Title" type="Label" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.25
+anchor_top = 0.03
+anchor_right = 0.75
+anchor_bottom = 0.3
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 23
+text = "选择对局人数"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot3" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.11
+anchor_top = 0.34
+anchor_right = 0.23
+anchor_bottom = 0.93
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_count_slot")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Slot4" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.34
+anchor_right = 0.45
+anchor_bottom = 0.93
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_count_slot")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Slot5" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.55
+anchor_top = 0.34
+anchor_right = 0.67
+anchor_bottom = 0.93
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_count_slot")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Slot6" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.77
+anchor_top = 0.34
+anchor_right = 0.89
+anchor_bottom = 0.93
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_count_slot")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Count3Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
 layout_mode = 1
@@ -218,6 +382,7 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
 theme_override_styles/hover = SubResource("CountHover")
@@ -239,6 +404,7 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
 theme_override_styles/hover = SubResource("CountHover")
@@ -261,6 +427,7 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
 theme_override_styles/hover = SubResource("CountHover")
@@ -282,6 +449,7 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
 theme_override_styles/hover = SubResource("CountHover")
@@ -302,6 +470,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.83, 0.69, 0.42, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 vertical_alignment = 1
