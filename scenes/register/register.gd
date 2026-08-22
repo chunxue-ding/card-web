@@ -13,6 +13,10 @@ const REGISTER_LOADING_TEXT := "注册中…"
 @onready var error_label: Label = $Background/Center/VBox/ErrorLabel
 
 
+func _ready() -> void:
+	Music.play_ambient()
+
+
 func _on_register_pressed() -> void:
 	var email := email_input.text.strip_edges()
 	var password := password_input.text

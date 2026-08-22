@@ -14,6 +14,10 @@ const GUEST_NORMAL_TEXT := "游客一键登录"
 @onready var error_label: Label = $Background/Center/VBox/ErrorLabel
 
 
+func _ready() -> void:
+	Music.play_ambient()
+
+
 func _on_login_pressed() -> void:
 	var email := email_input.text.strip_edges()
 	var password := password_input.text

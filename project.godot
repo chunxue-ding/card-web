@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.7")
 [autoload]
 
 Session="*res://scripts/session.gd"
+Music="*res://scripts/music.gd"
 
 [display]
 
