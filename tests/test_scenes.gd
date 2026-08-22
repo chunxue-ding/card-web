@@ -65,6 +65,7 @@ func _check_lobby() -> void:
 	h.check("快速匹配中" in page.get_node("Background/StatusLabel").text, "lobby 快速匹配进入匹配态")
 	h.check(page.has_method("_set_match_mode"), "lobby 匹配态切换存在")
 	page.queue_free()
+	await process_frame
 
 
 func _check_friend_room() -> void:
@@ -88,6 +89,12 @@ func _check_friend_room() -> void:
 	page.get_node("Background/CodeCenter/CodePanel/RoomCodeInput").text = "ABCD12"
 	page.get_node("Background/ActionCenter/Actions/JoinRoomButton").pressed.emit()
 	h.check("ABCD12" in page.get_node("Background/StatusLabel").text, "friend_room 加入会读取编号")
+	for _i in range(2):
+		await process_frame
+	page.get_node("Background/CodeCenter/CodePanel/RoomCodeInput").text = "abc12"
+	page._on_join_room_pressed()
+	h.check("房间编号为 6 位字母或数字" in page.get_node("Background/StatusLabel").text, "friend_room 非法编号被拒绝")
+	h.check(page._busy == false, "friend_room 校验失败不进入忙态")
 	page.queue_free()
 
 
