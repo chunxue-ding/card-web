@@ -24,7 +24,10 @@ func guest_login(device_id: String) -> Variant:
 
 
 func logout(token: String) -> Variant:
-	return await _client.post_json(Endpoints.LOGOUT, {}, token)
+	var res: Dictionary = await _client.post_json(Endpoints.LOGOUT, {}, token)
+	if not res["ok"]:
+		return res["error"]
+	return res["data"]
 
 
 func _auth(path: String, body: Dictionary) -> Variant:
