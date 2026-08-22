@@ -118,4 +118,6 @@ func _check_room() -> void:
 	h.check(page.has_method("_on_ready_pressed"), "room 准备回调存在")
 	h.check(page.has_method("_on_start_pressed"), "room 开始回调存在")
 	h.check(page.has_method("_on_reconnect_pressed"), "room 重连回调存在")
+	page._on_state({"status": "playing", "players": []})
+	h.check(page.get_node("Background/GameStartedOverlay").visible, "room 非 lobby 态显示开局 overlay")
 	page.queue_free()

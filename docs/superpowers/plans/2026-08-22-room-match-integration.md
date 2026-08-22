@@ -1616,7 +1616,7 @@ Expected: `== 7 passed, 0 failed ==`（注册/建房/初始 state/加机器人/�
 - [ ] **Step 4: 全量回归**
 
 Run: 依次运行 `res://tests/test_validators_endpoints.gd`、`test_api_client.gd`、`test_card_contract.gd`、`test_session_device.gd`、`test_card_api.gd`、`test_room_socket.gd`、`test_scenes.gd`、`live_smoke.gd`
-Expected: 21 / 8 / 18 / 2 / 2 / 9 / 38 / 8 全部 0 failed。（live_smoke.gd 若遇 guest 限流 100006，等 10 分钟重跑一次。）
+Expected: 21 / 8 / 20 / 2 / 2 / 9 / 38 / 8 全部 0 failed。（live_smoke.gd 若遇 guest 限流 100006，等 10 分钟重跑一次。）
 
 - [ ] **Step 5: 手动走查（人工，向用户汇报用）**
 

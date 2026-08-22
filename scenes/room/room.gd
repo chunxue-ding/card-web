@@ -18,6 +18,7 @@ var _socket: RoomSocket
 var _view: Dictionary = {}
 var _my_id := 0
 var _room_code := ""
+var _leaving := false
 
 
 func _ready() -> void:
@@ -85,6 +86,9 @@ func _render() -> void:
 	remove_bot_button.visible = is_host and in_lobby
 	start_button.visible = is_host and in_lobby
 	start_button.disabled = players.size() < 3
+	var status := str(_view.get("status", ""))
+	if status != "" and status != "lobby":
+		overlay.visible = true
 
 
 func _is_ready(player_id: int) -> bool:
@@ -116,10 +120,15 @@ func _on_start_pressed() -> void:
 
 
 func _on_socket_error(message: String) -> void:
+	if message == RoomSocket.CONNECT_FAIL_MESSAGE:
+		disconnect_bar.visible = true
 	status_label.text = message
+	_render()
 
 
 func _on_closed() -> void:
+	if _leaving:
+		return
 	disconnect_bar.visible = true
 	status_label.text = "房间连接已断开"
 
@@ -131,6 +140,7 @@ func _on_reconnect_pressed() -> void:
 
 
 func _on_back_home_pressed() -> void:
+	_leaving = true
 	if _socket != null:
 		_socket.close()
 	var error := get_tree().change_scene_to_file(LOBBY_SCENE)

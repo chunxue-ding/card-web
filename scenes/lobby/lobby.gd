@@ -119,6 +119,8 @@ func _on_friend_play_pressed() -> void:
 
 func _on_logout_pressed() -> void:
 	logout_button.disabled = true
+	if _matching:
+		Session.card().match_cancel(Session.token)  # fire-and-forget：不 await，尽力清服务端队列
 	await Session.logout()
 	var error := get_tree().change_scene_to_file(LOGIN_SCENE)
 	if error != OK:

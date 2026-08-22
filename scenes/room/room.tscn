@@ -89,6 +89,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_type_variation = "SecondaryButton"
 text = "+ 机器人"
+visible = false
 
 [node name="RemoveBotButton" type="Button" parent="Background/Actions/BotRow"]
 custom_minimum_size = Vector2(154, 64)
@@ -96,12 +97,14 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_type_variation = "SecondaryButton"
 text = "- 机器人"
+visible = false
 
 [node name="StartGameButton" type="Button" parent="Background/Actions"]
 custom_minimum_size = Vector2(320, 76)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "开始游戏"
+visible = false
 
 [node name="StatusLabel" type="Label" parent="Background"]
 layout_mode = 1

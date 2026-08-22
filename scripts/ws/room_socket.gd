@@ -9,6 +9,8 @@ signal events_received(events: Array, version: int)
 signal socket_error(message: String)
 signal closed
 
+const CONNECT_FAIL_MESSAGE := "无法连接房间服务"
+
 var _peer := WebSocketPeer.new()
 var _token := ""
 var _room_code := ""
@@ -23,9 +25,11 @@ func connect_room(token: String, room_code: String) -> void:
 	_auth_pending = false
 	_authed = false
 	_ever_open = false
+	if _peer.get_ready_state() != WebSocketPeer.STATE_CLOSED:
+		_peer.close()
 	_peer = WebSocketPeer.new()
 	if _peer.connect_to_url(_ws_base_url() + Endpoints.CARD_WS_PATH) != OK:
-		socket_error.emit("无法连接房间服务")
+		socket_error.emit(CONNECT_FAIL_MESSAGE)
 		return
 	_auth_pending = true
 
@@ -49,7 +53,7 @@ func poll() -> void:
 			closed.emit()
 		elif _auth_pending:
 			_auth_pending = false
-			socket_error.emit("无法连接房间服务")
+			socket_error.emit(CONNECT_FAIL_MESSAGE)
 
 
 func set_ready(ready: bool) -> void:
