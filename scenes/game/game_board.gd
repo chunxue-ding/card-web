@@ -4,7 +4,9 @@ extends Control
 
 signal exit_requested
 signal prediction_submitted(rank: int)
+signal rank_selected(rank: int)
 signal next_round_requested
+signal rematch_requested
 
 const SUIT_TO_ASSET_ROW := {0: 3, 1: 2, 2: 1, 3: 0}
 const CARD_BACK := "res://cards/back.png"
@@ -37,6 +39,8 @@ const RANK_BUTTON_ASSETS := [
 @onready var status_label: Label = $Background/StatusLabel
 
 var _selected_rank := 0
+var _my_id := 0
+var _locked_ranks: Array[int] = []
 var _state: Dictionary = {}
 var _round_results: Array[bool] = []
 var _win_mark_texture: Texture2D
@@ -85,7 +89,7 @@ func _configure_vault() -> void:
 	money_frame.texture = _money_frame_texture
 	money_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	money_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	money_frame.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	money_frame.stretch_mode = TextureRect.STRETCH_SCALE
 	_set_rect(money_frame, 0.265, 0.62, 0.669, 0.80)
 	vault.add_child(money_frame)
 
@@ -98,7 +102,7 @@ func _configure_vault() -> void:
 	coin.texture = _coin_icon_texture
 	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	coin.stretch_mode = TextureRect.STRETCH_SCALE
 	_set_rect(coin, 0.075, 0.20, 0.285, 0.80)
 	money_frame.add_child(coin)
 
@@ -111,15 +115,27 @@ func _configure_prediction_art() -> void:
 	artwork.texture = _prediction_frame_texture
 	artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	artwork.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	artwork.stretch_mode = TextureRect.STRETCH_SCALE
 	artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	prediction_panel.add_child(artwork)
 	prediction_panel.move_child(artwork, 0)
-	rank_buttons.add_theme_constant_override("separation", 27)
-	var horizontal_offsets := [2.0, 1.0, -1.0]
+	var button_layer := Control.new()
+	button_layer.name = "ButtonLayer"
+	button_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	prediction_panel.add_child(button_layer)
+	rank_buttons.visible = false
+	var button_rects := [
+		Rect2(0.17368, 0.30591, 0.17836, 0.54009),
+		Rect2(0.41416, 0.30802, 0.17635, 0.53376),
+		Rect2(0.64930, 0.30591, 0.17702, 0.54009),
+	]
 	for index in prediction_buttons.size():
 		var button := prediction_buttons[index]
-		button.custom_minimum_size = Vector2(84, 84)
+		button.reparent(button_layer)
+		button.custom_minimum_size = Vector2.ZERO
+		var button_rect := button_rects[index] as Rect2
+		_set_rect(button, button_rect.position.x, button_rect.position.y, button_rect.end.x, button_rect.end.y)
 		button.texture_normal = null
 		button.texture_hover = null
 		button.texture_pressed = null
@@ -129,12 +145,8 @@ func _configure_prediction_art() -> void:
 		button_art.texture = _rank_button_textures[index]
 		button_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		button_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		button_art.stretch_mode = TextureRect.STRETCH_SCALE
 		button_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		button_art.offset_left = horizontal_offsets[index]
-		button_art.offset_right = horizontal_offsets[index]
-		button_art.offset_top = 11.0
-		button_art.offset_bottom = 11.0
 		button.add_child(button_art)
 
 
@@ -216,7 +228,7 @@ func _configure_player_info(seat: Control, right_side: bool, bottom := false) ->
 	name_frame.texture = null
 	money.texture = null
 	_set_rect(avatar, frame_left, top, frame_left + 0.27, bottom_edge)
-	_set_rect(name_frame, frame_left + 0.267, top + 0.075, frame_right, top + 0.255)
+	_set_rect(name_frame, frame_left + 0.235, top + 0.075, frame_right - 0.035, top + 0.255)
 	_set_rect(money, frame_left + 0.27, top + 0.28, frame_left + 0.52, bottom_edge)
 	var coin_center_x := frame_left + 0.288
 	var coin_center_y := top + 0.369
@@ -237,7 +249,7 @@ func _configure_prediction_history(seat: Control, right_side: bool, bottom: bool
 		history.texture = _player_prediction_history_texture
 		history.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		history.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		history.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		history.stretch_mode = TextureRect.STRETCH_SCALE
 		seat.add_child(history)
 		var centers := [0.1924, 0.3983, 0.6039, 0.8076]
 		for index in 4:
@@ -255,7 +267,7 @@ func _configure_prediction_history(seat: Control, right_side: bool, bottom: bool
 			result_icon.name = "Round%dIcon" % (index + 1)
 			result_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			result_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			result_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			result_icon.stretch_mode = TextureRect.STRETCH_SCALE
 			_set_rect(result_icon, centers[index] - 0.072, 0.428, centers[index] + 0.072, 0.816)
 			history.add_child(result_icon)
 	if bottom:
@@ -289,6 +301,8 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 	phase_label.text = {"white": "白色阶段", "yellow": "黄色阶段", "orange": "橙色阶段", "red": "红色阶段"}.get(phase, "警报进度")
 	_update_progress(int(view.get("vaults", 0)), int(view.get("alarms", 0)), phase)
 	_update_cards(community_cards, view.get("community_cards", []), false)
+	var status := str(view.get("status", "playing"))
+	var reveal_hole_cards := status == "round_complete" or status == "finished"
 
 	var players: Array = view.get("players", [])
 	var mine: Dictionary = {}
@@ -299,16 +313,26 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 			mine = player
 		else:
 			others.append(player)
-	_update_seat($Background/LeftPlayer, others[0] if others.size() > 0 else {}, false)
-	_update_seat($Background/RightPlayer, others[1] if others.size() > 1 else {}, false)
-	_update_seat($Background/BottomPlayer, mine, true)
+	_update_seat($Background/LeftPlayer, others[0] if others.size() > 0 else {}, false, reveal_hole_cards)
+	_update_seat($Background/RightPlayer, others[1] if others.size() > 1 else {}, false, reveal_hole_cards)
+	_update_seat($Background/BottomPlayer, mine, true, reveal_hole_cards)
 
-	var status := str(view.get("status", "playing"))
+	_my_id = my_id
+	_locked_ranks.clear()
+	for raw_player in players:
+		var player := raw_player as Dictionary
+		if int(player.get("id", 0)) != my_id and bool(player.get("confirmed", false)):
+			var locked_rank := int(player.get("chip", 0))
+			if locked_rank > 0:
+				_locked_ranks.append(locked_rank)
+	_selected_rank = int(mine.get("chip", 0))
+	_refresh_prediction_buttons()
+
 	if status == "round_complete":
 		submit_label.text = "下一轮"
 		status_label.text = "本轮成功" if bool(view.get("round_succeeded", false)) else "本轮失败"
 	elif status == "finished":
-		submit_label.text = "返回主页"
+		submit_label.text = "再来一局" if int(view.get("host_id", 0)) == my_id else "等待房主再来一局"
 		status_label.text = "帮派获胜" if str(view.get("winner", "")) == "gang" else "警报方获胜"
 	else:
 		submit_label.text = "提交预测"
@@ -319,6 +343,8 @@ func show_events(events: Array) -> void:
 	for event in events:
 		var event_data := event as Dictionary
 		match str(event_data.get("event", "")):
+			"chip_claimed":
+				_cache_claimed_chip(int(event_data.get("player_id", 0)), int(event_data.get("rank", 0)))
 			"phase_changed":
 				status_label.text = "进入下一阶段"
 			"round_settled":
@@ -331,7 +357,18 @@ func show_events(events: Array) -> void:
 				status_label.text = "整局结算完成"
 
 
-func _update_seat(seat: Control, player: Dictionary, is_me: bool) -> void:
+func _cache_claimed_chip(player_id: int, rank: int) -> void:
+	if player_id == 0 or rank < 1 or rank > 3:
+		return
+	var values: Array = [0, 0, 0, 0]
+	if _player_prediction_cache.has(player_id):
+		values = (_player_prediction_cache[player_id] as Array).duplicate()
+	var phase_index := int({"white": 0, "yellow": 1, "orange": 2, "red": 3}.get(_current_phase, 0))
+	values[phase_index] = rank
+	_player_prediction_cache[player_id] = values
+
+
+func _update_seat(seat: Control, player: Dictionary, is_me: bool, reveal_hole_cards: bool) -> void:
 	var empty := player.is_empty()
 	seat.visible = not empty
 	if empty:
@@ -342,7 +379,7 @@ func _update_seat(seat: Control, player: Dictionary, is_me: bool) -> void:
 	seat.get_node("MoneyFrame/MoneyLabel").text = _format_number(int(player.get("balance", 0)))
 	seat.get_node("StateLabel").text = "已确认" if bool(player.get("confirmed", false)) else "预测排名"
 	_update_prediction_history(seat, player)
-	_update_cards(seat.get_node("HoleCards"), player.get("hole_cards", []), not is_me)
+	_update_cards(seat.get_node("HoleCards"), player.get("hole_cards", []), not is_me and not reveal_hole_cards)
 
 
 func _update_prediction_history(seat: Control, player: Dictionary) -> void:
@@ -418,7 +455,7 @@ func _render_progress_results() -> void:
 			icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.stretch_mode = TextureRect.STRETCH_SCALE
 			slot.add_child(icon)
 		icon.visible = index < _round_results.size()
 		if icon.visible:
@@ -439,15 +476,24 @@ func _cropped_texture(path: String) -> Texture2D:
 
 
 func _select_rank(rank: int) -> void:
+	if rank == _selected_rank or rank in _locked_ranks:
+		return
 	_selected_rank = rank
 	_refresh_prediction_buttons()
+	rank_selected.emit(rank)
 
 
 func _refresh_prediction_buttons() -> void:
 	for index in prediction_buttons.size():
-		var selected := index + 1 == _selected_rank
-		prediction_buttons[index].modulate = Color(1.28, 1.12, 1.42, 1.0) if selected else Color.WHITE
-		prediction_buttons[index].scale = Vector2.ONE
+		var button := prediction_buttons[index]
+		var rank := index + 1
+		var locked := rank in _locked_ranks
+		button.disabled = locked
+		if locked:
+			button.modulate = Color(0.45, 0.42, 0.38, 0.55)
+		else:
+			button.modulate = Color(1.28, 1.12, 1.42, 1.0) if rank == _selected_rank else Color.WHITE
+		button.scale = Vector2.ONE
 
 
 func _on_submit_pressed() -> void:
@@ -455,7 +501,8 @@ func _on_submit_pressed() -> void:
 		"round_complete":
 			next_round_requested.emit()
 		"finished":
-			exit_requested.emit()
+			if int(_state.get("host_id", 0)) == _my_id:
+				rematch_requested.emit()
 		_:
 			if _selected_rank == 0:
 				status_label.text = "请先选择预测排名"

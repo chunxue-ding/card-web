@@ -10,10 +10,10 @@
 [ext_resource type="Texture2D" uid="uid://c8vq2gpaq15hg" path="res://game/提交预测按钮底框无文字.png" id="8_submit"]
 [ext_resource type="Texture2D" uid="uid://bhu4twvnrt7co" path="res://game/退出图标.png" id="9_exit"]
 [ext_resource type="Script" uid="uid://civxnmrxuuylh" path="res://scenes/game/game_board.gd" id="10_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="11_font"]
 
-[sub_resource type="SystemFont" id="DisplayFont"]
-font_names = PackedStringArray("Songti SC", "STSong", "Noto Serif CJK SC", "serif")
-subpixel_positioning = 0
+[sub_resource type="Theme" id="GameTheme"]
+default_font = ExtResource("11_font")
 
 [sub_resource type="StyleBoxFlat" id="CardStyle"]
 bg_color = Color(0.08, 0.055, 0.07, 0.98)
@@ -48,6 +48,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("GameTheme")
 script = ExtResource("10_script")
 
 [node name="Background" type="TextureRect" parent="." unique_id=777950954]
@@ -70,7 +71,7 @@ anchor_right = 0.235
 anchor_bottom = 0.405
 texture = ExtResource("2_vault")
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 0
 
 [node name="PotLabel" type="Label" parent="Background/Vault" unique_id=1671555355]
 layout_mode = 1
@@ -84,7 +85,7 @@ offset_top = -34.031982
 offset_right = -7.700836
 offset_bottom = -34.031982
 theme_override_colors/font_color = Color(0.94, 0.75, 0.39, 1)
-theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_fonts/font = ExtResource("11_font")
 theme_override_font_sizes/font_size = 24
 text = "3,600"
 horizontal_alignment = 1
@@ -102,7 +103,7 @@ offset_right = 48.19995
 offset_bottom = 33.0
 texture = ExtResource("3_progress")
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 0
 
 [node name="PhaseLabel" type="Label" parent="Background/Progress" unique_id=1153495587]
 visible = false
@@ -117,7 +118,7 @@ offset_top = 11.071999
 offset_right = 309.55203
 offset_bottom = 11.071995
 theme_override_colors/font_color = Color(0.92, 0.72, 0.4, 1)
-theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_fonts/font = ExtResource("11_font")
 theme_override_font_sizes/font_size = 20
 text = "白色阶段"
 horizontal_alignment = 1
@@ -129,95 +130,67 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Slot1" type="Label" parent="Background/Progress/Slots" unique_id=1601727562]
-custom_minimum_size = Vector2(66.5, 66.5)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.15513
-anchor_top = 0.58099
-anchor_right = 0.15513
-anchor_bottom = 0.58099
-offset_left = -33.25
-offset_top = -33.25
-offset_right = 33.25
-offset_bottom = 33.25
+anchor_left = 0.098298
+anchor_top = 0.456866
+anchor_right = 0.165786
+anchor_bottom = 0.707746
 
 [node name="Slot2" type="Label" parent="Background/Progress/Slots" unique_id=1406456585]
-custom_minimum_size = Vector2(66.5, 66.5)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.27529
-anchor_top = 0.58099
-anchor_right = 0.27529
-anchor_bottom = 0.58099
-offset_left = -33.25
-offset_top = -33.25
-offset_right = 33.25
-offset_bottom = 33.25
+anchor_left = 0.226232
+anchor_top = 0.456866
+anchor_right = 0.294308
+anchor_bottom = 0.707746
 
 [node name="Slot3" type="Label" parent="Background/Progress/Slots" unique_id=988676591]
-custom_minimum_size = Vector2(66.5, 66.5)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.39576
-anchor_top = 0.58099
-anchor_right = 0.39576
-anchor_bottom = 0.58099
-offset_left = -33.25
-offset_top = -33.25
-offset_right = 33.25
-offset_bottom = 33.25
+anchor_left = 0.354754
+anchor_top = 0.457746
+anchor_right = 0.422242
+anchor_bottom = 0.708627
 
 [node name="Slot4" type="Label" parent="Background/Progress/Slots" unique_id=862708124]
-custom_minimum_size = Vector2(66.5, 66.5)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.50937
-anchor_top = 0.58099
-anchor_right = 0.50937
-anchor_bottom = 0.58099
-offset_left = -33.25
-offset_top = -33.25
-offset_right = 33.25
-offset_bottom = 33.25
+anchor_left = 0.475939
+anchor_top = 0.456866
+anchor_right = 0.544014
+anchor_bottom = 0.708627
 
 [node name="Slot5" type="Label" parent="Background/Progress/Slots" unique_id=572923302]
-custom_minimum_size = Vector2(66.5, 66.5)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.61938
-anchor_top = 0.58099
-anchor_right = 0.61938
-anchor_bottom = 0.58099
-offset_left = -33.25
-offset_top = -33.25
-offset_right = 33.25
-offset_bottom = 33.25
+anchor_left = 0.593603
+anchor_top = 0.456866
+anchor_right = 0.660505
+anchor_bottom = 0.707746
 
 [node name="Slot6" type="Label" parent="Background/Progress/Slots" unique_id=1502887366]
-custom_minimum_size = Vector2(66.5, 66.5)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.73406
-anchor_top = 0.58099
-anchor_right = 0.73406
-anchor_bottom = 0.58099
-offset_left = -33.25
-offset_top = -33.25
-offset_right = 33.25
-offset_bottom = 33.25
+anchor_left = 0.715962
+anchor_top = 0.458627
+anchor_right = 0.783157
+anchor_bottom = 0.707746
 
 [node name="Slot7" type="Label" parent="Background/Progress/Slots" unique_id=2122680751]
-custom_minimum_size = Vector2(66.5, 66.5)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.84928
-anchor_top = 0.58099
-anchor_right = 0.84928
-anchor_bottom = 0.58099
-offset_left = -33.25
-offset_top = -33.25
-offset_right = 33.25
-offset_bottom = 33.25
+anchor_left = 0.839202
+anchor_top = 0.456866
+anchor_right = 0.905516
+anchor_bottom = 0.707746
 
 [node name="ExitButton" type="TextureButton" parent="Background" unique_id=1472036891]
 layout_mode = 1
@@ -240,7 +213,7 @@ anchor_top = 0.205
 anchor_right = 0.62
 anchor_bottom = 0.245
 theme_override_colors/font_color = Color(0.94, 0.75, 0.4, 1)
-theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_fonts/font = ExtResource("11_font")
 theme_override_font_sizes/font_size = 26
 text = "公共牌区域"
 horizontal_alignment = 1
@@ -328,7 +301,7 @@ theme_override_styles/panel = SubResource("PredictionStyle")
 [node name="Title" type="Label" parent="Background/PredictionPanel" unique_id=1573762056]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94, 0.75, 0.4, 1)
-theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_fonts/font = ExtResource("11_font")
 theme_override_font_sizes/font_size = 22
 text = "本轮排名预测（1-3名）
 
@@ -582,7 +555,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.94, 0.75, 0.4, 1)
-theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_fonts/font = ExtResource("11_font")
 theme_override_font_sizes/font_size = 28
 text = "提交预测"
 horizontal_alignment = 1
@@ -596,7 +569,7 @@ anchor_top = 0.94
 anchor_right = 0.64
 anchor_bottom = 0.985
 theme_override_colors/font_color = Color(0.91, 0.72, 0.38, 1)
-theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_fonts/font = ExtResource("11_font")
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 

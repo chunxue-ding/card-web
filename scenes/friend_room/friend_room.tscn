@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/room/friend_room_bg.png" id="1_bg"]
 [ext_resource type="Texture2D" path="res://assets/homepage/quick_button_frame.png" id="2_quick_frame"]
@@ -10,10 +10,10 @@
 [ext_resource type="Theme" path="res://themes/main_theme.tres" id="8_theme"]
 [ext_resource type="Script" path="res://scenes/friend_room/friend_room.gd" id="9_script"]
 [ext_resource type="Texture2D" path="res://assets/homepage/friend_button_frame.png" id="10_friend_frame"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="11_font"]
 
-[sub_resource type="SystemFont" id="DisplayFont"]
-font_names = PackedStringArray("Songti SC", "STSong", "Noto Serif CJK SC", "serif")
-font_weight = 400
+[sub_resource type="FontVariation" id="DisplayFont"]
+base_font = ExtResource("11_font")
 
 [sub_resource type="StyleBoxFlat" id="HeaderButtonNormal"]
 bg_color = Color(0.035, 0.025, 0.025, 0.82)

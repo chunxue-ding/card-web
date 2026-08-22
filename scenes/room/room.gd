@@ -38,6 +38,15 @@ func _ready() -> void:
 	_socket.socket_error.connect(_on_socket_error)
 	_socket.closed.connect(_on_closed)
 	_socket.connect_room(Session.token, _room_code)
+	status_label.text = "连接房间服务器…"
+	get_tree().create_timer(8.0).timeout.connect(_check_socket_connected)
+
+
+func _check_socket_connected() -> void:
+	if _socket == null or _socket.is_authed():
+		return
+	disconnect_bar.visible = true
+	status_label.text = "连接房间服务器失败，请改用 Safari/Chrome 打开本页"
 
 
 func _process(_delta: float) -> void:
@@ -91,6 +100,8 @@ func _render() -> void:
 	if status != "" and status != "lobby":
 		overlay.visible = true
 		game_board.apply_state(_view, _my_id)
+	else:
+		overlay.visible = false
 
 
 func _is_ready(player_id: int) -> bool:
@@ -128,9 +139,20 @@ func _on_prediction_submitted(rank: int) -> void:
 	_socket.confirm_phase()
 
 
+func _on_rank_selected(rank: int) -> void:
+	if _socket == null:
+		return
+	_socket.claim_chip(rank)
+
+
 func _on_next_round_requested() -> void:
 	if _socket != null:
 		_socket.next_round()
+
+
+func _on_rematch_requested() -> void:
+	if _socket != null:
+		_socket.rematch()
 
 
 func _on_socket_error(message: String) -> void:

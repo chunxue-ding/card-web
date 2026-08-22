@@ -36,8 +36,8 @@ func _on_create_room_pressed() -> void:
 	if _busy:
 		return
 	var max_players := Session.pending_player_count
-	if max_players < 3 or max_players > 6:
-		max_players = 6
+	if max_players != 3:
+		max_players = 3
 	_busy = true
 	create_room_button.disabled = true
 	join_room_button.disabled = true

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Texture2D" path="res://homepage/简化主页背景底图.png" id="1_bg"]
 [ext_resource type="Texture2D" path="res://assets/homepage/quick_button_frame.png" id="2_quick_frame"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" path="res://assets/homepage/coin_icon.png" id="10_coin"]
 [ext_resource type="Theme" path="res://themes/main_theme.tres" id="11_theme"]
 [ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="12_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="13_font"]
 
 [sub_resource type="StyleBoxFlat" id="HeaderButtonNormal"]
 bg_color = Color(0.035, 0.025, 0.025, 0.82)
@@ -66,9 +67,8 @@ shadow_size = 10
 
 [sub_resource type="ButtonGroup" id="PlayerCountGroup"]
 
-[sub_resource type="SystemFont" id="DisplayFont"]
-font_names = PackedStringArray("Songti SC", "STSong", "Noto Serif CJK SC", "serif")
-font_weight = 400
+[sub_resource type="FontVariation" id="DisplayFont"]
+base_font = ExtResource("13_font")
 
 [node name="Lobby" type="Control"]
 layout_mode = 3
@@ -329,6 +329,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Slot4" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+modulate = Color(0.48, 0.48, 0.48, 0.62)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.33
@@ -343,6 +344,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Slot5" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+modulate = Color(0.48, 0.48, 0.48, 0.62)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.55
@@ -357,6 +359,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Slot6" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+modulate = Color(0.48, 0.48, 0.48, 0.62)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.77
@@ -389,10 +392,12 @@ theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
 toggle_mode = true
+button_pressed = true
 button_group = SubResource("PlayerCountGroup")
 text = "3人"
 
 [node name="Count4Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+modulate = Color(0.58, 0.58, 0.58, 0.72)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.33
@@ -404,6 +409,7 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_disabled_color = Color(0.58, 0.58, 0.58, 0.9)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
@@ -411,11 +417,12 @@ theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
 toggle_mode = true
-button_pressed = true
+disabled = true
 button_group = SubResource("PlayerCountGroup")
 text = "4人"
 
 [node name="Count5Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+modulate = Color(0.58, 0.58, 0.58, 0.72)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.55
@@ -427,6 +434,7 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_disabled_color = Color(0.58, 0.58, 0.58, 0.9)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
@@ -434,10 +442,12 @@ theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
 toggle_mode = true
+disabled = true
 button_group = SubResource("PlayerCountGroup")
 text = "5人"
 
 [node name="Count6Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+modulate = Color(0.58, 0.58, 0.58, 0.72)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.77
@@ -449,6 +459,7 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_disabled_color = Color(0.58, 0.58, 0.58, 0.9)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
@@ -456,6 +467,7 @@ theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
 toggle_mode = true
+disabled = true
 button_group = SubResource("PlayerCountGroup")
 text = "6人"
 

@@ -30,6 +30,13 @@ func logout(token: String) -> Variant:
 	return res["data"]
 
 
+func me(token: String) -> Variant:
+	var res: Dictionary = await _client.get_json(Endpoints.ME, token)
+	if not res["ok"]:
+		return res["error"]
+	return res["data"]
+
+
 func _auth(path: String, body: Dictionary) -> Variant:
 	var res: Dictionary = await _client.post_json(path, body)
 	if not res["ok"]:

@@ -52,6 +52,21 @@ func guest_login() -> ApiError:
 	return _apply_auth(await _api.guest_login(get_device_id()))
 
 
+## 重新拉取当前用户资料(余额/昵称),用于对局结束回到大厅时刷新展示。
+func refresh_me() -> ApiError:
+	if token == "":
+		return ApiError.new(Endpoints.CODE_UNAUTHORIZED, "未登录")
+	var res: Variant = await _api.me(token)
+	if res is ApiError:
+		return res
+	var payload := res as Dictionary
+	var data: Dictionary = payload.get("user", payload)
+	for key in ["id", "name", "avatar_color", "has_password", "balance"]:
+		if data.has(key):
+			user[key] = data[key]
+	return null
+
+
 func logout() -> void:
 	if token != "":
 		await _api.logout(token)

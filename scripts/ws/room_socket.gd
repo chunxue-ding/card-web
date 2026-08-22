@@ -60,6 +60,10 @@ func set_ready(ready: bool) -> void:
 	_send_json({"type": "set_ready", "ready": ready})
 
 
+func is_authed() -> bool:
+	return _authed
+
+
 func add_bot() -> void:
 	_send_json({"type": "add_bot"})
 
@@ -82,6 +86,10 @@ func confirm_phase() -> void:
 
 func next_round() -> void:
 	_send_json({"type": "next_round"})
+
+
+func rematch() -> void:
+	_send_json({"type": "rematch"})
 
 
 func close() -> void:

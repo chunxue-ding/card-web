@@ -163,3 +163,5 @@ grow_vertical = 2
 [connection signal="exit_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_back_home_pressed"]
 [connection signal="next_round_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_next_round_requested"]
 [connection signal="prediction_submitted" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_prediction_submitted"]
+[connection signal="rank_selected" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_rank_selected"]
+[connection signal="rematch_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_rematch_requested"]
