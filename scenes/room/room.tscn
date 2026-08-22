@@ -1,0 +1,179 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/room/friend_room_bg.png" id="1_bg"]
+[ext_resource type="Theme" path="res://themes/main_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://scenes/room/room.gd" id="3_script"]
+
+[node name="Room" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("3_script")
+
+[node name="Background" type="TextureRect" parent="."]
+texture = ExtResource("1_bg")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Header" type="HBoxContainer" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.12
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+
+[node name="RoomCodeLabel" type="Label" parent="Background/Header"]
+theme_override_colors/font_color = Color(0.831373, 0.686275, 0.415686, 1)
+theme_override_font_sizes/font_size = 40
+text = "房间 ------"
+vertical_alignment = 1
+
+[node name="BackHomeButton" type="Button" parent="Background/Header"]
+custom_minimum_size = Vector2(180, 64)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_type_variation = "SecondaryButton"
+text = "离开房间"
+
+[node name="Center" type="CenterContainer" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.18
+anchor_right = 0.7
+anchor_bottom = 0.68
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerList" type="VBoxContainer" parent="Background/Center"]
+theme_override_constants/separation = 16
+
+[node name="Actions" type="VBoxContainer" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.38
+anchor_top = 0.7
+anchor_right = 0.62
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="ReadyButton" type="Button" parent="Background/Actions"]
+custom_minimum_size = Vector2(320, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "准备"
+
+[node name="BotRow" type="HBoxContainer" parent="Background/Actions"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="AddBotButton" type="Button" parent="Background/Actions/BotRow"]
+custom_minimum_size = Vector2(154, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = "SecondaryButton"
+text = "+ 机器人"
+
+[node name="RemoveBotButton" type="Button" parent="Background/Actions/BotRow"]
+custom_minimum_size = Vector2(154, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = "SecondaryButton"
+text = "- 机器人"
+
+[node name="StartGameButton" type="Button" parent="Background/Actions"]
+custom_minimum_size = Vector2(320, 76)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "开始游戏"
+
+[node name="StatusLabel" type="Label" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.93
+anchor_right = 0.85
+anchor_bottom = 0.98
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.909804, 0.298039, 0.235294, 1)
+theme_override_font_sizes/font_size = 24
+text = ""
+horizontal_alignment = 1
+
+[node name="DisconnectBar" type="HBoxContainer" parent="Background"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.35
+anchor_top = 0.45
+anchor_right = 0.65
+anchor_bottom = 0.55
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="TextLabel" type="Label" parent="Background/DisconnectBar"]
+theme_override_font_sizes/font_size = 28
+text = "房间连接已断开"
+
+[node name="ReconnectButton" type="Button" parent="Background/DisconnectBar"]
+custom_minimum_size = Vector2(200, 64)
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "重新连接"
+
+[node name="GameStartedOverlay" type="ColorRect" parent="Background"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="CenterBox" type="CenterContainer" parent="Background/GameStartedOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Background/GameStartedOverlay/CenterBox"]
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Background/GameStartedOverlay/CenterBox/VBox"]
+theme_override_colors/font_color = Color(0.831373, 0.686275, 0.415686, 1)
+theme_override_font_sizes/font_size = 48
+text = "对局已开始"
+horizontal_alignment = 1
+
+[node name="Note" type="Label" parent="Background/GameStartedOverlay/CenterBox/VBox"]
+theme_override_font_sizes/font_size = 26
+text = "对局界面下一期开放，请保持连接"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="Background/Header/BackHomeButton" to="." method="_on_back_home_pressed"]
+[connection signal="pressed" from="Background/Actions/ReadyButton" to="." method="_on_ready_pressed"]
+[connection signal="pressed" from="Background/Actions/BotRow/AddBotButton" to="." method="_on_add_bot_pressed"]
+[connection signal="pressed" from="Background/Actions/BotRow/RemoveBotButton" to="." method="_on_remove_bot_pressed"]
+[connection signal="pressed" from="Background/Actions/StartGameButton" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="Background/DisconnectBar/ReconnectButton" to="." method="_on_reconnect_pressed"]

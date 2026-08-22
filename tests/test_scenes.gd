@@ -12,6 +12,7 @@ func _initialize() -> void:
 	_check_register()
 	await _check_lobby()
 	await _check_friend_room()
+	await _check_room()
 	h.finish(self)
 
 
@@ -86,4 +87,23 @@ func _check_friend_room() -> void:
 	page.get_node("Background/CodeCenter/CodePanel/RoomCodeInput").text = "ABCD12"
 	page.get_node("Background/ActionCenter/Actions/JoinRoomButton").pressed.emit()
 	h.check("ABCD12" in page.get_node("Background/StatusLabel").text, "friend_room 加入会读取编号")
+	page.queue_free()
+
+
+func _check_room() -> void:
+	var scene := load("res://scenes/room/room.tscn") as PackedScene
+	if scene == null:
+		h.check(false, "room 场景可加载")
+		return
+	var page := scene.instantiate() as Control
+	root.add_child(page)
+	await process_frame
+	h.check(page.get_node_or_null("Background/Header/RoomCodeLabel") != null, "room 房间号标签存在")
+	h.check(page.get_node_or_null("Background/Center/PlayerList") != null, "room 玩家列表存在")
+	h.check(page.get_node_or_null("Background/Actions/ReadyButton") != null, "room 准备按钮存在")
+	h.check(page.get_node_or_null("Background/Actions/StartGameButton") != null, "room 开始按钮存在")
+	h.check(page.get_node_or_null("Background/GameStartedOverlay") != null, "room 开局 overlay 存在")
+	h.check(page.has_method("_on_ready_pressed"), "room 准备回调存在")
+	h.check(page.has_method("_on_start_pressed"), "room 开始回调存在")
+	h.check(page.has_method("_on_reconnect_pressed"), "room 重连回调存在")
 	page.queue_free()
