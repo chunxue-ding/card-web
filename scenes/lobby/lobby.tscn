@@ -1,8 +1,65 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=13 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/login/login_bg.png" id="1_bg"]
-[ext_resource type="Theme" path="res://themes/main_theme.tres" id="2_theme"]
-[ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="3_script"]
+[ext_resource type="Texture2D" path="res://homepage/简化主页背景底图.png" id="1_bg"]
+[ext_resource type="Texture2D" path="res://assets/homepage/quick_match_button.png" id="2_quick"]
+[ext_resource type="Texture2D" path="res://assets/homepage/friend_play_button.png" id="3_friend"]
+[ext_resource type="Texture2D" path="res://assets/homepage/player_count_panel.png" id="4_count"]
+[ext_resource type="Theme" path="res://themes/main_theme.tres" id="5_theme"]
+[ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="6_script"]
+
+[sub_resource type="StyleBoxFlat" id="HeaderButtonNormal"]
+bg_color = Color(0.035, 0.025, 0.025, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.33, 0.18, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="HeaderButtonHover"]
+bg_color = Color(0.12, 0.07, 0.14, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.74, 0.57, 0.3, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxEmpty" id="CountNormal"]
+
+[sub_resource type="StyleBoxFlat" id="CountHover"]
+bg_color = Color(0.26, 0.09, 0.35, 0.42)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.3, 0.72, 0.8)
+corner_radius_top_left = 48
+corner_radius_top_right = 48
+corner_radius_bottom_right = 48
+corner_radius_bottom_left = 48
+
+[sub_resource type="StyleBoxFlat" id="CountSelected"]
+bg_color = Color(0.31, 0.08, 0.43, 0.76)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.72, 0.42, 0.91, 1)
+corner_radius_top_left = 48
+corner_radius_top_right = 48
+corner_radius_bottom_right = 48
+corner_radius_bottom_left = 48
+shadow_color = Color(0.45, 0.12, 0.65, 0.6)
+shadow_size = 10
+
+[sub_resource type="ButtonGroup" id="PlayerCountGroup"]
 
 [node name="Lobby" type="Control"]
 layout_mode = 3
@@ -11,60 +68,244 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("2_theme")
-script = ExtResource("3_script")
+theme = ExtResource("5_theme")
+script = ExtResource("6_script")
 
 [node name="Background" type="TextureRect" parent="."]
-texture = ExtResource("1_bg")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("1_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Center" type="CenterContainer" parent="Background"]
+[node name="Header" type="HBoxContainer" parent="Background"]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = -1
+anchor_left = 0.66
+anchor_top = 0.035
+anchor_right = 0.965
+anchor_bottom = 0.115
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 2
+
+[node name="NameLabel" type="Label" parent="Background/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.61, 1)
+theme_override_font_sizes/font_size = 25
+text = "玩家"
+vertical_alignment = 1
+
+[node name="BalanceLabel" type="Label" parent="Background/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
+theme_override_font_sizes/font_size = 25
+text = "◉ 0"
+vertical_alignment = 1
+
+[node name="LogoutButton" type="Button" parent="Background/Header"]
+custom_minimum_size = Vector2(126, 48)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("HeaderButtonNormal")
+theme_override_styles/hover = SubResource("HeaderButtonHover")
+theme_override_styles/pressed = SubResource("HeaderButtonHover")
+text = "退出登录"
+
+[node name="Actions" type="HBoxContainer" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.19
+anchor_top = 0.505
+anchor_right = 0.81
+anchor_bottom = 0.665
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="QuickMatchButton" type="TextureButton" parent="Background/Actions"]
+custom_minimum_size = Vector2(500, 156)
+layout_mode = 2
+texture_normal = ExtResource("2_quick")
+texture_hover = ExtResource("2_quick")
+texture_pressed = ExtResource("2_quick")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Background/Actions/QuickMatchButton"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.35
+anchor_top = 0.08
+anchor_right = 0.96
+anchor_bottom = 0.94
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
+theme_override_font_sizes/font_size = 42
+text = "快速匹配"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FriendPlayButton" type="TextureButton" parent="Background/Actions"]
+custom_minimum_size = Vector2(500, 156)
+layout_mode = 2
+texture_normal = ExtResource("3_friend")
+texture_hover = ExtResource("3_friend")
+texture_pressed = ExtResource("3_friend")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Background/Actions/FriendPlayButton"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.35
+anchor_top = 0.08
+anchor_right = 0.96
+anchor_bottom = 0.94
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
+theme_override_font_sizes/font_size = 42
+text = "好友同玩"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CountCenter" type="CenterContainer" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.25
+anchor_top = 0.67
+anchor_right = 0.75
+anchor_bottom = 0.83
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Background/Center"]
-theme_override_constants/separation = 24
-
-[node name="TitleLabel" type="Label" parent="Background/Center/VBox"]
-theme_override_colors/font_color = Color(0.831373, 0.686275, 0.415686, 1)
-theme_override_font_sizes/font_size = 48
-text = "大 厅"
-horizontal_alignment = 1
-
-[node name="NameLabel" type="Label" parent="Background/Center/VBox"]
-theme_override_font_sizes/font_size = 32
-text = "昵称："
-horizontal_alignment = 1
-
-[node name="EmailLabel" type="Label" parent="Background/Center/VBox"]
-theme_override_font_sizes/font_size = 28
-text = "账号："
-horizontal_alignment = 1
-
-[node name="BalanceLabel" type="Label" parent="Background/Center/VBox"]
-theme_override_font_sizes/font_size = 28
-text = "余额："
-horizontal_alignment = 1
-
-[node name="Gap" type="Control" parent="Background/Center/VBox"]
-custom_minimum_size = Vector2(0, 40)
+[node name="PlayerCountPanel" type="Control" parent="Background/CountCenter"]
+custom_minimum_size = Vector2(700, 160)
 layout_mode = 2
+
+[node name="Frame" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
+texture = ExtResource("4_count")
+expand_mode = 1
+stretch_mode = 0
 
-[node name="LogoutButton" type="Button" parent="Background/Center/VBox"]
-custom_minimum_size = Vector2(440, 84)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_type_variation = "SecondaryButton"
-text = "退出登录"
+[node name="Count3Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.11
+anchor_top = 0.36
+anchor_right = 0.23
+anchor_bottom = 0.91
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("CountNormal")
+theme_override_styles/hover = SubResource("CountHover")
+theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover_pressed = SubResource("CountSelected")
+toggle_mode = true
+button_group = SubResource("PlayerCountGroup")
+text = "3人"
 
-[connection signal="pressed" from="Background/Center/VBox/LogoutButton" to="." method="_on_logout_pressed"]
+[node name="Count4Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.36
+anchor_right = 0.45
+anchor_bottom = 0.91
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("CountNormal")
+theme_override_styles/hover = SubResource("CountHover")
+theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover_pressed = SubResource("CountSelected")
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("PlayerCountGroup")
+text = "4人"
+
+[node name="Count5Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.55
+anchor_top = 0.36
+anchor_right = 0.67
+anchor_bottom = 0.91
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("CountNormal")
+theme_override_styles/hover = SubResource("CountHover")
+theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover_pressed = SubResource("CountSelected")
+toggle_mode = true
+button_group = SubResource("PlayerCountGroup")
+text = "5人"
+
+[node name="Count6Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.77
+anchor_top = 0.36
+anchor_right = 0.89
+anchor_bottom = 0.91
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("CountNormal")
+theme_override_styles/hover = SubResource("CountHover")
+theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover_pressed = SubResource("CountSelected")
+toggle_mode = true
+button_group = SubResource("PlayerCountGroup")
+text = "6人"
+
+[node name="StatusLabel" type="Label" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.835
+anchor_right = 0.7
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.83, 0.69, 0.42, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="Background/Header/LogoutButton" to="." method="_on_logout_pressed"]
+[connection signal="pressed" from="Background/Actions/QuickMatchButton" to="." method="_on_quick_match_pressed"]
+[connection signal="pressed" from="Background/Actions/FriendPlayButton" to="." method="_on_friend_play_pressed"]
