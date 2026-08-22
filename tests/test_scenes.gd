@@ -60,9 +60,10 @@ func _check_lobby() -> void:
 	h.check(page.has_method("_on_friend_play_pressed"), "lobby 好友同玩回调存在")
 	h.check(page.has_method("_set_action_hover"), "lobby 操作按钮悬停反馈存在")
 	page.get_node("Background/CountCenter/PlayerCountPanel/Count6Button").pressed.emit()
-	page.get_node("Background/Actions/QuickMatchButton").pressed.emit()
 	h.check(page.player_count == 6, "lobby 人数选择会更新")
-	h.check("6 人" in page.get_node("Background/StatusLabel").text, "lobby 匹配使用已选人数")
+	page.get_node("Background/Actions/QuickMatchButton").pressed.emit()
+	h.check("快速匹配中" in page.get_node("Background/StatusLabel").text, "lobby 快速匹配进入匹配态")
+	h.check(page.has_method("_set_match_mode"), "lobby 匹配态切换存在")
 	page.queue_free()
 
 
