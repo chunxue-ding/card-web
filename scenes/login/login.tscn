@@ -83,4 +83,14 @@ size_flags_horizontal = 4
 text = "新建账号"
 underline = 1
 
+[node name="ErrorLabel" type="Label" parent="Background/Center/VBox"]
+custom_minimum_size = Vector2(560, 30)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.909804, 0.298039, 0.235294, 1)
+theme_override_font_sizes/font_size = 22
+text = ""
+horizontal_alignment = 1
+
 [connection signal="pressed" from="Background/Center/VBox/CreateAccountButton" to="." method="_on_create_account_pressed"]
+[connection signal="pressed" from="Background/Center/VBox/LoginButton" to="." method="_on_login_pressed"]
+[connection signal="pressed" from="Background/Center/VBox/GuestButton" to="." method="_on_guest_pressed"]
