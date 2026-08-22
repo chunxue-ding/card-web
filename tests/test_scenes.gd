@@ -3,14 +3,11 @@ extends SceneTree
 ## 运行：/Users/dn/bin/godot --headless --script res://tests/test_scenes.gd
 
 const Helper = preload("res://tests/test_helper.gd")
-const _SessionScript = preload("res://scripts/session.gd")
 
 var h := Helper.new()
 
 
 func _initialize() -> void:
-	# 预加载 Session 脚本以避免 --script 模式下 autoload 未注册的编译错误
-	# 实际登录/游客流程由 autoload Session 驱动，此处仅验证场景接线
 	_check_login()
 	_check_register()
 	await _check_lobby()
