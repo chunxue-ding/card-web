@@ -1,17 +1,29 @@
-[gd_resource type="Theme" load_steps=13 format=3]
+[gd_resource type="Theme" load_steps=16 format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="1_font"]
-[ext_resource type="Texture2D" path="res://assets/login/input_frame.png" id="2_input_frame"]
-[ext_resource type="Texture2D" path="res://assets/login/sign_in_frame.png" id="3_sign_in_frame"]
-[ext_resource type="Texture2D" path="res://assets/login/guest_frame.png" id="4_guest_frame"]
+[ext_resource type="Texture2D" path="res://assets/login/email_input_frame.png" id="2_email_input"]
+[ext_resource type="Texture2D" path="res://assets/login/password_input_frame.png" id="3_password_input"]
+[ext_resource type="Texture2D" path="res://assets/login/sign_in_frame_cropped.png" id="3_sign_in_frame"]
+[ext_resource type="Texture2D" path="res://assets/login/guest_frame_cropped.png" id="4_guest_frame"]
 
-[sub_resource type="StyleBoxTexture" id="LineEdit_normal"]
-texture = ExtResource("2_input_frame")
-texture_margin_left = 48.0
-texture_margin_top = 0.0
-texture_margin_right = 48.0
-texture_margin_bottom = 0.0
-content_margin_left = 72.0
+[sub_resource type="StyleBoxTexture" id="EmailInput_normal"]
+texture = ExtResource("2_email_input")
+texture_margin_left = 46.0
+texture_margin_top = 12.0
+texture_margin_right = 46.0
+texture_margin_bottom = 12.0
+content_margin_left = 88.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="PasswordInput_normal"]
+texture = ExtResource("3_password_input")
+texture_margin_left = 46.0
+texture_margin_top = 12.0
+texture_margin_right = 46.0
+texture_margin_bottom = 12.0
+content_margin_left = 88.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
@@ -30,10 +42,10 @@ expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxTexture" id="Button_primary_normal"]
 texture = ExtResource("3_sign_in_frame")
-texture_margin_left = 80.0
-texture_margin_top = 0.0
-texture_margin_right = 80.0
-texture_margin_bottom = 0.0
+texture_margin_left = 36.0
+texture_margin_top = 20.0
+texture_margin_right = 36.0
+texture_margin_bottom = 20.0
 content_margin_left = 96.0
 content_margin_top = 8.0
 content_margin_right = 96.0
@@ -41,10 +53,10 @@ content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxTexture" id="Button_primary_hover"]
 texture = ExtResource("3_sign_in_frame")
-texture_margin_left = 80.0
-texture_margin_top = 0.0
-texture_margin_right = 80.0
-texture_margin_bottom = 0.0
+texture_margin_left = 36.0
+texture_margin_top = 20.0
+texture_margin_right = 36.0
+texture_margin_bottom = 20.0
 content_margin_left = 96.0
 content_margin_top = 8.0
 content_margin_right = 96.0
@@ -53,10 +65,10 @@ modulate_color = Color(1.2, 1.12, 0.95, 1)
 
 [sub_resource type="StyleBoxTexture" id="Button_primary_pressed"]
 texture = ExtResource("3_sign_in_frame")
-texture_margin_left = 80.0
-texture_margin_top = 0.0
-texture_margin_right = 80.0
-texture_margin_bottom = 0.0
+texture_margin_left = 36.0
+texture_margin_top = 20.0
+texture_margin_right = 36.0
+texture_margin_bottom = 20.0
 content_margin_left = 96.0
 content_margin_top = 8.0
 content_margin_right = 96.0
@@ -65,10 +77,10 @@ modulate_color = Color(0.75, 0.7, 0.6, 1)
 
 [sub_resource type="StyleBoxTexture" id="Button_secondary_normal"]
 texture = ExtResource("4_guest_frame")
-texture_margin_left = 80.0
-texture_margin_top = 0.0
-texture_margin_right = 80.0
-texture_margin_bottom = 0.0
+texture_margin_left = 32.0
+texture_margin_top = 16.0
+texture_margin_right = 32.0
+texture_margin_bottom = 16.0
 content_margin_left = 96.0
 content_margin_top = 8.0
 content_margin_right = 96.0
@@ -76,10 +88,10 @@ content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxTexture" id="Button_secondary_hover"]
 texture = ExtResource("4_guest_frame")
-texture_margin_left = 80.0
-texture_margin_top = 0.0
-texture_margin_right = 80.0
-texture_margin_bottom = 0.0
+texture_margin_left = 32.0
+texture_margin_top = 16.0
+texture_margin_right = 32.0
+texture_margin_bottom = 16.0
 content_margin_left = 96.0
 content_margin_top = 8.0
 content_margin_right = 96.0
@@ -88,25 +100,31 @@ modulate_color = Color(1.2, 1.12, 0.95, 1)
 
 [sub_resource type="StyleBoxTexture" id="Button_secondary_pressed"]
 texture = ExtResource("4_guest_frame")
-texture_margin_left = 80.0
-texture_margin_top = 0.0
-texture_margin_right = 80.0
-texture_margin_bottom = 0.0
+texture_margin_left = 32.0
+texture_margin_top = 16.0
+texture_margin_right = 32.0
+texture_margin_bottom = 16.0
 content_margin_left = 96.0
 content_margin_top = 8.0
 content_margin_right = 96.0
 content_margin_bottom = 8.0
 modulate_color = Color(0.75, 0.7, 0.6, 1)
 
+[sub_resource type="StyleBoxEmpty" id="Button_focus"]
+
 [resource]
 default_font = ExtResource("1_font")
 default_font_size = 28
 LineEdit/colors/font_color = Color(0.909804, 0.862745, 0.752941, 1)
-LineEdit/colors/font_placeholder_color = Color(0.419608, 0.392157, 0.333333, 1)
+LineEdit/colors/font_placeholder_color = Color(0.180392, 0.145098, 0.101961, 0.9)
 LineEdit/colors/caret_color = Color(0.831373, 0.686275, 0.415686, 1)
 LineEdit/colors/selection_color = Color(0.690196, 0.552941, 0.290196, 0.35)
-LineEdit/styles/normal = SubResource("LineEdit_normal")
+LineEdit/styles/normal = SubResource("EmailInput_normal")
 LineEdit/styles/focus = SubResource("LineEdit_focus")
+EmailInput/base_type = &"LineEdit"
+EmailInput/styles/normal = SubResource("EmailInput_normal")
+PasswordInput/base_type = &"LineEdit"
+PasswordInput/styles/normal = SubResource("PasswordInput_normal")
 SecondaryButton/base_type = &"Button"
 Button/colors/font_color = Color(0.909804, 0.862745, 0.752941, 1)
 Button/colors/font_hover_color = Color(1, 0.94902, 0.85098, 1)
@@ -114,9 +132,17 @@ Button/colors/font_pressed_color = Color(0.74902, 0.658824, 0.45098, 1)
 Button/styles/normal = SubResource("Button_primary_normal")
 Button/styles/hover = SubResource("Button_primary_hover")
 Button/styles/pressed = SubResource("Button_primary_pressed")
+Button/styles/focus = SubResource("Button_focus")
 SecondaryButton/colors/font_color = Color(0.909804, 0.862745, 0.752941, 1)
 SecondaryButton/colors/font_hover_color = Color(1, 0.94902, 0.85098, 1)
 SecondaryButton/colors/font_pressed_color = Color(0.74902, 0.658824, 0.45098, 1)
 SecondaryButton/styles/normal = SubResource("Button_secondary_normal")
 SecondaryButton/styles/hover = SubResource("Button_secondary_hover")
 SecondaryButton/styles/pressed = SubResource("Button_secondary_pressed")
+SecondaryButton/styles/focus = SubResource("Button_focus")
+LinkButton/colors/font_color = Color(0.760784, 0.639216, 0.454902, 1)
+LinkButton/colors/font_hover_color = Color(0.960784, 0.85098, 0.65098, 1)
+LinkButton/colors/font_pressed_color = Color(0.619608, 0.498039, 0.329412, 1)
+LinkButton/colors/font_focus_color = Color(0.960784, 0.85098, 0.65098, 1)
+LinkButton/font_sizes/font_size = 24
+LinkButton/styles/focus = SubResource("Button_focus")

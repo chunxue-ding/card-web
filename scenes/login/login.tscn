@@ -1,10 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/login/login_bg.png" id="1_bg"]
 [ext_resource type="Theme" path="res://themes/main_theme.tres" id="2_theme"]
-[ext_resource type="Texture2D" path="res://assets/login/icon_user.png" id="3_iu"]
-[ext_resource type="Texture2D" path="res://assets/login/icon_lock.png" id="4_il"]
-[ext_resource type="Texture2D" path="res://assets/login/icon_eye.png" id="5_ie"]
+[ext_resource type="Script" path="res://scenes/login/login.gd" id="3_script"]
 
 [node name="Login" type="Control"]
 layout_mode = 3
@@ -14,6 +12,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_theme")
+script = ExtResource("3_script")
 
 [node name="Background" type="TextureRect" parent="."]
 texture = ExtResource("1_bg")
@@ -23,66 +22,65 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+expand_mode = 1
 stretch_mode = 6
 
 [node name="Center" type="CenterContainer" parent="Background"]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.62
-anchor_top = 0.0
+anchor_top = 0.183333
 anchor_right = 0.98
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBox" type="VBoxContainer" parent="Background/Center"]
-theme_override_constants/separation = 24
+theme_override_constants/separation = 18
 
 [node name="EmailInput" type="LineEdit" parent="Background/Center/VBox"]
-custom_minimum_size = Vector2(440, 96)
+custom_minimum_size = Vector2(560, 82)
 layout_mode = 2
+theme_type_variation = "EmailInput"
 placeholder_text = "邮箱"
 
 [node name="PasswordInput" type="LineEdit" parent="Background/Center/VBox"]
-custom_minimum_size = Vector2(440, 96)
+custom_minimum_size = Vector2(560, 82)
 layout_mode = 2
-right_icon = ExtResource("5_ie")
+theme_type_variation = "PasswordInput"
 placeholder_text = "密码"
 secret = true
+
+[node name="ForgotPasswordButton" type="LinkButton" parent="Background/Center/VBox"]
+custom_minimum_size = Vector2(0, 29)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "忘记密码？"
+underline = 1
 
 [node name="LoginButton" type="Button" parent="Background/Center/VBox"]
 custom_minimum_size = Vector2(440, 96)
 layout_mode = 2
+size_flags_horizontal = 4
 text = "登 录"
 
-[node name="GuestButton" type="Button" parent="Background/Center/VBox"]
-custom_minimum_size = Vector2(440, 96)
+[node name="GuestGap" type="Control" parent="Background/Center/VBox"]
+custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
+mouse_filter = 2
+
+[node name="GuestButton" type="Button" parent="Background/Center/VBox"]
+custom_minimum_size = Vector2(440, 84)
+layout_mode = 2
+size_flags_horizontal = 4
 theme_type_variation = "SecondaryButton"
 text = "游客一键登录"
 
-[node name="UserIcon" type="TextureRect" parent="Background/Center/VBox/EmailInput"]
-texture = ExtResource("3_iu")
-layout_mode = 1
-anchors_preset = 9
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 16.0
-offset_top = -24.0
-offset_right = 64.0
-offset_bottom = 24.0
-grow_vertical = 2
-mouse_filter = 2
+[node name="CreateAccountButton" type="LinkButton" parent="Background/Center/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "新建账号"
+underline = 1
 
-[node name="LockIcon" type="TextureRect" parent="Background/Center/VBox/PasswordInput"]
-texture = ExtResource("4_il")
-layout_mode = 1
-anchors_preset = 9
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 16.0
-offset_top = -24.0
-offset_right = 64.0
-offset_bottom = 24.0
-grow_vertical = 2
-mouse_filter = 2
+[connection signal="pressed" from="Background/Center/VBox/CreateAccountButton" to="." method="_on_create_account_pressed"]
