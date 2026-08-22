@@ -17,6 +17,10 @@ window/size/min_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[autoload]
+
+Session="*res://scripts/session.gd"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
