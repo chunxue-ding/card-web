@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/profile/profile.gd" id="1_script"]
 [ext_resource type="Theme" path="res://themes/main_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://profile/用户名和头像设置背景图.png" id="3_bg"]
+
+[sub_resource type="StyleBoxEmpty" id="EmptyStyle"]
 
 [node name="Profile" type="Control"]
 layout_mode = 3
@@ -13,82 +16,228 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_script")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.07, 0.06, 0.09, 1)
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="Center" type="CenterContainer" parent="Background"]
+[node name="Center" type="Control" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.255
+anchor_top = 0.235
+anchor_right = 0.745
+anchor_bottom = 0.945
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelFrame" type="TextureRect" parent="Background/Center"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
 
-[node name="VBox" type="VBoxContainer" parent="Background/Center"]
-theme_override_constants/separation = 28
+[node name="VBox" type="Control" parent="Background/Center"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Title" type="Label" parent="Background/Center/VBox"]
-theme_override_font_sizes/font_size = 44
-text = "设置你的昵称与头像"
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.18
+anchor_right = 0.9
+anchor_bottom = 0.25
+theme_override_colors/font_color = Color(0.92, 0.82, 0.65, 1)
+theme_override_font_sizes/font_size = 38
+text = "设置你的档案或创建角色"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Divider" type="ColorRect" parent="Background/Center/VBox"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.18
+anchor_top = 0.275
+anchor_right = 0.82
+anchor_bottom = 0.278
+mouse_filter = 2
+color = Color(0.49, 0.34, 0.17, 0.85)
+
+[node name="DividerMark" type="Label" parent="Background/Center/VBox"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.44
+anchor_top = 0.248
+anchor_right = 0.56
+anchor_bottom = 0.305
+theme_override_colors/font_color = Color(0.58, 0.28, 0.73, 1)
+theme_override_font_sizes/font_size = 24
+text = "◇◆◇"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameCaption" type="Label" parent="Background/Center/VBox"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.14
+anchor_top = 0.285
+anchor_right = 0.5
+anchor_bottom = 0.335
+theme_override_colors/font_color = Color(0.87, 0.74, 0.53, 1)
+theme_override_font_sizes/font_size = 24
+text = "用户名"
+vertical_alignment = 1
+
+[node name="NameInputFrame" type="TextureRect" parent="Background/Center/VBox"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.14
+anchor_top = 0.335
+anchor_right = 0.86
+anchor_bottom = 0.42
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
 
 [node name="NameInput" type="LineEdit" parent="Background/Center/VBox"]
-custom_minimum_size = Vector2(560, 64)
-theme_override_font_sizes/font_size = 30
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.17
+anchor_top = 0.345
+anchor_right = 0.83
+anchor_bottom = 0.41
+theme_override_colors/font_color = Color(0.88, 0.78, 0.63, 1)
+theme_override_colors/font_placeholder_color = Color(0.48, 0.46, 0.48, 0.88)
+theme_override_colors/caret_color = Color(0.76, 0.58, 0.31, 1)
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("EmptyStyle")
+theme_override_styles/focus = SubResource("EmptyStyle")
+theme_override_styles/read_only = SubResource("EmptyStyle")
 max_length = 24
-placeholder_text = "昵称（1-24 个字符）"
-alignment = 1
+placeholder_text = "输入你的用户名"
+alignment = 0
+
+[node name="AvatarCaption" type="Label" parent="Background/Center/VBox"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.14
+anchor_top = 0.412
+anchor_right = 0.5
+anchor_bottom = 0.455
+theme_override_colors/font_color = Color(0.87, 0.74, 0.53, 1)
+theme_override_font_sizes/font_size = 24
+text = "选择头像"
+vertical_alignment = 1
 
 [node name="AvatarGrid" type="GridContainer" parent="Background/Center/VBox"]
-theme_override_constants/h_separation = 24
-theme_override_constants/v_separation = 24
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.18
+anchor_top = 0.465
+anchor_right = 0.82
+anchor_bottom = 0.79
+theme_override_constants/h_separation = 26
+theme_override_constants/v_separation = 12
 columns = 3
 
 [node name="Avatar1" type="TextureButton" parent="Background/Center/VBox/AvatarGrid"]
-custom_minimum_size = Vector2(176, 176)
-expand_mode = 2
+custom_minimum_size = Vector2(118, 118)
+layout_mode = 2
+ignore_texture_size = true
 stretch_mode = 5
+mouse_default_cursor_shape = 2
 
 [node name="Avatar2" type="TextureButton" parent="Background/Center/VBox/AvatarGrid"]
-custom_minimum_size = Vector2(176, 176)
-expand_mode = 2
+custom_minimum_size = Vector2(118, 118)
+layout_mode = 2
+ignore_texture_size = true
 stretch_mode = 5
+mouse_default_cursor_shape = 2
 
 [node name="Avatar3" type="TextureButton" parent="Background/Center/VBox/AvatarGrid"]
-custom_minimum_size = Vector2(176, 176)
-expand_mode = 2
+custom_minimum_size = Vector2(118, 118)
+layout_mode = 2
+ignore_texture_size = true
 stretch_mode = 5
+mouse_default_cursor_shape = 2
 
 [node name="Avatar4" type="TextureButton" parent="Background/Center/VBox/AvatarGrid"]
-custom_minimum_size = Vector2(176, 176)
-expand_mode = 2
+custom_minimum_size = Vector2(118, 118)
+layout_mode = 2
+ignore_texture_size = true
 stretch_mode = 5
+mouse_default_cursor_shape = 2
 
 [node name="Avatar5" type="TextureButton" parent="Background/Center/VBox/AvatarGrid"]
-custom_minimum_size = Vector2(176, 176)
-expand_mode = 2
+custom_minimum_size = Vector2(118, 118)
+layout_mode = 2
+ignore_texture_size = true
 stretch_mode = 5
+mouse_default_cursor_shape = 2
 
 [node name="Avatar6" type="TextureButton" parent="Background/Center/VBox/AvatarGrid"]
-custom_minimum_size = Vector2(176, 176)
-expand_mode = 2
+custom_minimum_size = Vector2(118, 118)
+layout_mode = 2
+ignore_texture_size = true
 stretch_mode = 5
+mouse_default_cursor_shape = 2
 
 [node name="ErrorLabel" type="Label" parent="Background/Center/VBox"]
-theme_override_colors/font_color = Color(0.96, 0.34, 0.3, 1)
-theme_override_font_sizes/font_size = 26
-text = ""
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.18
+anchor_top = 0.775
+anchor_right = 0.82
+anchor_bottom = 0.82
+theme_override_colors/font_color = Color(0.96, 0.36, 0.32, 1)
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SaveFrame" type="TextureRect" parent="Background/Center/VBox"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31
+anchor_top = 0.815
+anchor_right = 0.69
+anchor_bottom = 0.905
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
 
 [node name="SaveButton" type="Button" parent="Background/Center/VBox"]
-custom_minimum_size = Vector2(360, 76)
-theme_override_font_sizes/font_size = 32
-text = "保存并开始"
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31
+anchor_top = 0.815
+anchor_right = 0.69
+anchor_bottom = 0.905
+theme_override_colors/font_color = Color(0.93, 0.82, 0.63, 1)
+theme_override_colors/font_hover_color = Color(1, 0.92, 0.76, 1)
+theme_override_colors/font_pressed_color = Color(0.82, 0.68, 0.46, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("EmptyStyle")
+theme_override_styles/hover = SubResource("EmptyStyle")
+theme_override_styles/pressed = SubResource("EmptyStyle")
+theme_override_styles/disabled = SubResource("EmptyStyle")
+theme_override_styles/focus = SubResource("EmptyStyle")
+mouse_default_cursor_shape = 2
+text = "确认"
 
 [connection signal="pressed" from="Background/Center/VBox/SaveButton" to="." method="_on_save_pressed"]

@@ -27,10 +27,12 @@ func _check_profile() -> void:
 	await process_frame
 	var grid := page.get_node("Background/Center/VBox/AvatarGrid") as GridContainer
 	h.check(grid.get_child_count() == 6, "profile 六个头像按钮")
+	h.check((page.get_node("Background") as TextureRect).texture.resource_path.ends_with("用户名和头像设置背景图.png"), "profile 使用新增背景素材")
+	h.check((page.get_node("Background/Center/PanelFrame") as TextureRect).texture is AtlasTexture, "profile 使用裁剪后的档案面板")
 	var with_texture := 0
 	for index in 6:
 		var button := grid.get_node("Avatar%d" % (index + 1)) as TextureButton
-		if button.texture_normal != null:
+		if button.texture_normal != null and button.get_node_or_null("AvatarIcon") != null:
 			with_texture += 1
 	h.check(with_texture == 6, "profile 头像按钮全部绑定素材")
 	h.check(page.get_node("Background/Center/VBox/NameInput") is LineEdit, "profile 昵称输入框存在")

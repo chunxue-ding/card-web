@@ -68,10 +68,14 @@ func refresh_me() -> ApiError:
 	return null
 
 
-## 首次登录(尚未选头像)需要先走资料设置页。
-## 仅邮箱注册用户:游客一键登录不走设置,保持原逻辑直进大厅。
+## 首次登录或资料尚不完整时先走设置页。
+## 仅邮箱用户进入；游客一键登录保持原逻辑直进主页。
 func needs_profile_setup() -> bool:
-	return is_logged_in() and not is_guest() and int(user.get("avatar", 0)) == 0
+	if not is_logged_in() or is_guest():
+		return false
+	var name_missing := str(user.get("name", "")).strip_edges().is_empty()
+	var avatar_missing := int(user.get("avatar", 0)) == 0
+	return is_new_user or name_missing or avatar_missing
 
 
 func update_profile(nickname: String, avatar: int) -> ApiError:
