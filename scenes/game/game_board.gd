@@ -390,8 +390,26 @@ func _update_seat(seat: Control, player: Dictionary, is_me: bool, reveal_hole_ca
 		return
 	var name := str(player.get("name", "玩家"))
 	seat.get_node("NameFrame/NameLabel").text = "You" if is_me else name
-	seat.get_node("AvatarFrame/InitialLabel").text = name.left(1).to_upper()
 	seat.get_node("MoneyFrame/MoneyLabel").text = _format_number(int(player.get("balance", 0)))
+	var initial := seat.get_node("AvatarFrame/InitialLabel") as Label
+	initial.text = name.left(1).to_upper()
+	var avatar_id := int(player.get("avatar", 0))
+	var icon := seat.get_node_or_null("AvatarFrame/AvatarIcon") as TextureRect
+	if avatar_id >= 1 and avatar_id <= Avatars.PATHS.size():
+		if icon == null:
+			icon = TextureRect.new()
+			icon.name = "AvatarIcon"
+			icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			seat.get_node("AvatarFrame").add_child(icon)
+		icon.texture = load(Avatars.path_for(avatar_id))
+		initial.visible = false
+	else:
+		if icon != null:
+			icon.texture = null
+		initial.visible = true
 	var state_text := "已确认" if bool(player.get("confirmed", false)) else "预测排名"
 	if str(_state.get("status", "")) == "round_complete":
 		state_text = "已继续" if bool(player.get("next_ready", false)) else "看牌中"

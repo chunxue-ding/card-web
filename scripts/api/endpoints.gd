@@ -6,6 +6,7 @@ const REGISTER := "/api/v1/auth/register"
 const GUEST_LOGIN := "/api/v1/auth/guest-login"
 const LOGOUT := "/api/v1/auth/logout"
 const ME := "/api/v1/users/me"
+const UPDATE_ME := "/api/v1/users/me"
 
 const CODE_NETWORK := -1
 const CODE_INVALID_PARAM := 100001

@@ -10,10 +10,35 @@ var h := Helper.new()
 func _initialize() -> void:
 	_check_login()
 	_check_register()
+	await _check_profile()
 	await _check_lobby()
 	await _check_friend_room()
 	await _check_room()
 	h.finish(self)
+
+
+func _check_profile() -> void:
+	var scene := load("res://scenes/profile/profile.tscn") as PackedScene
+	if scene == null:
+		h.check(false, "profile 场景可加载")
+		return
+	var page := scene.instantiate() as Control
+	root.add_child(page)
+	await process_frame
+	var grid := page.get_node("Background/Center/VBox/AvatarGrid") as GridContainer
+	h.check(grid.get_child_count() == 6, "profile 六个头像按钮")
+	var with_texture := 0
+	for index in 6:
+		var button := grid.get_node("Avatar%d" % (index + 1)) as TextureButton
+		if button.texture_normal != null:
+			with_texture += 1
+	h.check(with_texture == 6, "profile 头像按钮全部绑定素材")
+	h.check(page.get_node("Background/Center/VBox/NameInput") is LineEdit, "profile 昵称输入框存在")
+	h.check(page.has_method("_select_avatar"), "profile 头像选择回调存在")
+	h.check(page.has_method("_on_save_pressed"), "profile 保存回调存在")
+	page.get_node("Background/Center/VBox/AvatarGrid/Avatar3").pressed.emit()
+	h.check(not (page.get_node("Background/Center/VBox/AvatarGrid/Avatar3") as TextureButton).modulate.is_equal_approx(Color.WHITE), "profile 选中头像高亮")
+	page.queue_free()
 
 
 func _check_login() -> void:

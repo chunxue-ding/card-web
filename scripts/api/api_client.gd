@@ -29,6 +29,13 @@ func post_json(path: String, body: Dictionary, bearer_token := "", timeout := 0.
 	return await _request_json(HTTPClient.METHOD_POST, path, headers, JSON.stringify(body), timeout)
 
 
+func put_json(path: String, body: Dictionary, bearer_token := "", timeout := 0.0) -> Dictionary:
+	var headers := PackedStringArray(["Content-Type: application/json"])
+	if bearer_token != "":
+		headers.append("Authorization: Bearer %s" % bearer_token)
+	return await _request_json(HTTPClient.METHOD_PUT, path, headers, JSON.stringify(body), timeout)
+
+
 func get_json(path: String, bearer_token := "", timeout := 0.0) -> Dictionary:
 	var headers := PackedStringArray()
 	if bearer_token != "":

@@ -119,7 +119,7 @@ func _initialize() -> void:
 		"status": "playing",
 		"phase": "orange",
 		"players": [
-			{"id": 2, "name": "对手甲", "balance": 2300, "chips": [2, 0, 0, 0], "chip": 2, "confirmed": true, "hole_cards": []},
+			{"id": 2, "name": "对手甲", "balance": 2300, "avatar": 2, "chips": [2, 0, 0, 0], "chip": 2, "confirmed": true, "hole_cards": []},
 			{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},
 			{"id": 1, "name": "本人", "balance": 1950, "chip": 3, "hole_cards": []},
 		],
@@ -128,6 +128,10 @@ func _initialize() -> void:
 	h.check(rank_buttons.get_node("Rank2").disabled, "game 已确认的排名不可再选")
 	h.check(not rank_buttons.get_node("Rank1").disabled and not rank_buttons.get_node("Rank3").disabled, "game 未锁排名保持可选")
 	h.check(not rank_buttons.get_node("Rank3").modulate.is_equal_approx(Color.WHITE), "game 本人选择高亮跟随服务端 chip")
+	var left_avatar := board.get_node("Background/LeftPlayer/AvatarFrame/AvatarIcon") as TextureRect
+	h.check(left_avatar.visible and left_avatar.texture != null, "game 有头像的玩家座席显示头像图")
+	h.check(not board.get_node("Background/LeftPlayer/AvatarFrame/InitialLabel").visible, "game 有头像时隐藏首字母占位")
+	h.check(board.get_node("Background/RightPlayer/AvatarFrame/InitialLabel").visible, "game 无头像玩家保留首字母占位")
 	board.apply_state({
 		"status": "playing",
 		"phase": "white",

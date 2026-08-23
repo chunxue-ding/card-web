@@ -37,6 +37,13 @@ func me(token: String) -> Variant:
 	return res["data"]
 
 
+func update_me(token: String, nickname: String, avatar: int) -> Variant:
+	var res: Dictionary = await _client.put_json(Endpoints.UPDATE_ME, {"name": nickname, "avatar": avatar}, token)
+	if not res["ok"]:
+		return res["error"]
+	return res["data"]
+
+
 func _auth(path: String, body: Dictionary) -> Variant:
 	var res: Dictionary = await _client.post_json(path, body)
 	if not res["ok"]:

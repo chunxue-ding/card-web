@@ -62,9 +62,28 @@ func refresh_me() -> ApiError:
 		return res
 	var payload := res as Dictionary
 	var data: Dictionary = payload.get("user", payload)
-	for key in ["id", "name", "avatar_color", "has_password", "balance"]:
+	for key in ["id", "name", "avatar_color", "avatar", "has_password", "balance"]:
 		if data.has(key):
 			user[key] = data[key]
+	return null
+
+
+## 首次登录(尚未选头像)需要先走资料设置页。
+## 仅邮箱注册用户:游客一键登录不走设置,保持原逻辑直进大厅。
+func needs_profile_setup() -> bool:
+	return is_logged_in() and not is_guest() and int(user.get("avatar", 0)) == 0
+
+
+func update_profile(nickname: String, avatar: int) -> ApiError:
+	var res: Variant = await _api.update_me(token, nickname, avatar)
+	if res is ApiError:
+		return res
+	var payload := res as Dictionary
+	var data: Dictionary = payload.get("user", payload)
+	for key in ["name", "avatar_color", "avatar"]:
+		if data.has(key):
+			user[key] = data[key]
+	is_new_user = false
 	return null
 
 

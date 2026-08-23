@@ -3,6 +3,7 @@ extends Control
 
 const LOBBY_SCENE := "res://scenes/lobby/lobby.tscn"
 const REGISTER_SCENE := "res://scenes/register/register.tscn"
+const PROFILE_SCENE := "res://scenes/profile/profile.tscn"
 const LOGIN_NORMAL_TEXT := "登 录"
 const LOGIN_LOADING_TEXT := "登录中…"
 const GUEST_NORMAL_TEXT := "游客一键登录"
@@ -72,6 +73,7 @@ func _set_loading(button: Button, loading: bool) -> void:
 
 
 func _goto_lobby() -> void:
-	var error := get_tree().change_scene_to_file(LOBBY_SCENE)
+	var next := PROFILE_SCENE if Session.needs_profile_setup() else LOBBY_SCENE
+	var error := get_tree().change_scene_to_file(next)
 	if error != OK:
 		push_error("无法进入大厅场景：%s" % error_string(error))
