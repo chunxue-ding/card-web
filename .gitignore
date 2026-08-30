@@ -2,3 +2,6 @@
 export/
 build/
 .gstack/
+.idea/
+*.exe
+*.pck

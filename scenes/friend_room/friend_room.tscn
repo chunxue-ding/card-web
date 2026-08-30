@@ -1,16 +1,17 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene format=3 uid="uid://5s5yva3fg32c"]
 
-[ext_resource type="Texture2D" path="res://assets/room/friend_room_bg.png" id="1_bg"]
-[ext_resource type="Texture2D" path="res://assets/homepage/quick_button_frame.png" id="2_quick_frame"]
-[ext_resource type="Texture2D" path="res://assets/room/create_room_icon.png" id="3_create_icon"]
-[ext_resource type="Texture2D" path="res://assets/room/join_room_icon.png" id="4_join_icon"]
-[ext_resource type="Texture2D" path="res://assets/room/room_code_frame.png" id="5_code_frame"]
-[ext_resource type="Texture2D" path="res://assets/homepage/player_avatar_frame.png" id="6_avatar"]
-[ext_resource type="Texture2D" path="res://assets/homepage/coin_icon.png" id="7_coin"]
-[ext_resource type="Theme" path="res://themes/main_theme.tres" id="8_theme"]
-[ext_resource type="Script" path="res://scenes/friend_room/friend_room.gd" id="9_script"]
-[ext_resource type="Texture2D" path="res://assets/homepage/friend_button_frame.png" id="10_friend_frame"]
-[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="11_font"]
+[ext_resource type="Texture2D" uid="uid://dq4towrh05lt6" path="res://assets/room/friend_room_bg.png" id="1_bg"]
+[ext_resource type="Texture2D" uid="uid://bk8cgrcv18ttk" path="res://assets/homepage/quick_button_frame.png" id="2_quick_frame"]
+[ext_resource type="Texture2D" uid="uid://cqqv6ucmcre68" path="res://assets/room/create_room_icon.png" id="3_create_icon"]
+[ext_resource type="Texture2D" uid="uid://cqy8fki5tnkim" path="res://assets/room/join_room_icon.png" id="4_join_icon"]
+[ext_resource type="Texture2D" uid="uid://dk3rr61r0kwer" path="res://assets/room/room_code_frame.png" id="5_code_frame"]
+[ext_resource type="Texture2D" uid="uid://cxxd23oy4h44l" path="res://assets/homepage/player_avatar_frame.png" id="6_avatar"]
+[ext_resource type="Texture2D" uid="uid://dykeywpb31afb" path="res://assets/homepage/coin_icon.png" id="7_coin"]
+[ext_resource type="Theme" uid="uid://ckuqgtpmitv7e" path="res://themes/main_theme.tres" id="8_theme"]
+[ext_resource type="Script" uid="uid://but6pie3aldt1" path="res://scenes/friend_room/friend_room.gd" id="9_script"]
+[ext_resource type="Texture2D" uid="uid://dt2uhqfbrns5r" path="res://assets/homepage/friend_button_frame.png" id="10_friend_frame"]
+[ext_resource type="FontFile" uid="uid://bt1ywdsco3yhl" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="11_font"]
+[ext_resource type="Texture2D" uid="uid://dwjb873tp57st" path="res://title/克苏鲁Q版头像2 深潜者.png" id="12_avatar_preview"]
 
 [sub_resource type="FontVariation" id="DisplayFont"]
 base_font = ExtResource("11_font")
@@ -40,6 +41,8 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="CodeInputNormal"]
+content_margin_left = 18.0
+content_margin_right = 18.0
 bg_color = Color(0.012, 0.01, 0.018, 0.9)
 border_width_left = 1
 border_width_top = 1
@@ -50,10 +53,10 @@ corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
-content_margin_left = 18.0
-content_margin_right = 18.0
 
 [sub_resource type="StyleBoxFlat" id="CodeInputFocus"]
+content_margin_left = 18.0
+content_margin_right = 18.0
 bg_color = Color(0.018, 0.012, 0.025, 0.95)
 border_width_left = 2
 border_width_top = 2
@@ -64,10 +67,8 @@ corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
-content_margin_left = 18.0
-content_margin_right = 18.0
 
-[node name="FriendRoom" type="Control"]
+[node name="FriendRoom" type="Control" unique_id=1819681470]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -77,7 +78,7 @@ grow_vertical = 2
 theme = ExtResource("8_theme")
 script = ExtResource("9_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=1915013461]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -88,9 +89,8 @@ texture = ExtResource("1_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Header" type="Control" parent="Background"]
+[node name="Header" type="Control" parent="Background" unique_id=1114017123]
 layout_mode = 1
-anchors_preset = -1
 anchor_left = 0.661
 anchor_top = 0.025
 anchor_right = 0.936
@@ -98,10 +98,10 @@ anchor_bottom = 0.125
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="AvatarFrame" type="TextureRect" parent="Background/Header"]
+[node name="AvatarFrame" type="TextureRect" parent="Background/Header" unique_id=1232516573]
+editor_description = "2D 编辑器头像预览：调整 AvatarFrame 可改变头像框整体大小；调整子节点 AvatarIcon 可改变头像在圆框中的大小和位置。"
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.0
 anchor_top = 0.08
 anchor_right = 0.17
 anchor_bottom = 0.92
@@ -112,20 +112,22 @@ texture = ExtResource("6_avatar")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AvatarIcon" type="TextureRect" parent="Background/Header/AvatarFrame"]
+[node name="AvatarIcon" type="TextureRect" parent="Background/Header/AvatarFrame" unique_id=374583497]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.115
-anchor_top = 0.115
-anchor_right = 0.885
-anchor_bottom = 0.885
+anchor_left = 0.020944934
+anchor_top = 0.026014116
+anchor_right = 0.97905546
+anchor_bottom = 0.9739859
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+texture = ExtResource("12_avatar_preview")
 expand_mode = 1
 stretch_mode = 5
+metadata/_edit_use_anchors_ = true
 
-[node name="NameLabel" type="Label" parent="Background/Header"]
+[node name="NameLabel" type="Label" parent="Background/Header" unique_id=66051533]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.19
@@ -139,7 +141,7 @@ theme_override_font_sizes/font_size = 26
 text = "玩家"
 vertical_alignment = 1
 
-[node name="CoinIcon" type="TextureRect" parent="Background/Header"]
+[node name="CoinIcon" type="TextureRect" parent="Background/Header" unique_id=1216735975]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.49
@@ -153,7 +155,7 @@ texture = ExtResource("7_coin")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BalanceLabel" type="Label" parent="Background/Header"]
+[node name="BalanceLabel" type="Label" parent="Background/Header" unique_id=169871162]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.57
@@ -167,7 +169,7 @@ theme_override_font_sizes/font_size = 25
 text = "0"
 vertical_alignment = 1
 
-[node name="BackHomeButton" type="Button" parent="Background/Header"]
+[node name="BackHomeButton" type="Button" parent="Background/Header" unique_id=1190900520]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.77
@@ -179,11 +181,11 @@ grow_vertical = 2
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("HeaderButtonNormal")
-theme_override_styles/hover = SubResource("HeaderButtonHover")
 theme_override_styles/pressed = SubResource("HeaderButtonHover")
+theme_override_styles/hover = SubResource("HeaderButtonHover")
 text = "返回主页"
 
-[node name="ActionCenter" type="CenterContainer" parent="Background"]
+[node name="ActionCenter" type="CenterContainer" parent="Background" unique_id=408197302]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.2
@@ -193,23 +195,23 @@ anchor_bottom = 0.61
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Actions" type="HBoxContainer" parent="Background/ActionCenter"]
+[node name="Actions" type="HBoxContainer" parent="Background/ActionCenter" unique_id=2072501103]
 layout_mode = 2
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="CreateRoomButton" type="TextureButton" parent="Background/ActionCenter/Actions"]
+[node name="CreateRoomButton" type="TextureButton" parent="Background/ActionCenter/Actions" unique_id=1315348522]
 custom_minimum_size = Vector2(500, 140)
 layout_mode = 2
 size_flags_vertical = 4
+mouse_default_cursor_shape = 2
 texture_normal = ExtResource("2_quick_frame")
-texture_hover = ExtResource("2_quick_frame")
 texture_pressed = ExtResource("2_quick_frame")
+texture_hover = ExtResource("2_quick_frame")
 ignore_texture_size = true
 stretch_mode = 5
-mouse_default_cursor_shape = 2
 
-[node name="Icon" type="TextureRect" parent="Background/ActionCenter/Actions/CreateRoomButton"]
+[node name="Icon" type="TextureRect" parent="Background/ActionCenter/Actions/CreateRoomButton" unique_id=336920119]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.09
@@ -223,7 +225,7 @@ texture = ExtResource("3_create_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Background/ActionCenter/Actions/CreateRoomButton"]
+[node name="Label" type="Label" parent="Background/ActionCenter/Actions/CreateRoomButton" unique_id=298380434]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.32
@@ -232,7 +234,6 @@ anchor_right = 0.96
 anchor_bottom = 0.94
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 40
@@ -240,18 +241,18 @@ text = "创建房间"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="JoinRoomButton" type="TextureButton" parent="Background/ActionCenter/Actions"]
+[node name="JoinRoomButton" type="TextureButton" parent="Background/ActionCenter/Actions" unique_id=1941966796]
 custom_minimum_size = Vector2(500, 140)
 layout_mode = 2
 size_flags_vertical = 4
+mouse_default_cursor_shape = 2
 texture_normal = ExtResource("10_friend_frame")
-texture_hover = ExtResource("10_friend_frame")
 texture_pressed = ExtResource("10_friend_frame")
+texture_hover = ExtResource("10_friend_frame")
 ignore_texture_size = true
 stretch_mode = 5
-mouse_default_cursor_shape = 2
 
-[node name="Icon" type="TextureRect" parent="Background/ActionCenter/Actions/JoinRoomButton"]
+[node name="Icon" type="TextureRect" parent="Background/ActionCenter/Actions/JoinRoomButton" unique_id=928601660]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.09
@@ -265,7 +266,7 @@ texture = ExtResource("4_join_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Background/ActionCenter/Actions/JoinRoomButton"]
+[node name="Label" type="Label" parent="Background/ActionCenter/Actions/JoinRoomButton" unique_id=533760264]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.32
@@ -274,7 +275,6 @@ anchor_right = 0.96
 anchor_bottom = 0.94
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 40
@@ -282,7 +282,7 @@ text = "加入房间"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CodeCenter" type="CenterContainer" parent="Background"]
+[node name="CodeCenter" type="CenterContainer" parent="Background" unique_id=1934527487]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -292,11 +292,11 @@ anchor_bottom = 0.78
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CodePanel" type="Control" parent="Background/CodeCenter"]
+[node name="CodePanel" type="Control" parent="Background/CodeCenter" unique_id=190229181]
 custom_minimum_size = Vector2(440, 126)
 layout_mode = 2
 
-[node name="Frame" type="TextureRect" parent="Background/CodeCenter/CodePanel"]
+[node name="Frame" type="TextureRect" parent="Background/CodeCenter/CodePanel" unique_id=473859520]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -306,9 +306,8 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("5_code_frame")
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Title" type="Label" parent="Background/CodeCenter/CodePanel"]
+[node name="Title" type="Label" parent="Background/CodeCenter/CodePanel" unique_id=1852740010]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.14
@@ -317,7 +316,6 @@ anchor_right = 0.86
 anchor_bottom = 0.41
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 24
@@ -325,7 +323,7 @@ text = "输入房间编号"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RoomCodeInput" type="LineEdit" parent="Background/CodeCenter/CodePanel"]
+[node name="RoomCodeInput" type="LineEdit" parent="Background/CodeCenter/CodePanel" unique_id=2000193132]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.08
@@ -342,7 +340,7 @@ theme_override_styles/normal = SubResource("CodeInputNormal")
 theme_override_styles/focus = SubResource("CodeInputFocus")
 placeholder_text = "请输入房间编号"
 
-[node name="StatusLabel" type="Label" parent="Background"]
+[node name="StatusLabel" type="Label" parent="Background" unique_id=1168605931]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -351,7 +349,6 @@ anchor_right = 0.7
 anchor_bottom = 0.84
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.83, 0.69, 0.42, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 22

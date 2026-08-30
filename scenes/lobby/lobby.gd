@@ -8,7 +8,8 @@ const FRIEND_ROOM_SCENE := "res://scenes/friend_room/friend_room.tscn"
 const ROOM_SCENE := "res://scenes/room/room.tscn"
 const QUICK_MATCH_LABEL_TEXT := "快速匹配"
 const CANCEL_MATCH_LABEL_TEXT := "取消匹配"
-const SUPPORTED_PLAYER_COUNT := 3
+const DEFAULT_PLAYER_COUNT := 3
+const SUPPORTED_PLAYER_COUNTS := [3, 4]
 
 @onready var name_label: Label = $Background/Header/NameLabel
 @onready var balance_label: Label = $Background/Header/BalanceLabel
@@ -19,7 +20,7 @@ const SUPPORTED_PLAYER_COUNT := 3
 @onready var friend_play_button: TextureButton = $Background/Actions/FriendPlayButton
 @onready var status_label: Label = $Background/StatusLabel
 
-var player_count := SUPPORTED_PLAYER_COUNT
+var player_count := DEFAULT_PLAYER_COUNT
 var _hover_tweens: Dictionary = {}
 var _matching := false
 
@@ -31,11 +32,14 @@ func _ready() -> void:
 	for count in range(3, 7):
 		var button := get_node("Background/CountCenter/PlayerCountPanel/Count%dButton" % count) as Button
 		button.pressed.connect(_on_player_count_pressed.bind(count))
-		button.button_pressed = count == SUPPORTED_PLAYER_COUNT
-		button.disabled = count != SUPPORTED_PLAYER_COUNT
-		if count != SUPPORTED_PLAYER_COUNT:
+		button.button_pressed = count == DEFAULT_PLAYER_COUNT
+		button.disabled = count not in SUPPORTED_PLAYER_COUNTS
+		if count not in SUPPORTED_PLAYER_COUNTS:
 			button.modulate = Color(0.58, 0.58, 0.58, 0.72)
 			(get_node("Background/CountCenter/PlayerCountPanel/Slot%d" % count) as TextureRect).modulate = Color(0.48, 0.48, 0.48, 0.62)
+		else:
+			button.modulate = Color.WHITE
+			(get_node("Background/CountCenter/PlayerCountPanel/Slot%d" % count) as TextureRect).modulate = Color.WHITE
 	_setup_action_feedback(quick_match_button)
 	_setup_action_feedback(friend_play_button)
 	if Session.pending_quick_match:
@@ -67,7 +71,7 @@ func _refresh_user() -> void:
 
 
 func _on_player_count_pressed(count: int) -> void:
-	if _matching or count != SUPPORTED_PLAYER_COUNT:
+	if _matching or count not in SUPPORTED_PLAYER_COUNTS:
 		return
 	player_count = count
 	status_label.text = ""
@@ -82,8 +86,8 @@ func _on_quick_match_pressed() -> void:
 
 func _start_match() -> void:
 	_set_match_mode(true)
-	game_mode_selected.emit("quick_match", player_count)
-	status_label.text = "快速匹配中…"
+	game_mode_selected.emit("quick_match", DEFAULT_PLAYER_COUNT)
+	status_label.text = "快速匹配中…（固定3人）"
 	while _matching:
 		var res: Variant = await Session.card().match_wait(Session.token)
 		if not is_inside_tree():
@@ -136,7 +140,7 @@ func _set_match_mode(matching: bool) -> void:
 	quick_match_label.text = CANCEL_MATCH_LABEL_TEXT if matching else QUICK_MATCH_LABEL_TEXT
 	friend_play_button.disabled = matching
 	for count in range(3, 7):
-		(get_node("Background/CountCenter/PlayerCountPanel/Count%dButton" % count) as Button).disabled = matching or count != SUPPORTED_PLAYER_COUNT
+		(get_node("Background/CountCenter/PlayerCountPanel/Count%dButton" % count) as Button).disabled = matching or count not in SUPPORTED_PLAYER_COUNTS
 
 
 func _on_friend_play_pressed() -> void:

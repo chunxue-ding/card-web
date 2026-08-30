@@ -23,14 +23,19 @@ func _initialize() -> void:
 	var scene := load("res://scenes/game/game_board.tscn") as PackedScene
 	var board := scene.instantiate() as Control
 	var editor_node_count := board.find_children("*", "", true, false).size()
-	h.check(board.has_node("Background/RightPlayer") and board.has_node("Background/BottomPlayer"), "game 三个玩家座席已固定在场景文件")
+	h.check(board.has_node("Background/RightPlayer") and board.has_node("Background/TopPlayer") and board.has_node("Background/BottomPlayer"), "game 四个玩家座席已固定在场景文件")
 	h.check(board.has_node("Background/Vault/MoneyFrame/CoinIcon"), "game 金库组件已固定在场景文件")
 	h.check(board.has_node("Background/PredictionPanel/ButtonLayer/Rank3/Artwork"), "game 排名预测组件已固定在场景文件")
+	h.check(board.has_node("Background/PredictionPanel/ButtonLayer/Rank4/Artwork"), "game 四人模式第4名按钮已固定在场景文件")
 	h.check(board.has_node("Background/DeckPile/TopCard"), "game 离开图标左侧固定显示独立牌堆")
 	root.add_child(board)
 	await process_frame
 	var runtime_node_count := board.find_children("*", "", true, false).size()
 	h.check(runtime_node_count == editor_node_count, "game 运行时不再新增布局节点")
+	var music_node := root.get_node("Music")
+	var music_player := music_node.get("_player") as AudioStreamPlayer
+	var game_music := music_player.stream as AudioStreamMP3
+	h.check(game_music != null and game_music.resource_path.ends_with("game.mp3") and game_music.loop, "game 场景循环播放 game.mp3 背景音乐")
 	var editor_preview_hidden_at_runtime := not (board.get_node("Background/Progress/Slots/Slot1/ResultIcon") as TextureRect).visible
 	board.apply_state({
 		"status": "playing",
@@ -84,6 +89,23 @@ func _initialize() -> void:
 	hover_motion.position = Vector2(interactive_card.size.x, 0.0)
 	interactive_card.gui_input.emit(hover_motion)
 	h.check(absf(float((interactive_card.material as ShaderMaterial).get_shader_parameter("y_rot"))) > 0.0, "game 鼠标位置会驱动手牌透视角度")
+	board.apply_state({
+		"status": "playing",
+		"phase": "yellow",
+		"players": [
+			{"id": 2, "name": "对手甲", "balance": 2300, "predictions": [1, 2, 3, 4], "hole_cards": []},
+			{"id": 3, "name": "对手乙", "balance": 1780, "predictions": [4, 3, 2, 1], "hole_cards": []},
+			{"id": 4, "name": "对手丙", "balance": 2100, "predictions": [2, 4, 1, 3], "hole_cards": []},
+			{"id": 1, "name": "本人", "balance": 1950, "chip": 4, "hole_cards": [{"rank": 12, "suit": 3}, {"rank": 11, "suit": 2}]},
+		],
+	}, 1)
+	var top_player := board.get_node("Background/TopPlayer") as Control
+	var rank4_button := board.get_node("Background/PredictionPanel/ButtonLayer/Rank4") as TextureButton
+	var top_rank4_history := board.get_node("Background/TopPlayer/PredictionHistory/Round2Icon") as TextureRect
+	h.check(top_player.visible and top_player.get_node("NameFrame/NameLabel").text == "对手乙", "game 四人模式显示第四位玩家座席")
+	h.check(rank4_button.visible and int(board.get("_active_player_count")) == 4, "game 四人模式显示第4名预测按钮")
+	h.check(top_rank4_history.visible and top_rank4_history.texture != null, "game 四人玩家历史可显示第4名")
+	h.check((board.call("_deal_targets") as Array).size() == 8, "game 四人模式准备两轮共8个发牌目标")
 	board.apply_state({
 		"status": "round_complete",
 		"phase": "red",
@@ -284,5 +306,21 @@ func _initialize() -> void:
 	board.apply_state(deal_state, 1)
 	await create_timer(0.3).timeout
 	h.check(community_deal_sequence == [0, 1, 2, 0], "game 新一轮从五张重置后第一张公共牌仍播放发牌")
+	deal_sequence.clear()
+	board.arm_new_round_animation()
+	var four_player_deal_state := {
+		"status": "playing",
+		"phase": "white",
+		"players": [
+			{"id": 2, "name": "对手甲", "balance": 2300, "hole_cards": []},
+			{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},
+			{"id": 4, "name": "对手丙", "balance": 2100, "hole_cards": []},
+			{"id": 1, "name": "本人", "balance": 1950, "hole_cards": [{"rank": 12, "suit": 3}, {"rank": 11, "suit": 2}]},
+		],
+	}
+	board.apply_state(four_player_deal_state, 1)
+	await create_timer(0.6).timeout
+	h.check(deal_sequence == ["LeftPlayer:0", "TopPlayer:0", "RightPlayer:0", "BottomPlayer:0", "LeftPlayer:1", "TopPlayer:1", "RightPlayer:1", "BottomPlayer:1"], "game 四人局按左、上、右、自己循环发两轮")
+	h.check(board.get_node("Background/TopPlayer/HoleCards/Card2/Image").visible, "game 四人局两轮发牌结束后显示上方玩家手牌")
 	board.queue_free()
 	h.finish(self)

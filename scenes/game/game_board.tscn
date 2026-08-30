@@ -1,25 +1,26 @@
-[gd_scene format=3 uid="uid://tv574j3o7uax"]
+[gd_scene format=3]
 
-[ext_resource type="FontFile" uid="uid://bt1ywdsco3yhl" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="1_vtrdf"]
-[ext_resource type="Script" uid="uid://civxnmrxuuylh" path="res://scenes/game/game_board.gd" id="2_i0n00"]
-[ext_resource type="Texture2D" uid="uid://c1hmc6818kxy0" path="res://game/游戏桌面底图.png" id="3_7ybxp"]
-[ext_resource type="Texture2D" uid="uid://bsvcx3mxp3173" path="res://game/金库区底图.png" id="4_gdx47"]
-[ext_resource type="Texture2D" uid="uid://cnv5irv24hyiv" path="res://game/玩家金钱框组件.png" id="5_s0cf0"]
-[ext_resource type="Texture2D" uid="uid://by6mqe5abfi2q" path="res://homepage/金币图标.png" id="6_67dag"]
-[ext_resource type="Texture2D" uid="uid://bg35o1r6m1hvu" path="res://game/进度报警上图.png" id="7_lb4tj"]
-[ext_resource type="Texture2D" uid="uid://bhu4twvnrt7co" path="res://game/退出图标.png" id="8_6sohv"]
-[ext_resource type="Texture2D" uid="uid://gpr0n4rei7wr" path="res://cards/back.png" id="9_46kh3"]
-[ext_resource type="Texture2D" uid="uid://bjgh0haswb2gm" path="res://game/本轮排名预测背景框.png" id="10_kc34d"]
-[ext_resource type="Texture2D" uid="uid://0s4dv38nvqet" path="res://game/排名预测圆形按钮1.png" id="11_2sh2o"]
-[ext_resource type="Texture2D" uid="uid://bufe5d4ww1tpn" path="res://game/排名预测圆形按钮2.png" id="12_dpu0g"]
-[ext_resource type="Texture2D" uid="uid://bj357188f6w4n" path="res://game/排名预测圆形按钮3.png" id="13_nw3ox"]
-[ext_resource type="Texture2D" uid="uid://c0ppfnfg13km4" path="res://game/个人信息组合.png" id="14_vv8cv"]
-[ext_resource type="Texture2D" uid="uid://dwjb873tp57st" path="res://title/克苏鲁Q版头像2 深潜者.png" id="15_s8hbr"]
-[ext_resource type="Texture2D" uid="uid://tnxlxku3jr05" path="res://game/玩家四轮预测排名区域.png" id="16_873an"]
-[ext_resource type="Texture2D" uid="uid://c8vq2gpaq15hg" path="res://game/提交预测按钮底框无文字.png" id="17_0sp7b"]
-[ext_resource type="Texture2D" uid="uid://c6uyja0ql2qs1" path="res://title/克苏鲁Q版头像3 古老者 1.png" id="18_mbu0h"]
-[ext_resource type="Texture2D" uid="uid://b5lajtis5gosd" path="res://title/克苏鲁Q版头像6 犹格索托斯.png" id="19_usly8"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="1_vtrdf"]
+[ext_resource type="Script" path="res://scenes/game/game_board.gd" id="2_i0n00"]
+[ext_resource type="Texture2D" path="res://game/游戏桌面底图.png" id="3_7ybxp"]
+[ext_resource type="Texture2D" path="res://game/金库区底图.png" id="4_gdx47"]
+[ext_resource type="Texture2D" path="res://game/玩家金钱框组件.png" id="5_s0cf0"]
+[ext_resource type="Texture2D" path="res://homepage/金币图标.png" id="6_67dag"]
+[ext_resource type="Texture2D" path="res://game/进度报警上图.png" id="7_lb4tj"]
+[ext_resource type="Texture2D" path="res://game/退出图标.png" id="8_6sohv"]
+[ext_resource type="Texture2D" path="res://cards/back.png" id="9_46kh3"]
+[ext_resource type="Texture2D" path="res://game/排名预测圆形按钮1.png" id="11_2sh2o"]
+[ext_resource type="Texture2D" path="res://game/排名预测圆形按钮2.png" id="12_dpu0g"]
+[ext_resource type="Texture2D" path="res://game/排名预测圆形按钮3.png" id="13_nw3ox"]
+[ext_resource type="Texture2D" path="res://game/个人信息组合.png" id="14_vv8cv"]
+[ext_resource type="Texture2D" path="res://title/克苏鲁Q版头像2 深潜者.png" id="15_s8hbr"]
+[ext_resource type="Texture2D" path="res://game/玩家四轮预测排名区域.png" id="16_873an"]
+[ext_resource type="Texture2D" path="res://game/提交预测按钮底框无文字.png" id="17_0sp7b"]
+[ext_resource type="Texture2D" path="res://title/克苏鲁Q版头像3 古老者 1.png" id="18_mbu0h"]
+[ext_resource type="Texture2D" path="res://title/克苏鲁Q版头像6 犹格索托斯.png" id="19_usly8"]
 [ext_resource type="Texture2D" path="res://game/胜利标记.png" id="20_progress_preview"]
+[ext_resource type="Texture2D" path="res://game/排名预测圆形按钮4.png" id="21_rank4"]
+[ext_resource type="Texture2D" path="res://game/本轮排名预测背景框 4人版.png" id="22_prediction4"]
 
 [sub_resource type="Theme" id="GameTheme"]
 default_font = ExtResource("1_vtrdf")
@@ -31,6 +32,10 @@ region = Rect2(98, 115, 1732, 615)
 [sub_resource type="AtlasTexture" id="AtlasTexture_yunia"]
 atlas = ExtResource("6_67dag")
 region = Rect2(188, 149, 875, 900)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_progress_preview"]
+atlas = ExtResource("20_progress_preview")
+region = Rect2(788, 49, 600, 592)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0v3ay"]
 
@@ -44,9 +49,9 @@ region = Rect2(188, 149, 875, 900)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_48agh"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_q1g88"]
-atlas = ExtResource("10_kc34d")
-region = Rect2(193, 167, 1497, 474)
+[sub_resource type="AtlasTexture" id="AtlasTexture_prediction4"]
+atlas = ExtResource("22_prediction4")
+region = Rect2(149, 167, 1582, 479)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_vrvi5"]
 atlas = ExtResource("11_2sh2o")
@@ -60,6 +65,10 @@ region = Rect2(161, 127, 931, 922)
 atlas = ExtResource("13_nw3ox")
 region = Rect2(133, 99, 986, 999)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_rank4"]
+atlas = ExtResource("21_rank4")
+region = Rect2(133, 99, 985, 999)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_w3hwl"]
 atlas = ExtResource("14_vv8cv")
 region = Rect2(116, 122, 1438, 650)
@@ -71,10 +80,6 @@ region = Rect2(116, 122, 1438, 650)
 [sub_resource type="AtlasTexture" id="AtlasTexture_o54c1"]
 atlas = ExtResource("16_873an")
 region = Rect2(223, 174, 1372, 509)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_progress_preview"]
-atlas = ExtResource("20_progress_preview")
-region = Rect2(788, 49, 600, 592)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n5m16"]
 
@@ -143,9 +148,9 @@ anchor_left = 0.32
 anchor_top = 0.18
 anchor_right = 0.94
 anchor_bottom = 0.82
-theme_override_colors/font_color = Color(0.94, 0.75, 0.39, 1)
 theme_override_fonts/font = ExtResource("1_vtrdf")
 theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.94, 0.75, 0.39, 1)
 text = "4,500"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -192,20 +197,20 @@ offset_left = 309.55203
 offset_top = 11.071999
 offset_right = 309.55203
 offset_bottom = 11.071995
-theme_override_colors/font_color = Color(0.92, 0.72, 0.4, 1)
 theme_override_fonts/font = ExtResource("1_vtrdf")
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.92, 0.72, 0.4, 1)
 text = "白色阶段"
 horizontal_alignment = 1
 
 [node name="Slots" type="Control" parent="Background/Progress" unique_id=880741121]
+editor_description = "2D 编辑器预览：展开 Slots 并选择 Slot1～Slot7，可直接调整七个圆形结果槽的位置和大小。运行时预览图会自动隐藏。"
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-editor_description = "2D 编辑器预览：展开 Slots 并选择 Slot1～Slot7，可直接调整七个圆形结果槽的位置和大小。运行时预览图会自动隐藏。"
 
 [node name="Slot1" type="Label" parent="Background/Progress/Slots" unique_id=1601727562]
 layout_mode = 1
@@ -339,17 +344,16 @@ texture_hover = ExtResource("8_6sohv")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="DeckPile" type="Control" parent="Background"]
+[node name="DeckPile" type="Control" parent="Background" unique_id=58621860]
 z_index = 5
 layout_mode = 1
-anchors_preset = -1
 anchor_left = 0.815
 anchor_top = 0.04
 anchor_right = 0.865
 anchor_bottom = 0.18
 mouse_filter = 2
 
-[node name="BackCard" type="TextureRect" parent="Background/DeckPile"]
+[node name="BackCard" type="TextureRect" parent="Background/DeckPile" unique_id=1326237338]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -365,7 +369,7 @@ texture = ExtResource("9_46kh3")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MiddleCard" type="TextureRect" parent="Background/DeckPile"]
+[node name="MiddleCard" type="TextureRect" parent="Background/DeckPile" unique_id=335497819]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -381,7 +385,7 @@ texture = ExtResource("9_46kh3")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TopCard" type="TextureRect" parent="Background/DeckPile"]
+[node name="TopCard" type="TextureRect" parent="Background/DeckPile" unique_id=1427985040]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -400,9 +404,9 @@ anchor_left = 0.38
 anchor_top = 0.205
 anchor_right = 0.62
 anchor_bottom = 0.245
-theme_override_colors/font_color = Color(0.94, 0.75, 0.4, 1)
 theme_override_fonts/font = ExtResource("1_vtrdf")
 theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.94, 0.75, 0.4, 1)
 text = "公共牌区域"
 horizontal_alignment = 1
 
@@ -424,8 +428,8 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_0v3ay")
 [node name="Label" type="Label" parent="Background/CommunityCards/Card1" unique_id=81032301]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.79, 0.61, 1)
 theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.92, 0.79, 0.61, 1)
 text = "?"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -513,18 +517,19 @@ texture = ExtResource("9_46kh3")
 expand_mode = 1
 
 [node name="PredictionPanel" type="PanelContainer" parent="Background" unique_id=228068856]
+editor_description = "2D 编辑器默认显示4人预测布局；运行时会按实际玩家数自动切换3人或4人素材与按钮。"
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.38
+anchor_left = 0.37
 anchor_top = 0.43
-anchor_right = 0.62
+anchor_right = 0.63
 anchor_bottom = 0.57
 theme_override_styles/panel = SubResource("StyleBoxEmpty_48agh")
 
 [node name="Artwork" type="TextureRect" parent="Background/PredictionPanel" unique_id=1471179088]
 layout_mode = 2
 mouse_filter = 2
-texture = SubResource("AtlasTexture_q1g88")
+texture = SubResource("AtlasTexture_prediction4")
 expand_mode = 1
 
 [node name="ButtonLayer" type="Control" parent="Background/PredictionPanel" unique_id=1099376608]
@@ -533,9 +538,9 @@ mouse_filter = 2
 
 [node name="Rank1" type="TextureButton" parent="Background/PredictionPanel/ButtonLayer" unique_id=1667846776]
 layout_mode = 0
-anchor_left = 0.17368
-anchor_top = 0.30591
-anchor_right = 0.35204
+anchor_left = 0.1
+anchor_top = 0.324
+anchor_right = 0.258
 anchor_bottom = 0.846
 mouse_default_cursor_shape = 2
 ignore_texture_size = true
@@ -564,10 +569,10 @@ expand_mode = 1
 
 [node name="Rank2" type="TextureButton" parent="Background/PredictionPanel/ButtonLayer" unique_id=1105814519]
 layout_mode = 0
-anchor_left = 0.41416
-anchor_top = 0.30802
-anchor_right = 0.59051
-anchor_bottom = 0.84178
+anchor_left = 0.31
+anchor_top = 0.324
+anchor_right = 0.468
+anchor_bottom = 0.846
 mouse_default_cursor_shape = 2
 ignore_texture_size = true
 stretch_mode = 5
@@ -595,9 +600,9 @@ expand_mode = 1
 
 [node name="Rank3" type="TextureButton" parent="Background/PredictionPanel/ButtonLayer" unique_id=544411445]
 layout_mode = 0
-anchor_left = 0.6493
-anchor_top = 0.30591
-anchor_right = 0.82632
+anchor_left = 0.525
+anchor_top = 0.324
+anchor_right = 0.683
 anchor_bottom = 0.846
 mouse_default_cursor_shape = 2
 ignore_texture_size = true
@@ -627,6 +632,38 @@ anchor_bottom = 1.0
 mouse_filter = 2
 texture = SubResource("AtlasTexture_nke3h")
 expand_mode = 1
+
+[node name="Rank4" type="TextureButton" parent="Background/PredictionPanel/ButtonLayer" unique_id=751264814]
+layout_mode = 0
+anchor_left = 0.742
+anchor_top = 0.324
+anchor_right = 0.9
+anchor_bottom = 0.846
+mouse_default_cursor_shape = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Background/PredictionPanel/ButtonLayer/Rank4" unique_id=1497472290]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 33
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Artwork" type="TextureRect" parent="Background/PredictionPanel/ButtonLayer/Rank4" unique_id=1681718215]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = SubResource("AtlasTexture_rank4")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="LeftPlayer" type="Control" parent="Background" unique_id=2046891139]
 layout_mode = 1
@@ -663,8 +700,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.93, 0.76, 0.44, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.76, 0.44, 1)
 text = "对手甲"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -689,8 +726,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.73, 0.54, 0.88, 1)
 theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.73, 0.54, 0.88, 1)
 text = "对"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -729,8 +766,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
 text = "2,300"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -771,8 +808,6 @@ alignment = 1
 z_index = 1
 custom_minimum_size = Vector2(90, 126)
 layout_mode = 2
-rotation = -0.06981317
-pivot_offset = Vector2(45, 126)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_7sf6p")
 
 [node name="Label" type="Label" parent="Background/LeftPlayer/HoleCards/Card1" unique_id=1101134581]
@@ -792,8 +827,6 @@ expand_mode = 1
 z_index = 2
 custom_minimum_size = Vector2(90, 126)
 layout_mode = 2
-rotation = 0.06981317
-pivot_offset = Vector2(45, 126)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_g41aw")
 
 [node name="Label" type="Label" parent="Background/LeftPlayer/HoleCards/Card2" unique_id=1254892853]
@@ -842,8 +875,8 @@ anchor_left = 0.1374
 anchor_top = 0.53
 anchor_right = 0.2474
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -864,8 +897,8 @@ anchor_left = 0.3433
 anchor_top = 0.53
 anchor_right = 0.4533
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -886,8 +919,8 @@ anchor_left = 0.5489
 anchor_top = 0.53
 anchor_right = 0.6589
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -908,8 +941,8 @@ anchor_left = 0.7526
 anchor_top = 0.53
 anchor_right = 0.8626
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -944,9 +977,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.94, 0.75, 0.4, 1)
 theme_override_fonts/font = ExtResource("1_vtrdf")
 theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.94, 0.75, 0.4, 1)
 text = "提交预测"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -958,9 +991,9 @@ anchor_left = 0.36
 anchor_top = 0.94
 anchor_right = 0.64
 anchor_bottom = 0.985
-theme_override_colors/font_color = Color(0.91, 0.72, 0.38, 1)
 theme_override_fonts/font = ExtResource("1_vtrdf")
 theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.91, 0.72, 0.38, 1)
 horizontal_alignment = 1
 
 [node name="RightPlayer" type="Control" parent="Background" unique_id=316150915]
@@ -998,8 +1031,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.93, 0.76, 0.44, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.76, 0.44, 1)
 text = "对手乙"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1022,8 +1055,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.73, 0.54, 0.88, 1)
 theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.73, 0.54, 0.88, 1)
 text = "对"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1059,8 +1092,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
 text = "1,780"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1101,8 +1134,6 @@ alignment = 1
 z_index = 1
 custom_minimum_size = Vector2(90, 126)
 layout_mode = 2
-rotation = -0.06981317
-pivot_offset = Vector2(45, 126)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_n5m16")
 
 [node name="Label" type="Label" parent="Background/RightPlayer/HoleCards/Card1" unique_id=691074151]
@@ -1122,8 +1153,6 @@ expand_mode = 1
 z_index = 2
 custom_minimum_size = Vector2(90, 126)
 layout_mode = 2
-rotation = 0.06981317
-pivot_offset = Vector2(45, 126)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_cge5g")
 
 [node name="Label" type="Label" parent="Background/RightPlayer/HoleCards/Card2" unique_id=1417454161]
@@ -1172,8 +1201,8 @@ anchor_left = 0.1374
 anchor_top = 0.53
 anchor_right = 0.2474
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1194,8 +1223,8 @@ anchor_left = 0.3433
 anchor_top = 0.53
 anchor_right = 0.4533
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1216,8 +1245,8 @@ anchor_left = 0.5489
 anchor_top = 0.53
 anchor_right = 0.6589
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1238,8 +1267,8 @@ anchor_left = 0.7526
 anchor_top = 0.53
 anchor_right = 0.8626
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1288,8 +1317,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.93, 0.76, 0.44, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.76, 0.44, 1)
 text = "You"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1312,8 +1341,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.73, 0.54, 0.88, 1)
 theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.73, 0.54, 0.88, 1)
 text = "Y"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1352,8 +1381,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
 text = "4,600"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1394,8 +1423,6 @@ alignment = 1
 z_index = 1
 custom_minimum_size = Vector2(150, 210)
 layout_mode = 2
-rotation = -0.05235988
-pivot_offset = Vector2(75, 210)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_f6rrw")
 
 [node name="Label" type="Label" parent="Background/BottomPlayer/HoleCards/Card1" unique_id=2066907632]
@@ -1415,8 +1442,6 @@ expand_mode = 1
 z_index = 2
 custom_minimum_size = Vector2(150, 210)
 layout_mode = 2
-rotation = 0.05235988
-pivot_offset = Vector2(75, 210)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_quo6a")
 
 [node name="Label" type="Label" parent="Background/BottomPlayer/HoleCards/Card2" unique_id=922468525]
@@ -1463,8 +1488,8 @@ anchor_left = 0.1374
 anchor_top = 0.53
 anchor_right = 0.2474
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1485,8 +1510,8 @@ anchor_left = 0.3433
 anchor_top = 0.53
 anchor_right = 0.4533
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1507,8 +1532,8 @@ anchor_left = 0.5489
 anchor_top = 0.53
 anchor_right = 0.6589
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1529,8 +1554,8 @@ anchor_left = 0.7526
 anchor_top = 0.53
 anchor_right = 0.8626
 anchor_bottom = 0.76
-theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1544,7 +1569,7 @@ anchor_bottom = 0.816
 mouse_filter = 2
 expand_mode = 1
 
-[node name="DealAnimationLayer" type="Control" parent="Background"]
+[node name="DealAnimationLayer" type="Control" parent="Background" unique_id=1652554922]
 z_index = 50
 layout_mode = 1
 anchors_preset = 15
@@ -1553,6 +1578,298 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="TopPlayer" type="Control" parent="Background" unique_id=1849666093]
+editor_description = "4人模式的第四位玩家预览座位，可在2D编辑器直接调整整体位置和大小。3人对局运行时自动隐藏。"
+layout_mode = 1
+anchor_left = 0.68
+anchor_top = 0.18
+anchor_right = 0.935
+anchor_bottom = 0.45
+
+[node name="InfoFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=346774617]
+layout_mode = 0
+anchor_left = 0.011
+anchor_top = 0.11
+anchor_right = 0.611
+anchor_bottom = 0.565
+mouse_filter = 2
+texture = SubResource("AtlasTexture_w3hwl")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=214262877]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.246
+anchor_top = 0.185
+anchor_right = 0.576
+anchor_bottom = 0.365
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Background/TopPlayer/NameFrame" unique_id=369175752]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.76, 0.44, 1)
+text = "对手甲"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AvatarFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=2087575514]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.011
+anchor_top = 0.11
+anchor_right = 0.287
+anchor_bottom = 0.565
+offset_top = 1.1640015
+offset_bottom = -1.5258789e-05
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InitialLabel" type="Label" parent="Background/TopPlayer/AvatarFrame" unique_id=1684025221]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.73, 0.54, 0.88, 1)
+text = "对"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AvatarIcon" type="TextureRect" parent="Background/TopPlayer/AvatarFrame" unique_id=1984139974]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.032158732
+anchor_top = 0.022811368
+anchor_right = 1.107488
+anchor_bottom = 0.977589
+offset_right = -10.0
+offset_bottom = -1.6779785
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("15_s8hbr")
+expand_mode = 1
+stretch_mode = 5
+metadata/_edit_use_anchors_ = true
+
+[node name="MoneyFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=6878855]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.281
+anchor_top = 0.39
+anchor_right = 0.531
+anchor_bottom = 0.565
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MoneyLabel" type="Label" parent="Background/TopPlayer/MoneyFrame" unique_id=1844633356]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.93, 0.72, 0.3, 1)
+text = "2,300"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StateLabel" type="Label" parent="Background/TopPlayer" unique_id=1688142989]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.65
+anchor_right = 0.32
+anchor_bottom = 0.77
+text = "预测排名"
+horizontal_alignment = 1
+
+[node name="PredictionLabel" type="Label" parent="Background/TopPlayer" unique_id=1683319065]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.8
+anchor_right = 0.32
+anchor_bottom = 0.92
+text = "尚未选择"
+horizontal_alignment = 1
+
+[node name="HoleCards" type="HBoxContainer" parent="Background/TopPlayer" unique_id=1542303875]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.68
+anchor_top = 0.155
+anchor_right = 0.98
+anchor_bottom = 0.587
+theme_override_constants/separation = -42
+alignment = 1
+
+[node name="Card1" type="PanelContainer" parent="Background/TopPlayer/HoleCards" unique_id=148090837]
+z_index = 1
+custom_minimum_size = Vector2(90, 126)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_7sf6p")
+
+[node name="Label" type="Label" parent="Background/TopPlayer/HoleCards/Card1" unique_id=1183243737]
+visible = false
+layout_mode = 2
+text = "✦"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Image" type="TextureRect" parent="Background/TopPlayer/HoleCards/Card1" unique_id=523454828]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("9_46kh3")
+expand_mode = 1
+
+[node name="Card2" type="PanelContainer" parent="Background/TopPlayer/HoleCards" unique_id=973242969]
+z_index = 2
+custom_minimum_size = Vector2(90, 126)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_g41aw")
+
+[node name="Label" type="Label" parent="Background/TopPlayer/HoleCards/Card2" unique_id=717136421]
+visible = false
+layout_mode = 2
+text = "✦"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Image" type="TextureRect" parent="Background/TopPlayer/HoleCards/Card2" unique_id=815755035]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("9_46kh3")
+expand_mode = 1
+
+[node name="CoinIcon" type="TextureRect" parent="Background/TopPlayer" unique_id=1780292109]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.257
+anchor_top = 0.404
+anchor_right = 0.341
+anchor_bottom = 0.554
+offset_left = 2.2128067
+offset_top = -0.56640625
+offset_right = -2.9135895
+offset_bottom = -5.3063965
+mouse_filter = 2
+texture = SubResource("AtlasTexture_yunia")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PredictionHistory" type="TextureRect" parent="Background/TopPlayer" unique_id=1340947247]
+layout_mode = 0
+anchor_left = 0.005
+anchor_top = 0.61
+anchor_right = 0.615
+anchor_bottom = 0.99
+mouse_filter = 2
+texture = SubResource("AtlasTexture_o54c1")
+expand_mode = 1
+
+[node name="Round1" type="Label" parent="Background/TopPlayer/PredictionHistory" unique_id=1723574228]
+visible = false
+layout_mode = 0
+anchor_left = 0.1374
+anchor_top = 0.53
+anchor_right = 0.2474
+anchor_bottom = 0.76
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Round1Icon" type="TextureRect" parent="Background/TopPlayer/PredictionHistory" unique_id=166590781]
+visible = false
+layout_mode = 0
+anchor_left = 0.1204
+anchor_top = 0.428
+anchor_right = 0.2644
+anchor_bottom = 0.816
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Round2" type="Label" parent="Background/TopPlayer/PredictionHistory" unique_id=290864961]
+visible = false
+layout_mode = 0
+anchor_left = 0.3433
+anchor_top = 0.53
+anchor_right = 0.4533
+anchor_bottom = 0.76
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Round2Icon" type="TextureRect" parent="Background/TopPlayer/PredictionHistory" unique_id=165843342]
+visible = false
+layout_mode = 0
+anchor_left = 0.3263
+anchor_top = 0.428
+anchor_right = 0.4703
+anchor_bottom = 0.816
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Round3" type="Label" parent="Background/TopPlayer/PredictionHistory" unique_id=1563901585]
+visible = false
+layout_mode = 0
+anchor_left = 0.5489
+anchor_top = 0.53
+anchor_right = 0.6589
+anchor_bottom = 0.76
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Round3Icon" type="TextureRect" parent="Background/TopPlayer/PredictionHistory" unique_id=1677535227]
+visible = false
+layout_mode = 0
+anchor_left = 0.5319
+anchor_top = 0.428
+anchor_right = 0.6759
+anchor_bottom = 0.816
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Round4" type="Label" parent="Background/TopPlayer/PredictionHistory" unique_id=1927796554]
+visible = false
+layout_mode = 0
+anchor_left = 0.7526
+anchor_top = 0.53
+anchor_right = 0.8626
+anchor_bottom = 0.76
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.76, 0.43, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Round4Icon" type="TextureRect" parent="Background/TopPlayer/PredictionHistory" unique_id=1388354192]
+visible = false
+layout_mode = 0
+anchor_left = 0.7356
+anchor_top = 0.428
+anchor_right = 0.8796
+anchor_bottom = 0.816
+mouse_filter = 2
+expand_mode = 1
 
 [connection signal="pressed" from="Background/ExitButton" to="." method="_on_exit_pressed"]
 [connection signal="pressed" from="Background/SubmitButton" to="." method="_on_submit_pressed"]

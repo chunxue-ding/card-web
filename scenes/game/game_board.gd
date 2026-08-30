@@ -1,6 +1,6 @@
 class_name GameBoard
 extends Control
-## 三人牌桌：根据房间 WS 快照渲染牌面、玩家、警报进度与排名预测。
+## 三/四人牌桌：根据房间 WS 快照渲染牌面、玩家、警报进度与排名预测。
 
 signal exit_requested
 signal prediction_submitted(rank: int)
@@ -17,10 +17,13 @@ const CARD_BACK := "res://cards/back.png"
 const CARD_PERSPECTIVE_SHADER := preload("res://scenes/game/card_perspective.gdshader")
 const WIN_MARK := "res://game/胜利标记.png"
 const LOSS_MARK := "res://game/失败标记.png"
+const PREDICTION_PANEL_3 := "res://game/本轮排名预测背景框.png"
+const PREDICTION_PANEL_4 := "res://game/本轮排名预测背景框 4人版.png"
 const RANK_BUTTON_ASSETS := [
 	"res://game/排名预测圆形按钮1.png",
 	"res://game/排名预测圆形按钮2.png",
 	"res://game/排名预测圆形按钮3.png",
+	"res://game/排名预测圆形按钮4.png",
 ]
 
 @export_range(0.05, 1.0, 0.01) var deal_card_duration := 0.38
@@ -31,10 +34,12 @@ const RANK_BUTTON_ASSETS := [
 @onready var phase_label: Label = $Background/Progress/PhaseLabel
 @onready var progress_slots: Control = $Background/Progress/Slots
 @onready var community_cards: HBoxContainer = $Background/CommunityCards
+@onready var prediction_panel_artwork: TextureRect = $Background/PredictionPanel/Artwork
 @onready var prediction_buttons: Array[TextureButton] = [
 	$Background/PredictionPanel/ButtonLayer/Rank1,
 	$Background/PredictionPanel/ButtonLayer/Rank2,
 	$Background/PredictionPanel/ButtonLayer/Rank3,
+	$Background/PredictionPanel/ButtonLayer/Rank4,
 ]
 @onready var submit_button: TextureButton = $Background/SubmitButton
 @onready var submit_label: Label = $Background/SubmitButton/Label
@@ -49,7 +54,9 @@ var _round_results: Array[bool] = []
 var _win_mark_texture: Texture2D
 var _loss_mark_texture: Texture2D
 var _rank_button_textures: Array[Texture2D] = []
+var _prediction_panel_textures: Array[Texture2D] = []
 var _player_prediction_cache: Dictionary = {}
+var _active_player_count := 3
 var _current_phase := "white"
 var _deal_animation_pending := false
 var _dealing := false
@@ -72,18 +79,92 @@ func _ready() -> void:
 	# 场景文件中的七个胜利标记只用于 Godot 2D 编辑器对位；
 	# 游戏启动后立刻按真实结算数据重新控制显隐。
 	_render_progress_results()
+	_prediction_panel_textures = [
+		_cropped_texture(PREDICTION_PANEL_3),
+		_cropped_texture(PREDICTION_PANEL_4),
+	]
 	for path in RANK_BUTTON_ASSETS:
 		_rank_button_textures.append(_cropped_texture(path))
 	for index in prediction_buttons.size():
 		prediction_buttons[index].pressed.connect(_select_rank.bind(index + 1))
 	_setup_card_interactions()
-	for seat in [$Background/LeftPlayer, $Background/RightPlayer, $Background/BottomPlayer]:
+	for seat in _all_player_seats():
 		var hand := seat.get_node("HoleCards") as HBoxContainer
 		hand.sort_children.connect(_apply_hole_card_fan)
 	community_cards.sort_children.connect(_apply_community_card_spread)
 	call_deferred("_apply_hole_card_fan")
 	call_deferred("_apply_community_card_spread")
+	_configure_player_count(3)
 	_refresh_prediction_buttons()
+	var music := get_node_or_null("/root/Music")
+	if music != null:
+		music.call("play_game")
+
+
+func _exit_tree() -> void:
+	var music := get_node_or_null("/root/Music")
+	if music != null:
+		music.call("stop")
+
+
+func _all_player_seats() -> Array[Control]:
+	return [
+		$Background/LeftPlayer,
+		$Background/TopPlayer,
+		$Background/RightPlayer,
+		$Background/BottomPlayer,
+	]
+
+
+func _deal_seats() -> Array[Control]:
+	if _active_player_count == 4:
+		return [
+			$Background/LeftPlayer,
+			$Background/TopPlayer,
+			$Background/RightPlayer,
+			$Background/BottomPlayer,
+		]
+	return [
+		$Background/LeftPlayer,
+		$Background/RightPlayer,
+		$Background/BottomPlayer,
+	]
+
+
+func _configure_player_count(count: int) -> void:
+	_active_player_count = clampi(count, 3, 4)
+	$Background/TopPlayer.visible = _active_player_count == 4
+	var panel := $Background/PredictionPanel as PanelContainer
+	if _active_player_count == 4:
+		panel.anchor_left = 0.37
+		panel.anchor_right = 0.63
+		prediction_panel_artwork.texture = _prediction_panel_textures[1]
+	else:
+		panel.anchor_left = 0.38
+		panel.anchor_right = 0.62
+		prediction_panel_artwork.texture = _prediction_panel_textures[0]
+
+	var layouts_3 := [
+		Rect2(0.17368, 0.30591, 0.17836, 0.54009),
+		Rect2(0.41416, 0.30802, 0.17635, 0.53376),
+		Rect2(0.6493, 0.30591, 0.17702, 0.54009),
+	]
+	var layouts_4 := [
+		Rect2(0.100, 0.324, 0.158, 0.522),
+		Rect2(0.310, 0.324, 0.158, 0.522),
+		Rect2(0.525, 0.324, 0.158, 0.522),
+		Rect2(0.742, 0.324, 0.158, 0.522),
+	]
+	var layouts: Array = layouts_4 if _active_player_count == 4 else layouts_3
+	for index in prediction_buttons.size():
+		var button := prediction_buttons[index]
+		button.visible = index < _active_player_count
+		if button.visible:
+			var rect := layouts[index] as Rect2
+			button.anchor_left = rect.position.x
+			button.anchor_top = rect.position.y
+			button.anchor_right = rect.end.x
+			button.anchor_bottom = rect.end.y
 
 
 # 布局节点已固定在 game_board.tscn；这里以下只负责根据服务端状态更新内容。
@@ -129,6 +210,7 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 	var reveal_hole_cards := status == "round_complete" or status == "finished"
 
 	var players: Array = view.get("players", [])
+	_configure_player_count(clampi(players.size(), 3, 4))
 	var mine: Dictionary = {}
 	var others: Array[Dictionary] = []
 	for raw_player in players:
@@ -138,7 +220,8 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 		else:
 			others.append(player)
 	_update_seat($Background/LeftPlayer, others[0] if others.size() > 0 else {}, false, reveal_hole_cards)
-	_update_seat($Background/RightPlayer, others[1] if others.size() > 1 else {}, false, reveal_hole_cards)
+	_update_seat($Background/TopPlayer, others[1] if others.size() > 2 else {}, false, reveal_hole_cards)
+	_update_seat($Background/RightPlayer, others[2] if others.size() > 2 else (others[1] if others.size() > 1 else {}), false, reveal_hole_cards)
 	_update_seat($Background/BottomPlayer, mine, true, reveal_hole_cards)
 	if _dealing:
 		_apply_deal_visibility()
@@ -229,7 +312,8 @@ func _start_deal_animation() -> void:
 
 func _play_deal_animation(generation: int) -> void:
 	var targets := _deal_targets()
-	if targets.size() != 6:
+	var deal_seats := _deal_seats()
+	if targets.size() != deal_seats.size() * 2:
 		_finish_deal_animation(generation)
 		return
 	var origin_image := $Background/DeckPile/TopCard as TextureRect
@@ -257,7 +341,7 @@ func _play_deal_animation(generation: int) -> void:
 		_apply_deal_visibility()
 		_play_landing_bounce(target)
 		var seat := target.get_parent().get_parent().get_parent() as Control
-		card_dealt.emit(seat.name, index / 3)
+		card_dealt.emit(seat.name, index / deal_seats.size())
 		flying_card.queue_free()
 		if deal_card_gap > 0.0 and index < targets.size() - 1:
 			await get_tree().create_timer(deal_card_gap).timeout
@@ -265,11 +349,7 @@ func _play_deal_animation(generation: int) -> void:
 
 
 func _deal_targets() -> Array[TextureRect]:
-	var seats: Array[Control] = [
-		$Background/LeftPlayer,
-		$Background/RightPlayer,
-		$Background/BottomPlayer,
-	]
+	var seats := _deal_seats()
 	var targets: Array[TextureRect] = []
 	for card_index in 2:
 		for seat in seats:
@@ -287,7 +367,7 @@ func _finish_deal_animation(generation: int) -> void:
 	if generation != _deal_generation:
 		return
 	_dealing = false
-	_dealt_slot_count = 6
+	_dealt_slot_count = _deal_targets().size()
 	_apply_deal_visibility()
 	_clear_flying_cards()
 	_start_pending_community_deal()
@@ -390,7 +470,10 @@ func _play_landing_bounce(target: TextureRect) -> void:
 
 
 func _setup_card_interactions() -> void:
-	var interactive_cards := _deal_targets()
+	var interactive_cards: Array[TextureRect] = []
+	for seat in _all_player_seats():
+		for card_index in 2:
+			interactive_cards.append(seat.get_node("HoleCards/Card%d/Image" % (card_index + 1)) as TextureRect)
 	for slot in community_cards.get_children():
 		interactive_cards.append(slot.get_node("Image") as TextureRect)
 	var perspective_enabled := should_use_card_perspective(
@@ -423,7 +506,7 @@ static func should_use_card_perspective(is_web: bool, is_touchscreen: bool) -> b
 
 
 func _apply_hole_card_fan() -> void:
-	for seat in [$Background/LeftPlayer, $Background/RightPlayer, $Background/BottomPlayer]:
+	for seat in _all_player_seats():
 		var first := seat.get_node("HoleCards/Card1") as PanelContainer
 		var second := seat.get_node("HoleCards/Card2") as PanelContainer
 		var angle := deg_to_rad(3.0 if seat.name == "BottomPlayer" else 4.0)
@@ -529,7 +612,7 @@ func _apply_community_deal_visibility() -> void:
 
 
 func _cache_claimed_chip(player_id: int, rank: int) -> void:
-	if player_id == 0 or rank < 1 or rank > 3:
+	if player_id == 0 or rank < 1 or rank > _active_player_count:
 		return
 	var values: Array = [0, 0, 0, 0]
 	if _player_prediction_cache.has(player_id):
@@ -592,7 +675,7 @@ func _update_prediction_history(seat: Control, player: Dictionary) -> void:
 	for index in 4:
 		var value := int(values[index])
 		var icon := history.get_node("Round%dIcon" % (index + 1)) as TextureRect
-		icon.visible = value >= 1 and value <= 3
+		icon.visible = value >= 1 and value <= _active_player_count
 		icon.texture = _rank_button_textures[value - 1] if icon.visible else null
 
 

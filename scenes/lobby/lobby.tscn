@@ -1,17 +1,21 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene format=3 uid="uid://2yrxl2b0qher"]
 
-[ext_resource type="Texture2D" path="res://homepage/简化主页背景底图.png" id="1_bg"]
-[ext_resource type="Texture2D" path="res://assets/homepage/quick_button_frame.png" id="2_quick_frame"]
-[ext_resource type="Texture2D" path="res://assets/homepage/quick_match_icon.png" id="3_quick_icon"]
-[ext_resource type="Texture2D" path="res://assets/homepage/friend_button_frame.png" id="4_friend_frame"]
-[ext_resource type="Texture2D" path="res://assets/homepage/friend_play_icon.png" id="5_friend_icon"]
-[ext_resource type="Texture2D" path="res://assets/homepage/player_count_frame.png" id="6_count_frame"]
-[ext_resource type="Texture2D" path="res://assets/homepage/player_count_slot.png" id="7_count_slot"]
-[ext_resource type="Texture2D" path="res://assets/homepage/player_avatar_frame.png" id="8_avatar"]
-[ext_resource type="Texture2D" path="res://assets/homepage/coin_icon.png" id="10_coin"]
-[ext_resource type="Theme" path="res://themes/main_theme.tres" id="11_theme"]
-[ext_resource type="Script" path="res://scenes/lobby/lobby.gd" id="12_script"]
-[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="13_font"]
+[ext_resource type="Texture2D" uid="uid://bk7w12ajan1yl" path="res://homepage/简化主页背景底图.png" id="1_bg"]
+[ext_resource type="Texture2D" uid="uid://bk8cgrcv18ttk" path="res://assets/homepage/quick_button_frame.png" id="2_quick_frame"]
+[ext_resource type="Texture2D" uid="uid://bguvo41r3u5wd" path="res://assets/homepage/quick_match_icon.png" id="3_quick_icon"]
+[ext_resource type="Texture2D" uid="uid://dt2uhqfbrns5r" path="res://assets/homepage/friend_button_frame.png" id="4_friend_frame"]
+[ext_resource type="Texture2D" uid="uid://bfifs5b6xmbjn" path="res://assets/homepage/friend_play_icon.png" id="5_friend_icon"]
+[ext_resource type="Texture2D" uid="uid://clvwlxaieyv1o" path="res://assets/homepage/player_count_frame.png" id="6_count_frame"]
+[ext_resource type="Texture2D" uid="uid://dkch3h4ck568l" path="res://assets/homepage/player_count_slot.png" id="7_count_slot"]
+[ext_resource type="Texture2D" uid="uid://cxxd23oy4h44l" path="res://assets/homepage/player_avatar_frame.png" id="8_avatar"]
+[ext_resource type="Texture2D" uid="uid://dykeywpb31afb" path="res://assets/homepage/coin_icon.png" id="10_coin"]
+[ext_resource type="Theme" uid="uid://ckuqgtpmitv7e" path="res://themes/main_theme.tres" id="11_theme"]
+[ext_resource type="Script" uid="uid://b6vi7y77h376y" path="res://scenes/lobby/lobby.gd" id="12_script"]
+[ext_resource type="FontFile" uid="uid://bt1ywdsco3yhl" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="13_font"]
+[ext_resource type="Texture2D" uid="uid://dwjb873tp57st" path="res://title/克苏鲁Q版头像2 深潜者.png" id="14_avatar_preview"]
+
+[sub_resource type="FontVariation" id="DisplayFont"]
+base_font = ExtResource("13_font")
 
 [sub_resource type="StyleBoxFlat" id="HeaderButtonNormal"]
 bg_color = Color(0.035, 0.025, 0.025, 0.82)
@@ -39,18 +43,6 @@ corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxEmpty" id="CountNormal"]
 
-[sub_resource type="StyleBoxFlat" id="CountHover"]
-bg_color = Color(0.26, 0.09, 0.35, 0.42)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.57, 0.3, 0.72, 0.8)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-
 [sub_resource type="StyleBoxFlat" id="CountSelected"]
 bg_color = Color(0.31, 0.08, 0.43, 0.76)
 border_width_left = 3
@@ -65,12 +57,21 @@ corner_radius_bottom_left = 48
 shadow_color = Color(0.45, 0.12, 0.65, 0.6)
 shadow_size = 10
 
+[sub_resource type="StyleBoxFlat" id="CountHover"]
+bg_color = Color(0.26, 0.09, 0.35, 0.42)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.3, 0.72, 0.8)
+corner_radius_top_left = 48
+corner_radius_top_right = 48
+corner_radius_bottom_right = 48
+corner_radius_bottom_left = 48
+
 [sub_resource type="ButtonGroup" id="PlayerCountGroup"]
 
-[sub_resource type="FontVariation" id="DisplayFont"]
-base_font = ExtResource("13_font")
-
-[node name="Lobby" type="Control"]
+[node name="Lobby" type="Control" unique_id=1248080530]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -80,7 +81,7 @@ grow_vertical = 2
 theme = ExtResource("11_theme")
 script = ExtResource("12_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=483252134]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -91,9 +92,8 @@ texture = ExtResource("1_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Header" type="Control" parent="Background"]
+[node name="Header" type="Control" parent="Background" unique_id=1700310707]
 layout_mode = 1
-anchors_preset = -1
 anchor_left = 0.661
 anchor_top = 0.025
 anchor_right = 0.936
@@ -101,10 +101,10 @@ anchor_bottom = 0.125
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="AvatarFrame" type="TextureRect" parent="Background/Header"]
+[node name="AvatarFrame" type="TextureRect" parent="Background/Header" unique_id=442682306]
+editor_description = "2D 编辑器头像预览：调整 AvatarFrame 可改变头像框整体大小；调整子节点 AvatarIcon 可改变头像在圆框中的大小和位置。"
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.0
 anchor_top = 0.08
 anchor_right = 0.17
 anchor_bottom = 0.92
@@ -115,24 +115,25 @@ texture = ExtResource("8_avatar")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AvatarIcon" type="TextureRect" parent="Background/Header/AvatarFrame"]
+[node name="AvatarIcon" type="TextureRect" parent="Background/Header/AvatarFrame" unique_id=1884224050]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.115
-anchor_top = 0.115
-anchor_right = 0.885
-anchor_bottom = 0.885
+anchor_left = 0.020944934
+anchor_top = 0.014991188
+anchor_right = 0.97905546
+anchor_bottom = 0.98500884
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+texture = ExtResource("14_avatar_preview")
 expand_mode = 1
 stretch_mode = 5
+metadata/_edit_use_anchors_ = true
 
-[node name="NameLabel" type="Label" parent="Background/Header"]
+[node name="NameLabel" type="Label" parent="Background/Header" unique_id=1591507886]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.19
-anchor_top = 0.0
 anchor_right = 0.47
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -143,7 +144,7 @@ theme_override_font_sizes/font_size = 26
 text = "玩家"
 vertical_alignment = 1
 
-[node name="CoinIcon" type="TextureRect" parent="Background/Header"]
+[node name="CoinIcon" type="TextureRect" parent="Background/Header" unique_id=907305902]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.49
@@ -157,11 +158,10 @@ texture = ExtResource("10_coin")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BalanceLabel" type="Label" parent="Background/Header"]
+[node name="BalanceLabel" type="Label" parent="Background/Header" unique_id=869244105]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.57
-anchor_top = 0.0
 anchor_right = 0.75
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -172,7 +172,7 @@ theme_override_font_sizes/font_size = 25
 text = "0"
 vertical_alignment = 1
 
-[node name="LogoutButton" type="Button" parent="Background/Header"]
+[node name="LogoutButton" type="Button" parent="Background/Header" unique_id=495023961]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.77
@@ -184,11 +184,11 @@ grow_vertical = 2
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("HeaderButtonNormal")
-theme_override_styles/hover = SubResource("HeaderButtonHover")
 theme_override_styles/pressed = SubResource("HeaderButtonHover")
+theme_override_styles/hover = SubResource("HeaderButtonHover")
 text = "退出登录"
 
-[node name="Actions" type="HBoxContainer" parent="Background"]
+[node name="Actions" type="HBoxContainer" parent="Background" unique_id=190374582]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.19
@@ -200,18 +200,18 @@ grow_vertical = 2
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="QuickMatchButton" type="TextureButton" parent="Background/Actions"]
+[node name="QuickMatchButton" type="TextureButton" parent="Background/Actions" unique_id=1874715905]
 custom_minimum_size = Vector2(500, 140)
 layout_mode = 2
 size_flags_vertical = 4
+mouse_default_cursor_shape = 2
 texture_normal = ExtResource("2_quick_frame")
-texture_hover = ExtResource("2_quick_frame")
 texture_pressed = ExtResource("2_quick_frame")
+texture_hover = ExtResource("2_quick_frame")
 ignore_texture_size = true
 stretch_mode = 5
-mouse_default_cursor_shape = 2
 
-[node name="Icon" type="TextureRect" parent="Background/Actions/QuickMatchButton"]
+[node name="Icon" type="TextureRect" parent="Background/Actions/QuickMatchButton" unique_id=1956389990]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.09
@@ -225,7 +225,7 @@ texture = ExtResource("3_quick_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Background/Actions/QuickMatchButton"]
+[node name="Label" type="Label" parent="Background/Actions/QuickMatchButton" unique_id=1867922121]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.32
@@ -234,7 +234,6 @@ anchor_right = 0.96
 anchor_bottom = 0.94
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 40
@@ -242,18 +241,18 @@ text = "快速匹配"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FriendPlayButton" type="TextureButton" parent="Background/Actions"]
+[node name="FriendPlayButton" type="TextureButton" parent="Background/Actions" unique_id=2028699117]
 custom_minimum_size = Vector2(500, 140)
 layout_mode = 2
 size_flags_vertical = 4
+mouse_default_cursor_shape = 2
 texture_normal = ExtResource("4_friend_frame")
-texture_hover = ExtResource("4_friend_frame")
 texture_pressed = ExtResource("4_friend_frame")
+texture_hover = ExtResource("4_friend_frame")
 ignore_texture_size = true
 stretch_mode = 5
-mouse_default_cursor_shape = 2
 
-[node name="Icon" type="TextureRect" parent="Background/Actions/FriendPlayButton"]
+[node name="Icon" type="TextureRect" parent="Background/Actions/FriendPlayButton" unique_id=1248094732]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.09
@@ -267,7 +266,7 @@ texture = ExtResource("5_friend_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Background/Actions/FriendPlayButton"]
+[node name="Label" type="Label" parent="Background/Actions/FriendPlayButton" unique_id=1873716471]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.32
@@ -276,7 +275,6 @@ anchor_right = 0.96
 anchor_bottom = 0.94
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.93, 0.82, 0.62, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 40
@@ -284,7 +282,7 @@ text = "好友同玩"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CountCenter" type="CenterContainer" parent="Background"]
+[node name="CountCenter" type="CenterContainer" parent="Background" unique_id=2062677223]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
@@ -294,11 +292,11 @@ anchor_bottom = 0.83
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PlayerCountPanel" type="Control" parent="Background/CountCenter"]
+[node name="PlayerCountPanel" type="Control" parent="Background/CountCenter" unique_id=2064047708]
 custom_minimum_size = Vector2(700, 160)
 layout_mode = 2
 
-[node name="Frame" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Frame" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel" unique_id=1757794975]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -308,9 +306,8 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("6_count_frame")
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Title" type="Label" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Title" type="Label" parent="Background/CountCenter/PlayerCountPanel" unique_id=536514734]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
@@ -319,7 +316,6 @@ anchor_right = 0.75
 anchor_bottom = 0.3
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 23
@@ -327,7 +323,7 @@ text = "选择对局人数"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot3" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Slot3" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel" unique_id=1747714847]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.11
@@ -341,7 +337,7 @@ texture = ExtResource("7_count_slot")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot4" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Slot4" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel" unique_id=2039851122]
 modulate = Color(0.48, 0.48, 0.48, 0.62)
 layout_mode = 1
 anchors_preset = -1
@@ -356,7 +352,7 @@ texture = ExtResource("7_count_slot")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot5" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Slot5" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel" unique_id=1608844315]
 modulate = Color(0.48, 0.48, 0.48, 0.62)
 layout_mode = 1
 anchors_preset = -1
@@ -371,7 +367,7 @@ texture = ExtResource("7_count_slot")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot6" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Slot6" type="TextureRect" parent="Background/CountCenter/PlayerCountPanel" unique_id=1721547041]
 modulate = Color(0.48, 0.48, 0.48, 0.62)
 layout_mode = 1
 anchors_preset = -1
@@ -386,7 +382,7 @@ texture = ExtResource("7_count_slot")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Count3Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Count3Button" type="Button" parent="Background/CountCenter/PlayerCountPanel" unique_id=1720316614]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.11
@@ -396,20 +392,20 @@ anchor_bottom = 0.91
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
-theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
-theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
 toggle_mode = true
 button_pressed = true
 button_group = SubResource("PlayerCountGroup")
 text = "3人"
 
-[node name="Count4Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Count4Button" type="Button" parent="Background/CountCenter/PlayerCountPanel" unique_id=583802088]
 modulate = Color(0.58, 0.58, 0.58, 0.72)
 layout_mode = 1
 anchors_preset = -1
@@ -420,21 +416,21 @@ anchor_bottom = 0.91
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
-theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_disabled_color = Color(0.58, 0.58, 0.58, 0.9)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
-theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
-toggle_mode = true
 disabled = true
+toggle_mode = true
 button_group = SubResource("PlayerCountGroup")
 text = "4人"
 
-[node name="Count5Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Count5Button" type="Button" parent="Background/CountCenter/PlayerCountPanel" unique_id=2032997868]
 modulate = Color(0.58, 0.58, 0.58, 0.72)
 layout_mode = 1
 anchors_preset = -1
@@ -445,21 +441,21 @@ anchor_bottom = 0.91
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
-theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_disabled_color = Color(0.58, 0.58, 0.58, 0.9)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
-theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
-toggle_mode = true
 disabled = true
+toggle_mode = true
 button_group = SubResource("PlayerCountGroup")
 text = "5人"
 
-[node name="Count6Button" type="Button" parent="Background/CountCenter/PlayerCountPanel"]
+[node name="Count6Button" type="Button" parent="Background/CountCenter/PlayerCountPanel" unique_id=1682192928]
 modulate = Color(0.58, 0.58, 0.58, 0.72)
 layout_mode = 1
 anchors_preset = -1
@@ -470,21 +466,21 @@ anchor_bottom = 0.91
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.63, 1)
-theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.91, 0.75, 1)
+theme_override_colors/font_hover_color = Color(1, 0.91, 0.75, 1)
 theme_override_colors/font_disabled_color = Color(0.58, 0.58, 0.58, 0.9)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("CountNormal")
-theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/pressed = SubResource("CountSelected")
+theme_override_styles/hover = SubResource("CountHover")
 theme_override_styles/hover_pressed = SubResource("CountSelected")
-toggle_mode = true
 disabled = true
+toggle_mode = true
 button_group = SubResource("PlayerCountGroup")
 text = "6人"
 
-[node name="StatusLabel" type="Label" parent="Background"]
+[node name="StatusLabel" type="Label" parent="Background" unique_id=1928535094]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -493,7 +489,6 @@ anchor_right = 0.7
 anchor_bottom = 0.88
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.83, 0.69, 0.42, 1)
 theme_override_fonts/font = SubResource("DisplayFont")
 theme_override_font_sizes/font_size = 22

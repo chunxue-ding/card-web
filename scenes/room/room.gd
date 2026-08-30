@@ -108,7 +108,8 @@ func _render() -> void:
 	add_bot_button.visible = is_host and in_lobby
 	remove_bot_button.visible = is_host and in_lobby
 	start_button.visible = is_host and in_lobby
-	start_button.disabled = players.size() < 3
+	var required_players := clampi(int(_view.get("max_players", 3)), 3, 4)
+	start_button.disabled = players.size() < required_players
 	var status := str(_view.get("status", ""))
 	if status != "" and status != "lobby":
 		overlay.visible = true

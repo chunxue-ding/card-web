@@ -100,6 +100,7 @@ func _check_lobby() -> void:
 	var lobby_avatar := page.get_node("Background/Header/AvatarFrame/AvatarIcon") as TextureRect
 	h.check(lobby_avatar.visible and lobby_avatar.texture != null, "lobby 用户头像显示在头像框内")
 	h.check(lobby_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "lobby 用户头像保持比例居中")
+	h.check((load("res://scenes/lobby/lobby.tscn") as PackedScene).instantiate().get_node("Background/Header/AvatarFrame/AvatarIcon").texture != null, "lobby 2D 编辑器提供头像预览")
 	var lobby_font := page.get_node("Background/Actions/QuickMatchButton/Label").get_theme_font("font") as Font
 	h.check(lobby_font.has_char("中".unicode_at(0)), "lobby 局部字体包含中文字形")
 	h.check(page.has_method("_on_logout_pressed"), "lobby 登出回调存在")
@@ -108,10 +109,14 @@ func _check_lobby() -> void:
 	h.check(page.has_method("_set_action_hover"), "lobby 操作按钮悬停反馈存在")
 	var count3 := page.get_node("Background/CountCenter/PlayerCountPanel/Count3Button") as Button
 	var count6 := page.get_node("Background/CountCenter/PlayerCountPanel/Count6Button") as Button
-	h.check(page.player_count == 3 and count3.button_pressed and not count3.disabled, "lobby 默认选择当前支持的 3 人模式")
-	h.check(count6.disabled and count6.modulate.a < 1.0, "lobby 4 至 6 人模式置灰禁用")
+	var count4 := page.get_node("Background/CountCenter/PlayerCountPanel/Count4Button") as Button
+	h.check(page.player_count == 3 and count3.button_pressed and not count3.disabled, "lobby 默认选择 3 人模式")
+	h.check(not count4.disabled, "lobby 开放 4 人好友房模式")
+	h.check(count6.disabled and count6.modulate.a < 1.0, "lobby 5 至 6 人模式置灰禁用")
+	count4.pressed.emit()
+	h.check(page.player_count == 4, "lobby 可选择 4 人模式")
 	count6.pressed.emit()
-	h.check(page.player_count == 3, "lobby 禁用人数不能改变对局人数")
+	h.check(page.player_count == 4, "lobby 禁用人数不能改变对局人数")
 	page.get_node("Background/Actions/QuickMatchButton").pressed.emit()
 	h.check("快速匹配中" in page.get_node("Background/StatusLabel").text, "lobby 快速匹配进入匹配态")
 	h.check(page.has_method("_set_match_mode"), "lobby 匹配态切换存在")
@@ -138,6 +143,7 @@ func _check_friend_room() -> void:
 	var friend_avatar := page.get_node("Background/Header/AvatarFrame/AvatarIcon") as TextureRect
 	h.check(friend_avatar.visible and friend_avatar.texture != null, "friend_room 用户头像显示在头像框内")
 	h.check(friend_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "friend_room 用户头像保持比例居中")
+	h.check((load("res://scenes/friend_room/friend_room.tscn") as PackedScene).instantiate().get_node("Background/Header/AvatarFrame/AvatarIcon").texture != null, "friend_room 2D 编辑器提供头像预览")
 	var friend_room_font := page.get_node("Background/ActionCenter/Actions/CreateRoomButton/Label").get_theme_font("font") as Font
 	h.check(friend_room_font.has_char("中".unicode_at(0)), "friend_room 局部字体包含中文字形")
 	h.check(page.has_method("_on_create_room_pressed"), "friend_room 创建回调存在")
@@ -172,7 +178,7 @@ func _check_room() -> void:
 	h.check(page.get_node_or_null("Background/Actions/ReadyButton") != null, "room 准备按钮存在")
 	h.check(page.get_node_or_null("Background/Actions/StartGameButton") != null, "room 开始按钮存在")
 	h.check(page.get_node_or_null("Background/GameStartedOverlay") != null, "room 开局 overlay 存在")
-	h.check(page.get_node_or_null("Background/GameStartedOverlay/GameBoard") != null, "room 三人游戏界面存在")
+	h.check(page.get_node_or_null("Background/GameStartedOverlay/GameBoard") != null, "room 三/四人游戏界面存在")
 	var room_font := page.get_node("Background/Header/RoomCodeLabel").get_theme_font("font") as Font
 	h.check(room_font.has_char("中".unicode_at(0)), "room 默认字体包含中文字形")
 	h.check(page.has_method("_on_ready_pressed"), "room 准备回调存在")
@@ -181,6 +187,17 @@ func _check_room() -> void:
 	h.check(page.has_method("_on_prediction_submitted"), "room 排名预测回调存在")
 	h.check(page.has_method("_on_rank_selected"), "room 选择排名回调存在")
 	h.check(page.has_method("_on_rematch_requested"), "room 再来一局回调存在")
+	page._my_id = 1
+	page._on_state({
+		"status": "lobby", "host_id": 1, "max_players": 4,
+		"players": [{"id": 1, "name": "本人"}, {"id": 2, "name": "甲"}, {"id": 3, "name": "乙"}],
+	})
+	h.check(page.get_node("Background/Actions/StartGameButton").disabled, "room 四人房未满四人不能开局")
+	page._on_state({
+		"status": "lobby", "host_id": 1, "max_players": 4,
+		"players": [{"id": 1, "name": "本人"}, {"id": 2, "name": "甲"}, {"id": 3, "name": "乙"}, {"id": 4, "name": "丙"}],
+	})
+	h.check(not page.get_node("Background/Actions/StartGameButton").disabled, "room 四人房满四人后允许开局")
 	page._on_state({"status": "playing", "players": []})
 	h.check(page.get_node("Background/GameStartedOverlay").visible, "room 非 lobby 态显示开局 overlay")
 	page._on_state({"status": "lobby", "players": []})
