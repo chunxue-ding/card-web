@@ -15,6 +15,11 @@ var community_deal_sequence: Array[int] = []
 
 func _initialize() -> void:
 	h.check(ProjectSettings.get_setting("display/window/stretch/aspect") == "keep", "game 固定 16:9 逻辑画布避免预览布局漂移")
+	var background_import := ConfigFile.new()
+	var progress_import := ConfigFile.new()
+	h.check(background_import.load("res://game/游戏桌面底图.png.import") == OK and int(background_import.get_value("params", "process/size_limit", 0)) == 2048, "game Web 桌面底图限制导入尺寸降低移动端显存")
+	h.check(progress_import.load("res://game/进度报警上图.png.import") == OK and int(progress_import.get_value("params", "process/size_limit", 0)) == 1024, "game 警报图限制导入尺寸降低移动端显存")
+	h.check(not GameBoard.should_use_card_perspective(true, true) and GameBoard.should_use_card_perspective(true, false), "game Web 触屏设备禁用高成本透视 Shader")
 	var scene := load("res://scenes/game/game_board.tscn") as PackedScene
 	var board := scene.instantiate() as Control
 	var editor_node_count := board.find_children("*", "", true, false).size()
@@ -26,6 +31,7 @@ func _initialize() -> void:
 	await process_frame
 	var runtime_node_count := board.find_children("*", "", true, false).size()
 	h.check(runtime_node_count == editor_node_count, "game 运行时不再新增布局节点")
+	var editor_preview_hidden_at_runtime := not (board.get_node("Background/Progress/Slots/Slot1/ResultIcon") as TextureRect).visible
 	board.apply_state({
 		"status": "playing",
 		"phase": "yellow",
@@ -45,6 +51,18 @@ func _initialize() -> void:
 	var public_card := board.get_node("Background/CommunityCards/Card1/Image") as TextureRect
 	h.check(public_card.texture.resource_path.ends_with("card_r0_c0.png"), "game 公共牌映射真实牌面")
 	h.check(not board.get_node("Background/Progress/PhaseLabel").visible, "game 隐藏阶段文字说明")
+	var progress := board.get_node("Background/Progress") as TextureRect
+	h.check(progress.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "game 警报进度保持素材原始长宽比")
+	h.check(is_equal_approx(progress.size.x / progress.size.y, 3.0), "game 警报进度容器锁定为素材 3:1 比例")
+	var progress_slots_node := board.get_node("Background/Progress/Slots") as Control
+	var all_progress_slots_are_square := true
+	for slot_node in progress_slots_node.get_children():
+		var slot := slot_node as Control
+		var result_icon := slot.get_node("ResultIcon") as TextureRect
+		all_progress_slots_are_square = all_progress_slots_are_square and absf(slot.size.x - slot.size.y) < 0.05
+		all_progress_slots_are_square = all_progress_slots_are_square and result_icon.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	h.check(all_progress_slots_are_square, "game 警报进度七个圆槽等宽等高且结果图标保持正圆")
+	h.check(editor_preview_hidden_at_runtime, "game 2D 编辑器圆槽预览标记在运行时自动隐藏")
 	h.check(board.get_node("Background/CommunityCards/Card1").custom_minimum_size == Vector2(110, 154), "game 公共牌使用标准扑克牌比例")
 	var hidden_card := board.get_node("Background/LeftPlayer/HoleCards/Card1/Image") as TextureRect
 	h.check(hidden_card.texture.resource_path.ends_with("back.png"), "game 对手手牌使用卡背")
@@ -89,6 +107,8 @@ func _initialize() -> void:
 	var second_result := board.get_node("Background/Progress/Slots/Slot2/ResultIcon") as TextureRect
 	h.check(first_result.visible and first_result.texture != null, "game 胜利图标填入进度圆槽")
 	h.check(second_result.visible and second_result.texture != null, "game 失败图标填入进度圆槽")
+	var progress_result_tweens: Dictionary = board.get("_progress_result_tweens")
+	h.check(progress_result_tweens.size() == 2 and first_result.scale.x < 1.0 and second_result.modulate.a < 1.0, "game 新胜负标记播放淡入旋转回弹特效")
 	board.show_events([{"event": "round_settled", "succeeded": true, "vaults": 2, "alarms": 1}])
 	var third_result := board.get_node("Background/Progress/Slots/Slot3/ResultIcon") as TextureRect
 	var third_atlas := third_result.texture as AtlasTexture

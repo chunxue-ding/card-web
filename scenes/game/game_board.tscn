@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://c8vq2gpaq15hg" path="res://game/提交预测按钮底框无文字.png" id="17_0sp7b"]
 [ext_resource type="Texture2D" uid="uid://c6uyja0ql2qs1" path="res://title/克苏鲁Q版头像3 古老者 1.png" id="18_mbu0h"]
 [ext_resource type="Texture2D" uid="uid://b5lajtis5gosd" path="res://title/克苏鲁Q版头像6 犹格索托斯.png" id="19_usly8"]
+[ext_resource type="Texture2D" path="res://game/胜利标记.png" id="20_progress_preview"]
 
 [sub_resource type="Theme" id="GameTheme"]
 default_font = ExtResource("1_vtrdf")
@@ -70,6 +71,10 @@ region = Rect2(116, 122, 1438, 650)
 [sub_resource type="AtlasTexture" id="AtlasTexture_o54c1"]
 atlas = ExtResource("16_873an")
 region = Rect2(223, 174, 1372, 509)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_progress_preview"]
+atlas = ExtResource("20_progress_preview")
+region = Rect2(788, 49, 600, 592)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n5m16"]
 
@@ -167,12 +172,13 @@ anchor_left = 0.31
 anchor_top = 0.055
 anchor_right = 0.69
 anchor_bottom = 0.2
-offset_left = -67.20001
+offset_left = -40.700012
 offset_top = -74.4
-offset_right = 48.19995
+offset_right = 21.699951
 offset_bottom = 33.0
 texture = ExtResource("7_lb4tj")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="PhaseLabel" type="Label" parent="Background/Progress" unique_id=1153495587]
 visible = false
@@ -199,118 +205,126 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+editor_description = "2D 编辑器预览：展开 Slots 并选择 Slot1～Slot7，可直接调整七个圆形结果槽的位置和大小。运行时预览图会自动隐藏。"
 
 [node name="Slot1" type="Label" parent="Background/Progress/Slots" unique_id=1601727562]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.098298
-anchor_top = 0.456866
+anchor_top = 0.481074
 anchor_right = 0.165786
-anchor_bottom = 0.707746
+anchor_bottom = 0.683538
 
 [node name="ResultIcon" type="TextureRect" parent="Background/Progress/Slots/Slot1" unique_id=1609242571]
-visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+texture = SubResource("AtlasTexture_progress_preview")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot2" type="Label" parent="Background/Progress/Slots" unique_id=1406456585]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.226232
-anchor_top = 0.456866
+anchor_top = 0.480192
 anchor_right = 0.294308
-anchor_bottom = 0.707746
+anchor_bottom = 0.68442
 
 [node name="ResultIcon" type="TextureRect" parent="Background/Progress/Slots/Slot2" unique_id=152471807]
-visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+texture = SubResource("AtlasTexture_progress_preview")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot3" type="Label" parent="Background/Progress/Slots" unique_id=988676591]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.354754
-anchor_top = 0.457746
+anchor_top = 0.4819545
 anchor_right = 0.422242
-anchor_bottom = 0.708627
+anchor_bottom = 0.6844185
 
 [node name="ResultIcon" type="TextureRect" parent="Background/Progress/Slots/Slot3" unique_id=130881778]
-visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+texture = SubResource("AtlasTexture_progress_preview")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot4" type="Label" parent="Background/Progress/Slots" unique_id=862708124]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.475939
-anchor_top = 0.456866
+anchor_top = 0.480634
 anchor_right = 0.544014
-anchor_bottom = 0.708627
+anchor_bottom = 0.684859
 
 [node name="ResultIcon" type="TextureRect" parent="Background/Progress/Slots/Slot4" unique_id=1569738913]
-visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+texture = SubResource("AtlasTexture_progress_preview")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot5" type="Label" parent="Background/Progress/Slots" unique_id=572923302]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.593603
-anchor_top = 0.456866
+anchor_top = 0.481953
 anchor_right = 0.660505
-anchor_bottom = 0.707746
+anchor_bottom = 0.682659
 
 [node name="ResultIcon" type="TextureRect" parent="Background/Progress/Slots/Slot5" unique_id=1670489022]
-visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+texture = SubResource("AtlasTexture_progress_preview")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot6" type="Label" parent="Background/Progress/Slots" unique_id=1502887366]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.715962
-anchor_top = 0.458627
+anchor_top = 0.482394
 anchor_right = 0.783157
-anchor_bottom = 0.707746
+anchor_bottom = 0.683979
 
 [node name="ResultIcon" type="TextureRect" parent="Background/Progress/Slots/Slot6" unique_id=990479979]
-visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+texture = SubResource("AtlasTexture_progress_preview")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot7" type="Label" parent="Background/Progress/Slots" unique_id=2122680751]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.839202
-anchor_top = 0.456866
+anchor_top = 0.482835
 anchor_right = 0.905516
-anchor_bottom = 0.707746
+anchor_bottom = 0.681777
 
 [node name="ResultIcon" type="TextureRect" parent="Background/Progress/Slots/Slot7" unique_id=4987025]
-visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+texture = SubResource("AtlasTexture_progress_preview")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="ExitButton" type="TextureButton" parent="Background" unique_id=1472036891]
 layout_mode = 1

@@ -4,6 +4,16 @@ extends SceneTree
 
 const Helper = preload("res://tests/test_helper.gd")
 
+class PredictionSocket extends RoomSocket:
+	var claim_count := 0
+	var confirm_count := 0
+
+	func claim_chip(_rank: int) -> void:
+		claim_count += 1
+
+	func confirm_phase() -> void:
+		confirm_count += 1
+
 var h := Helper.new()
 
 
@@ -186,4 +196,10 @@ func _check_room() -> void:
 	})
 	var board := page.get_node("Background/GameStartedOverlay/GameBoard") as GameBoard
 	h.check(bool(board.get("_dealing")), "room 状态先于事件到达时仍会启动发牌动画")
+	var prediction_socket := PredictionSocket.new()
+	page.add_child(prediction_socket)
+	page._socket = prediction_socket
+	page._on_rank_selected(2)
+	page._on_prediction_submitted(2)
+	h.check(prediction_socket.claim_count == 1 and prediction_socket.confirm_count == 1, "room 预测选择和提交各发送一次 claim/confirm，不重复抢占排名")
 	page.queue_free()

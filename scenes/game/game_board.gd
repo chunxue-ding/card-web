@@ -25,6 +25,7 @@ const RANK_BUTTON_ASSETS := [
 
 @export_range(0.05, 1.0, 0.01) var deal_card_duration := 0.38
 @export_range(0.0, 0.5, 0.01) var deal_card_gap := 0.08
+@export_range(0.15, 0.8, 0.01) var progress_result_effect_duration := 0.34
 
 @onready var pot_label: Label = $Background/Vault/MoneyFrame/PotLabel
 @onready var phase_label: Label = $Background/Progress/PhaseLabel
@@ -60,6 +61,7 @@ var _pending_community_cards: Array[int] = []
 var _community_dealing := false
 var _active_community_card := -1
 var _card_hover_tweens: Dictionary = {}
+var _progress_result_tweens: Dictionary = {}
 var _prediction_submit_pending := false
 var _prediction_locked := false
 
@@ -67,6 +69,9 @@ var _prediction_locked := false
 func _ready() -> void:
 	_win_mark_texture = _cropped_texture(WIN_MARK)
 	_loss_mark_texture = _cropped_texture(LOSS_MARK)
+	# 场景文件中的七个胜利标记只用于 Godot 2D 编辑器对位；
+	# 游戏启动后立刻按真实结算数据重新控制显隐。
+	_render_progress_results()
 	for path in RANK_BUTTON_ASSETS:
 		_rank_button_textures.append(_cropped_texture(path))
 	for index in prediction_buttons.size():
@@ -388,20 +393,33 @@ func _setup_card_interactions() -> void:
 	var interactive_cards := _deal_targets()
 	for slot in community_cards.get_children():
 		interactive_cards.append(slot.get_node("Image") as TextureRect)
+	var perspective_enabled := should_use_card_perspective(
+		OS.has_feature("web"),
+		DisplayServer.is_touchscreen_available()
+	)
 	for card in interactive_cards:
-		var material := ShaderMaterial.new()
-		material.shader = CARD_PERSPECTIVE_SHADER
-		material.set_shader_parameter("rect_size", card.size)
-		material.set_shader_parameter("x_rot", 0.0)
-		material.set_shader_parameter("y_rot", 0.0)
-		material.set_shader_parameter("fov", 70.0)
-		material.set_shader_parameter("inset", 0.12)
-		card.material = material
+		if perspective_enabled:
+			var material := ShaderMaterial.new()
+			material.shader = CARD_PERSPECTIVE_SHADER
+			material.set_shader_parameter("rect_size", card.size)
+			material.set_shader_parameter("x_rot", 0.0)
+			material.set_shader_parameter("y_rot", 0.0)
+			material.set_shader_parameter("fov", 70.0)
+			material.set_shader_parameter("inset", 0.12)
+			card.material = material
+		else:
+			card.material = null
 		card.mouse_filter = Control.MOUSE_FILTER_STOP
 		card.resized.connect(_sync_card_shader_size.bind(card))
 		card.mouse_entered.connect(_on_card_mouse_entered.bind(card))
 		card.mouse_exited.connect(_on_card_mouse_exited.bind(card))
 		card.gui_input.connect(_on_card_gui_input.bind(card))
+
+
+static func should_use_card_perspective(is_web: bool, is_touchscreen: bool) -> bool:
+	# WebKit/mobile WebGL is memory constrained. Touch devices retain the safe
+	# scale feedback but skip the per-card perspective shader.
+	return not (is_web and is_touchscreen)
 
 
 func _apply_hole_card_fan() -> void:
@@ -459,6 +477,19 @@ func _on_card_mouse_exited(card: TextureRect) -> void:
 
 
 func _on_card_gui_input(event: InputEvent, card: TextureRect) -> void:
+	if event is InputEventScreenTouch:
+		var touch := event as InputEventScreenTouch
+		if touch.pressed:
+			_on_card_mouse_entered(card)
+		else:
+			_on_card_mouse_exited(card)
+		card.accept_event()
+		return
+	if event is InputEventMouseButton:
+		var mouse_button := event as InputEventMouseButton
+		if mouse_button.button_index == MOUSE_BUTTON_RIGHT:
+			card.accept_event()
+		return
 	if not event is InputEventMouseMotion or card.size.x <= 0.0 or card.size.y <= 0.0:
 		return
 	var mouse_event := event as InputEventMouseMotion
@@ -606,9 +637,51 @@ func _render_progress_results() -> void:
 		var slot := progress_slots.get_child(index) as Label
 		slot.text = ""
 		var icon := slot.get_node("ResultIcon") as TextureRect
-		icon.visible = index < _round_results.size()
-		if icon.visible:
-			icon.texture = _win_mark_texture if _round_results[index] else _loss_mark_texture
+		var should_show := index < _round_results.size()
+		var was_visible := icon.visible
+		if not should_show:
+			icon.visible = false
+			_reset_progress_result_icon(icon)
+			continue
+		var succeeded := _round_results[index]
+		icon.texture = _win_mark_texture if succeeded else _loss_mark_texture
+		icon.visible = true
+		if not was_visible:
+			_animate_progress_result_icon(icon, succeeded)
+
+
+func _animate_progress_result_icon(icon: TextureRect, succeeded: bool) -> void:
+	_reset_progress_result_icon(icon)
+	icon.pivot_offset = icon.size * 0.5
+	icon.scale = Vector2.ONE * 0.28
+	icon.rotation = deg_to_rad(-12.0 if succeeded else 12.0)
+	icon.modulate = Color(1.25, 1.08, 0.62, 0.0) if succeeded else Color(1.08, 0.72, 1.28, 0.0)
+
+	var tween := create_tween()
+	_progress_result_tweens[icon] = tween
+	var pop_duration := progress_result_effect_duration * 0.68
+	tween.set_parallel(true)
+	tween.tween_property(icon, "scale", Vector2.ONE * 1.16, pop_duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(icon, "rotation", 0.0, pop_duration).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	tween.tween_property(icon, "modulate", Color.WHITE, pop_duration * 0.72).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(false)
+	tween.tween_property(icon, "scale", Vector2.ONE, progress_result_effect_duration - pop_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.finished.connect(_on_progress_result_effect_finished.bind(icon, tween))
+
+
+func _reset_progress_result_icon(icon: TextureRect) -> void:
+	var running := _progress_result_tweens.get(icon) as Tween
+	if running != null and running.is_valid():
+		running.kill()
+	_progress_result_tweens.erase(icon)
+	icon.scale = Vector2.ONE
+	icon.rotation = 0.0
+	icon.modulate = Color.WHITE
+
+
+func _on_progress_result_effect_finished(icon: TextureRect, tween: Tween) -> void:
+	if _progress_result_tweens.get(icon) == tween:
+		_progress_result_tweens.erase(icon)
 
 
 func _cropped_texture(path: String) -> Texture2D:

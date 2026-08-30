@@ -148,7 +148,8 @@ func _on_start_pressed() -> void:
 func _on_prediction_submitted(rank: int) -> void:
 	if _socket == null:
 		return
-	_socket.claim_chip(rank)
+	# 选择排名时已经 claim；提交只负责确认，避免移动端一次点击连续
+	# 发送重复 claim_chip 后再 confirm_phase。
 	_socket.confirm_phase()
 
 
