@@ -8,13 +8,24 @@ var submitted_rank := 0
 var selected_rank := 0
 var rematch_count := 0
 var quick_match_fired := false
+var deal_started_count := 0
+var deal_sequence: Array[String] = []
+var community_deal_sequence: Array[int] = []
 
 
 func _initialize() -> void:
+	h.check(ProjectSettings.get_setting("display/window/stretch/aspect") == "keep", "game 固定 16:9 逻辑画布避免预览布局漂移")
 	var scene := load("res://scenes/game/game_board.tscn") as PackedScene
 	var board := scene.instantiate() as Control
+	var editor_node_count := board.find_children("*", "", true, false).size()
+	h.check(board.has_node("Background/RightPlayer") and board.has_node("Background/BottomPlayer"), "game 三个玩家座席已固定在场景文件")
+	h.check(board.has_node("Background/Vault/MoneyFrame/CoinIcon"), "game 金库组件已固定在场景文件")
+	h.check(board.has_node("Background/PredictionPanel/ButtonLayer/Rank3/Artwork"), "game 排名预测组件已固定在场景文件")
+	h.check(board.has_node("Background/DeckPile/TopCard"), "game 离开图标左侧固定显示独立牌堆")
 	root.add_child(board)
 	await process_frame
+	var runtime_node_count := board.find_children("*", "", true, false).size()
+	h.check(runtime_node_count == editor_node_count, "game 运行时不再新增布局节点")
 	board.apply_state({
 		"status": "playing",
 		"phase": "yellow",
@@ -37,6 +48,24 @@ func _initialize() -> void:
 	h.check(board.get_node("Background/CommunityCards/Card1").custom_minimum_size == Vector2(110, 154), "game 公共牌使用标准扑克牌比例")
 	var hidden_card := board.get_node("Background/LeftPlayer/HoleCards/Card1/Image") as TextureRect
 	h.check(hidden_card.texture.resource_path.ends_with("back.png"), "game 对手手牌使用卡背")
+	h.check((board.get_node("Background/LeftPlayer/HoleCards") as HBoxContainer).get_theme_constant("separation") < 0, "game 对手两张手牌采用德州式重叠排列")
+	h.check((board.get_node("Background/BottomPlayer/HoleCards") as HBoxContainer).get_theme_constant("separation") < 0, "game 自己的两张手牌采用德州式重叠排列")
+	var left_card_panel := board.get_node("Background/LeftPlayer/HoleCards/Card1") as PanelContainer
+	var left_second_panel := board.get_node("Background/LeftPlayer/HoleCards/Card2") as PanelContainer
+	h.check(left_card_panel.rotation < 0.0 and left_second_panel.rotation > 0.0, "game 两张手牌向两侧旋转形成扇形")
+	var interactive_card := board.get_node("Background/BottomPlayer/HoleCards/Card1/Image") as TextureRect
+	h.check(interactive_card.material is ShaderMaterial and interactive_card.mouse_filter == Control.MOUSE_FILTER_STOP, "game 手牌启用 2D 透视悬停材质")
+	var interactive_public_card := board.get_node("Background/CommunityCards/Card1/Image") as TextureRect
+	h.check(interactive_public_card.material is ShaderMaterial and interactive_public_card.mouse_filter == Control.MOUSE_FILTER_STOP, "game 公共牌启用相同的 2D 透视悬停材质")
+	var public_first_panel := board.get_node("Background/CommunityCards/Card1") as PanelContainer
+	var public_middle_panel := board.get_node("Background/CommunityCards/Card3") as PanelContainer
+	var public_last_panel := board.get_node("Background/CommunityCards/Card5") as PanelContainer
+	h.check(public_first_panel.rotation < 0.0 and is_zero_approx(public_middle_panel.rotation) and public_last_panel.rotation > 0.0, "game 五张公共牌向两侧展开形成轻微弧线")
+	h.check(public_first_panel.position.y > public_middle_panel.position.y and public_last_panel.position.y > public_middle_panel.position.y, "game 公共牌中间略高、两侧逐步下沉")
+	var hover_motion := InputEventMouseMotion.new()
+	hover_motion.position = Vector2(interactive_card.size.x, 0.0)
+	interactive_card.gui_input.emit(hover_motion)
+	h.check(absf(float((interactive_card.material as ShaderMaterial).get_shader_parameter("y_rot"))) > 0.0, "game 鼠标位置会驱动手牌透视角度")
 	board.apply_state({
 		"status": "round_complete",
 		"phase": "red",
@@ -130,6 +159,8 @@ func _initialize() -> void:
 	h.check(not rank_buttons.get_node("Rank3").modulate.is_equal_approx(Color.WHITE), "game 本人选择高亮跟随服务端 chip")
 	var left_avatar := board.get_node("Background/LeftPlayer/AvatarFrame/AvatarIcon") as TextureRect
 	h.check(left_avatar.visible and left_avatar.texture != null, "game 有头像的玩家座席显示头像图")
+	h.check(left_avatar.size.x > 0.0 and left_avatar.size.y > 0.0, "game 头像使用场景文件中的可编辑布局")
+	h.check(left_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "game 头像保持比例不拉伸")
 	h.check(not board.get_node("Background/LeftPlayer/AvatarFrame/InitialLabel").visible, "game 有头像时隐藏首字母占位")
 	h.check(board.get_node("Background/RightPlayer/AvatarFrame/InitialLabel").visible, "game 无头像玩家保留首字母占位")
 	board.apply_state({
@@ -155,6 +186,9 @@ func _initialize() -> void:
 	h.check(selected_rank == 2, "game 选择即上报排名")
 	board.get_node("Background/SubmitButton").pressed.emit()
 	h.check(submitted_rank == 2, "game 提交所选预测排名")
+	h.check(board.get_node("Background/SubmitButton").disabled and "已锁定" in board.get_node("Background/SubmitButton/Label").text, "game 提交预测后按钮显示已锁定并禁止重复提交")
+	h.check("等待其他玩家" in board.get_node("Background/StatusLabel").text, "game 锁定预测后显示持续状态反馈")
+	h.check(board.get_node("Background/PredictionPanel/ButtonLayer/Rank1").modulate.a < 0.7 and board.get_node("Background/PredictionPanel/ButtonLayer/Rank2").modulate.a == 1.0, "game 锁定后保留所选排名高亮并淡化其他选项")
 	var finished_players := [
 		{"id": 2, "name": "对手甲", "balance": 2300, "hole_cards": []},
 		{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},
@@ -185,5 +219,50 @@ func _initialize() -> void:
 	board.quick_match_requested.connect(func() -> void: quick_match_fired = true)
 	board.get_node("Background/SubmitButton").pressed.emit()
 	h.check(quick_match_fired, "game 匹配桌提交触发快速匹配")
+	board.deal_card_duration = 0.01
+	board.deal_card_gap = 0.01
+	board.deal_started.connect(func() -> void: deal_started_count += 1)
+	board.card_dealt.connect(func(seat_name: String, card_index: int) -> void: deal_sequence.append("%s:%d" % [seat_name, card_index]))
+	board.arm_new_round_animation()
+	var deal_state := {
+		"status": "playing",
+		"phase": "white",
+		"players": [
+			{"id": 2, "name": "对手甲", "balance": 2300, "hole_cards": []},
+			{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},
+			{"id": 1, "name": "本人", "balance": 1950, "hole_cards": [{"rank": 12, "suit": 3}, {"rank": 11, "suit": 2}]},
+		],
+	}
+	board.apply_state(deal_state, 1)
+	h.check(not board.get_node("Background/LeftPlayer/HoleCards/Card1/Image").visible, "game 发牌开始时隐藏尚未到达的手牌")
+	await create_timer(0.5).timeout
+	h.check(deal_sequence == ["LeftPlayer:0", "RightPlayer:0", "BottomPlayer:0", "LeftPlayer:1", "RightPlayer:1", "BottomPlayer:1"], "game 按左、右、自己循环发两轮，每轮一张")
+	h.check(board.get_node("Background/BottomPlayer/HoleCards/Card2/Image").visible, "game 两轮发牌结束后显示全部手牌")
+	board.apply_state(deal_state, 1)
+	await create_timer(0.05).timeout
+	h.check(deal_started_count == 1, "game 重复状态快照不会重复播放发牌动画")
+	board.community_card_dealt.connect(func(card_index: int) -> void: community_deal_sequence.append(card_index))
+	board.arm_community_animation()
+	deal_state["phase"] = "yellow"
+	deal_state["community_cards"] = [
+		{"rank": 2, "suit": 0},
+		{"rank": 3, "suit": 1},
+		{"rank": 4, "suit": 2},
+	]
+	board.apply_state(deal_state, 1)
+	h.check(not board.get_node("Background/CommunityCards/Card1/Image").visible, "game 新公共牌飞入前隐藏目标牌位")
+	await create_timer(0.2).timeout
+	h.check(community_deal_sequence == [0, 1, 2], "game 一次新增三张公共牌时从独立牌堆依次发出")
+	h.check(board.get_node("Background/CommunityCards/Card3/Image").visible, "game 飞入后的公共牌显示真实牌面")
+	h.check(not board.get_node("Background/CommunityCards/Card4/Image").visible, "game 尚未发出的公共牌位置保持空白")
+	board.apply_state(deal_state, 1)
+	await create_timer(0.05).timeout
+	h.check(community_deal_sequence.size() == 3, "game 重复公共牌快照不会重复发牌")
+	board.show_events([{"event": "hole_dealt", "player_id": 2}])
+	deal_state["phase"] = "white"
+	deal_state["community_cards"] = [{"rank": 8, "suit": 3}]
+	board.apply_state(deal_state, 1)
+	await create_timer(0.3).timeout
+	h.check(community_deal_sequence == [0, 1, 2, 0], "game 新一轮从五张重置后第一张公共牌仍播放发牌")
 	board.queue_free()
 	h.finish(self)

@@ -10,6 +10,7 @@ const ROOM_CODE_PATTERN := "^[A-Z0-9]{6}$"
 
 @onready var name_label: Label = $Background/Header/NameLabel
 @onready var balance_label: Label = $Background/Header/BalanceLabel
+@onready var avatar_icon: TextureRect = $Background/Header/AvatarFrame/AvatarIcon
 @onready var back_home_button: Button = $Background/Header/BackHomeButton
 @onready var create_room_button: TextureButton = $Background/ActionCenter/Actions/CreateRoomButton
 @onready var join_room_button: TextureButton = $Background/ActionCenter/Actions/JoinRoomButton
@@ -21,15 +22,34 @@ var _busy := false
 
 
 func _ready() -> void:
+	_render_user()
+	_refresh_user()
+	for button in [create_room_button, join_room_button]:
+		button.pivot_offset = button.size * 0.5
+		button.mouse_entered.connect(_set_action_hover.bind(button, true))
+		button.mouse_exited.connect(_set_action_hover.bind(button, false))
+
+
+func _render_user() -> void:
 	var display_name := str(Session.user.get("name", ""))
 	if display_name.is_empty():
 		display_name = "游客" if Session.is_guest() else "玩家"
 	name_label.text = display_name
 	balance_label.text = _format_balance(int(Session.user.get("balance", 0)))
-	for button in [create_room_button, join_room_button]:
-		button.pivot_offset = button.size * 0.5
-		button.mouse_entered.connect(_set_action_hover.bind(button, true))
-		button.mouse_exited.connect(_set_action_hover.bind(button, false))
+	_set_avatar(int(Session.user.get("avatar", 0)))
+
+
+func _set_avatar(avatar_id: int) -> void:
+	var valid := avatar_id >= 1 and avatar_id <= Avatars.PATHS.size()
+	avatar_icon.texture = load(Avatars.path_for(avatar_id)) if valid else null
+	avatar_icon.visible = valid
+
+
+func _refresh_user() -> void:
+	var err: ApiError = await Session.refresh_me()
+	if err != null or not is_inside_tree():
+		return
+	_render_user()
 
 
 func _on_create_room_pressed() -> void:

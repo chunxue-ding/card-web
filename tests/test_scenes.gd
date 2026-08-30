@@ -86,6 +86,10 @@ func _check_lobby() -> void:
 	h.check(page.get_node_or_null("Background/Actions/QuickMatchButton") != null, "lobby 快速匹配按钮存在")
 	h.check(page.get_node_or_null("Background/Actions/FriendPlayButton") != null, "lobby 好友同玩按钮存在")
 	h.check(page.get_node_or_null("Background/CountCenter/PlayerCountPanel/Count4Button") != null, "lobby 人数选择存在")
+	page._set_avatar(2)
+	var lobby_avatar := page.get_node("Background/Header/AvatarFrame/AvatarIcon") as TextureRect
+	h.check(lobby_avatar.visible and lobby_avatar.texture != null, "lobby 用户头像显示在头像框内")
+	h.check(lobby_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "lobby 用户头像保持比例居中")
 	var lobby_font := page.get_node("Background/Actions/QuickMatchButton/Label").get_theme_font("font") as Font
 	h.check(lobby_font.has_char("中".unicode_at(0)), "lobby 局部字体包含中文字形")
 	h.check(page.has_method("_on_logout_pressed"), "lobby 登出回调存在")
@@ -120,6 +124,10 @@ func _check_friend_room() -> void:
 	h.check(page.get_node_or_null("Background/ActionCenter/Actions/CreateRoomButton") != null, "friend_room 创建按钮存在")
 	h.check(page.get_node_or_null("Background/ActionCenter/Actions/JoinRoomButton") != null, "friend_room 加入按钮存在")
 	h.check(page.get_node_or_null("Background/CodeCenter/CodePanel/RoomCodeInput") != null, "friend_room 房间编号输入框存在")
+	page._set_avatar(3)
+	var friend_avatar := page.get_node("Background/Header/AvatarFrame/AvatarIcon") as TextureRect
+	h.check(friend_avatar.visible and friend_avatar.texture != null, "friend_room 用户头像显示在头像框内")
+	h.check(friend_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "friend_room 用户头像保持比例居中")
 	var friend_room_font := page.get_node("Background/ActionCenter/Actions/CreateRoomButton/Label").get_theme_font("font") as Font
 	h.check(friend_room_font.has_char("中".unicode_at(0)), "friend_room 局部字体包含中文字形")
 	h.check(page.has_method("_on_create_room_pressed"), "friend_room 创建回调存在")
@@ -167,4 +175,15 @@ func _check_room() -> void:
 	h.check(page.get_node("Background/GameStartedOverlay").visible, "room 非 lobby 态显示开局 overlay")
 	page._on_state({"status": "lobby", "players": []})
 	h.check(not page.get_node("Background/GameStartedOverlay").visible, "room 回到大厅态隐藏开局 overlay")
+	page._on_state({
+		"status": "playing",
+		"phase": "white",
+		"players": [
+			{"id": 2, "name": "对手甲", "hole_cards": []},
+			{"id": 3, "name": "对手乙", "hole_cards": []},
+			{"id": 1, "name": "本人", "hole_cards": [{"rank": 5, "suit": 0}, {"rank": 3, "suit": 3}]},
+		],
+	})
+	var board := page.get_node("Background/GameStartedOverlay/GameBoard") as GameBoard
+	h.check(bool(board.get("_dealing")), "room 状态先于事件到达时仍会启动发牌动画")
 	page.queue_free()

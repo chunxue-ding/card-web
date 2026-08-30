@@ -60,6 +60,19 @@ func _on_authenticated() -> void:
 
 
 func _on_state(view: Dictionary) -> void:
+	var previous_status := str(_view.get("status", ""))
+	var next_status := str(view.get("status", ""))
+	var starts_new_round := (
+		next_status == "playing"
+		and previous_status in ["lobby", "round_complete", "finished"]
+	)
+	if starts_new_round:
+		game_board.arm_new_round_animation()
+	elif previous_status != "":
+		var previous_public_cards := (_view.get("community_cards", []) as Array).size()
+		var next_public_cards := (view.get("community_cards", []) as Array).size()
+		if next_public_cards > previous_public_cards:
+			game_board.arm_community_animation()
 	_view = view
 	_render()
 

@@ -112,6 +112,19 @@ texture = ExtResource("6_avatar")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="AvatarIcon" type="TextureRect" parent="Background/Header/AvatarFrame"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.115
+anchor_top = 0.115
+anchor_right = 0.885
+anchor_bottom = 0.885
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="NameLabel" type="Label" parent="Background/Header"]
 layout_mode = 1
 anchors_preset = -1

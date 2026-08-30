@@ -8,36 +8,37 @@ signal rank_selected(rank: int)
 signal next_round_requested
 signal rematch_requested
 signal quick_match_requested
+signal deal_started
+signal card_dealt(seat_name: String, card_index: int)
+signal community_card_dealt(card_index: int)
 
 const SUIT_TO_ASSET_ROW := {0: 3, 1: 2, 2: 1, 3: 0}
 const CARD_BACK := "res://cards/back.png"
+const CARD_PERSPECTIVE_SHADER := preload("res://scenes/game/card_perspective.gdshader")
 const WIN_MARK := "res://game/胜利标记.png"
 const LOSS_MARK := "res://game/失败标记.png"
-const PLAYER_INFO_FRAME := "res://game/个人信息组合.png"
-const COIN_ICON := "res://homepage/金币图标.png"
-const MONEY_FRAME := "res://game/玩家金钱框组件.png"
-const PREDICTION_FRAME := "res://game/本轮排名预测背景框.png"
-const PLAYER_PREDICTION_HISTORY := "res://game/玩家四轮预测排名区域.png"
 const RANK_BUTTON_ASSETS := [
 	"res://game/排名预测圆形按钮1.png",
 	"res://game/排名预测圆形按钮2.png",
 	"res://game/排名预测圆形按钮3.png",
 ]
 
-@onready var pot_label: Label = $Background/Vault/PotLabel
+@export_range(0.05, 1.0, 0.01) var deal_card_duration := 0.38
+@export_range(0.0, 0.5, 0.01) var deal_card_gap := 0.08
+
+@onready var pot_label: Label = $Background/Vault/MoneyFrame/PotLabel
 @onready var phase_label: Label = $Background/Progress/PhaseLabel
 @onready var progress_slots: Control = $Background/Progress/Slots
 @onready var community_cards: HBoxContainer = $Background/CommunityCards
 @onready var prediction_buttons: Array[TextureButton] = [
-	$Background/PredictionPanel/RankButtons/Rank1,
-	$Background/PredictionPanel/RankButtons/Rank2,
-	$Background/PredictionPanel/RankButtons/Rank3,
+	$Background/PredictionPanel/ButtonLayer/Rank1,
+	$Background/PredictionPanel/ButtonLayer/Rank2,
+	$Background/PredictionPanel/ButtonLayer/Rank3,
 ]
-@onready var prediction_panel: PanelContainer = $Background/PredictionPanel
-@onready var rank_buttons: HBoxContainer = $Background/PredictionPanel/RankButtons
 @onready var submit_button: TextureButton = $Background/SubmitButton
 @onready var submit_label: Label = $Background/SubmitButton/Label
 @onready var status_label: Label = $Background/StatusLabel
+@onready var deal_animation_layer: Control = $Background/DealAnimationLayer
 
 var _selected_rank := 0
 var _my_id := 0
@@ -46,249 +47,50 @@ var _state: Dictionary = {}
 var _round_results: Array[bool] = []
 var _win_mark_texture: Texture2D
 var _loss_mark_texture: Texture2D
-var _player_info_texture: Texture2D
-var _coin_icon_texture: Texture2D
-var _money_frame_texture: Texture2D
-var _prediction_frame_texture: Texture2D
 var _rank_button_textures: Array[Texture2D] = []
-var _player_prediction_history_texture: Texture2D
 var _player_prediction_cache: Dictionary = {}
 var _current_phase := "white"
+var _deal_animation_pending := false
+var _dealing := false
+var _dealt_slot_count := 0
+var _deal_generation := 0
+var _community_animation_pending := false
+var _known_community_count := 0
+var _pending_community_cards: Array[int] = []
+var _community_dealing := false
+var _active_community_card := -1
+var _card_hover_tweens: Dictionary = {}
+var _prediction_submit_pending := false
+var _prediction_locked := false
 
 
 func _ready() -> void:
 	_win_mark_texture = _cropped_texture(WIN_MARK)
 	_loss_mark_texture = _cropped_texture(LOSS_MARK)
-	_player_info_texture = _cropped_texture(PLAYER_INFO_FRAME)
-	_coin_icon_texture = _cropped_texture(COIN_ICON)
-	_money_frame_texture = _cropped_texture(MONEY_FRAME)
-	_prediction_frame_texture = _cropped_texture(PREDICTION_FRAME)
-	_player_prediction_history_texture = _cropped_texture(PLAYER_PREDICTION_HISTORY)
 	for path in RANK_BUTTON_ASSETS:
 		_rank_button_textures.append(_cropped_texture(path))
-	_configure_prediction_art()
-	_configure_vault()
-	_setup_player_seats()
 	for index in prediction_buttons.size():
 		prediction_buttons[index].pressed.connect(_select_rank.bind(index + 1))
+	_setup_card_interactions()
+	for seat in [$Background/LeftPlayer, $Background/RightPlayer, $Background/BottomPlayer]:
+		var hand := seat.get_node("HoleCards") as HBoxContainer
+		hand.sort_children.connect(_apply_hole_card_fan)
+	community_cards.sort_children.connect(_apply_community_card_spread)
+	call_deferred("_apply_hole_card_fan")
+	call_deferred("_apply_community_card_spread")
 	_refresh_prediction_buttons()
 
 
-func _configure_vault() -> void:
-	var vault := $Background/Vault as TextureRect
-	var vault_artwork := TextureRect.new()
-	vault_artwork.name = "Artwork"
-	vault_artwork.texture = vault.texture
-	vault_artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vault_artwork.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	vault_artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_set_rect(vault_artwork, -0.075, -0.075, 1.075, 1.075)
-	vault.texture = null
-	vault.add_child(vault_artwork)
-	var money_frame := TextureRect.new()
-	money_frame.name = "MoneyFrame"
-	money_frame.texture = _money_frame_texture
-	money_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	money_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	money_frame.stretch_mode = TextureRect.STRETCH_SCALE
-	_set_rect(money_frame, 0.265, 0.62, 0.669, 0.80)
-	vault.add_child(money_frame)
+# 布局节点已固定在 game_board.tscn；这里以下只负责根据服务端状态更新内容。
 
-	pot_label.reparent(money_frame)
-	_set_rect(pot_label, 0.32, 0.18, 0.94, 0.82)
-	pot_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-
-	var coin := TextureRect.new()
-	coin.name = "CoinIcon"
-	coin.texture = _coin_icon_texture
-	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	coin.stretch_mode = TextureRect.STRETCH_SCALE
-	_set_rect(coin, 0.075, 0.20, 0.285, 0.80)
-	money_frame.add_child(coin)
+func arm_new_round_animation() -> void:
+	if not _dealing:
+		_deal_animation_pending = true
+	_community_animation_pending = true
 
 
-func _configure_prediction_art() -> void:
-	prediction_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-	prediction_panel.get_node("Title").visible = false
-	var artwork := TextureRect.new()
-	artwork.name = "Artwork"
-	artwork.texture = _prediction_frame_texture
-	artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	artwork.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	artwork.stretch_mode = TextureRect.STRETCH_SCALE
-	artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	prediction_panel.add_child(artwork)
-	prediction_panel.move_child(artwork, 0)
-	var button_layer := Control.new()
-	button_layer.name = "ButtonLayer"
-	button_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	button_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	prediction_panel.add_child(button_layer)
-	rank_buttons.visible = false
-	var button_rects := [
-		Rect2(0.17368, 0.30591, 0.17836, 0.54009),
-		Rect2(0.41416, 0.30802, 0.17635, 0.53376),
-		Rect2(0.64930, 0.30591, 0.17702, 0.54009),
-	]
-	for index in prediction_buttons.size():
-		var button := prediction_buttons[index]
-		button.reparent(button_layer)
-		button.custom_minimum_size = Vector2.ZERO
-		var button_rect := button_rects[index] as Rect2
-		_set_rect(button, button_rect.position.x, button_rect.position.y, button_rect.end.x, button_rect.end.y)
-		button.texture_normal = null
-		button.texture_hover = null
-		button.texture_pressed = null
-		button.get_node("Label").visible = false
-		var button_art := TextureRect.new()
-		button_art.name = "Artwork"
-		button_art.texture = _rank_button_textures[index]
-		button_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		button_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		button_art.stretch_mode = TextureRect.STRETCH_SCALE
-		button_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		button.add_child(button_art)
-
-
-func _setup_player_seats() -> void:
-	var left := $Background/LeftPlayer as Control
-	_configure_player_info(left, false)
-	_set_rect(left, 0.063, 0.447, 0.318, 0.717)
-	var left_cards := left.get_node("HoleCards") as Control
-	left_cards.anchor_left = 0.68
-	left_cards.anchor_top = 0.155
-	left_cards.anchor_right = 0.98
-	left_cards.anchor_bottom = 0.587
-	for card_slot in left_cards.get_children():
-		(card_slot as Control).custom_minimum_size = Vector2(90, 126)
-	var right := left.duplicate() as Control
-	right.name = "RightPlayer"
-	_set_rect(right, 0.59, 0.452, 0.845, 0.722)
-	_configure_player_info(right, true)
-	var right_state := right.get_node("StateLabel") as Control
-	right_state.anchor_left = 0.68
-	right_state.anchor_right = 0.92
-	var right_prediction := right.get_node("PredictionLabel") as Control
-	right_prediction.anchor_left = 0.68
-	right_prediction.anchor_right = 0.92
-	var right_cards := right.get_node("HoleCards") as Control
-	right_cards.anchor_left = 0.28
-	right_cards.anchor_right = 0.58
-	$Background.add_child(right)
-
-	var bottom := left.duplicate() as Control
-	bottom.name = "BottomPlayer"
-	_set_rect(bottom, 0.331, 0.747, 0.611, 1.017)
-	_configure_player_info(bottom, false, true)
-	var bottom_cards := bottom.get_node("HoleCards") as Control
-	bottom_cards.anchor_left = 0.29
-	bottom_cards.anchor_top = -0.567
-	bottom_cards.anchor_right = 0.89
-	bottom_cards.anchor_bottom = 0.153
-	bottom_cards.add_theme_constant_override("separation", 24)
-	for card_slot in bottom_cards.get_children():
-		(card_slot as Control).custom_minimum_size = Vector2(150, 210)
-	_set_rect(bottom.get_node("StateLabel"), 0.72, 0.22, 1.15, 0.34)
-	_set_rect(bottom.get_node("PredictionLabel"), 0.72, 0.38, 1.15, 0.50)
-	$Background.add_child(bottom)
-
-
-func _configure_player_info(seat: Control, right_side: bool, bottom := false) -> void:
-	var info := seat.get_node_or_null("InfoFrame") as TextureRect
-	if info == null:
-		info = TextureRect.new()
-		info.name = "InfoFrame"
-		info.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		info.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		info.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		seat.add_child(info)
-		seat.move_child(info, 0)
-	info.texture = _player_info_texture
-	info.flip_h = false
-	var coin_icon := seat.get_node_or_null("CoinIcon") as TextureRect
-	if coin_icon == null:
-		coin_icon = TextureRect.new()
-		coin_icon.name = "CoinIcon"
-		coin_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		coin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		coin_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		seat.add_child(coin_icon)
-	coin_icon.texture = _coin_icon_texture
-
-	var frame_left := 0.70 if right_side else (0.007 if bottom else 0.011)
-	var top := 0.21 if bottom else 0.11
-	var frame_right := frame_left + 0.60
-	var bottom_edge := top + 0.455
-	_set_rect(info, frame_left, top, frame_right, bottom_edge)
-
-	var avatar := seat.get_node("AvatarFrame") as TextureRect
-	var name_frame := seat.get_node("NameFrame") as TextureRect
-	var money := seat.get_node("MoneyFrame") as TextureRect
-	avatar.texture = null
-	name_frame.texture = null
-	money.texture = null
-	_set_rect(avatar, frame_left, top, frame_left + 0.27, bottom_edge)
-	_set_rect(name_frame, frame_left + 0.235, top + 0.075, frame_right - 0.035, top + 0.255)
-	_set_rect(money, frame_left + 0.27, top + 0.28, frame_left + 0.52, bottom_edge)
-	var coin_center_x := frame_left + 0.288
-	var coin_center_y := top + 0.369
-	_set_rect(coin_icon, coin_center_x - 0.042, coin_center_y - 0.075, coin_center_x + 0.042, coin_center_y + 0.075)
-	_set_rect(avatar.get_node("InitialLabel"), 0.0, 0.0, 1.0, 1.0)
-	_set_rect(name_frame.get_node("NameLabel"), 0.0, 0.0, 1.0, 1.0)
-	_set_rect(money.get_node("MoneyLabel"), 0.0, 0.0, 1.0, 1.0)
-	_configure_prediction_history(seat, right_side, bottom)
-
-
-func _configure_prediction_history(seat: Control, right_side: bool, bottom: bool) -> void:
-	seat.get_node("StateLabel").visible = false
-	seat.get_node("PredictionLabel").visible = false
-	var history := seat.get_node_or_null("PredictionHistory") as TextureRect
-	if history == null:
-		history = TextureRect.new()
-		history.name = "PredictionHistory"
-		history.texture = _player_prediction_history_texture
-		history.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		history.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		history.stretch_mode = TextureRect.STRETCH_SCALE
-		seat.add_child(history)
-		var centers := [0.1924, 0.3983, 0.6039, 0.8076]
-		for index in 4:
-			var value := Label.new()
-			value.name = "Round%d" % (index + 1)
-			value.visible = false
-			value.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			value.add_theme_color_override("font_color", Color(0.95, 0.76, 0.43, 1.0))
-			value.add_theme_font_size_override("font_size", 20)
-			value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			_set_rect(value, centers[index] - 0.055, 0.53, centers[index] + 0.055, 0.76)
-			history.add_child(value)
-			var result_icon := TextureRect.new()
-			result_icon.name = "Round%dIcon" % (index + 1)
-			result_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			result_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			result_icon.stretch_mode = TextureRect.STRETCH_SCALE
-			_set_rect(result_icon, centers[index] - 0.072, 0.428, centers[index] + 0.072, 0.816)
-			history.add_child(result_icon)
-	if bottom:
-		_set_rect(history, 0.6525, 0.22, 1.2075, 0.60)
-	elif right_side:
-		_set_rect(history, 0.585, 0.61, 1.195, 0.99)
-	else:
-		_set_rect(history, 0.005, 0.61, 0.615, 0.99)
-
-
-func _set_rect(control: Control, left: float, top: float, right: float, bottom: float) -> void:
-	control.anchor_left = left
-	control.anchor_top = top
-	control.anchor_right = right
-	control.anchor_bottom = bottom
-	control.offset_left = 0.0
-	control.offset_top = 0.0
-	control.offset_right = 0.0
-	control.offset_bottom = 0.0
-
+func arm_community_animation() -> void:
+	_community_animation_pending = true
 
 func apply_state(view: Dictionary, my_id: int) -> void:
 	_state = view
@@ -298,10 +100,26 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 	_current_phase = phase
 	if phase_changed:
 		_selected_rank = 0
+		_prediction_submit_pending = false
+		_prediction_locked = false
 		_refresh_prediction_buttons()
 	phase_label.text = {"white": "白色阶段", "yellow": "黄色阶段", "orange": "橙色阶段", "red": "红色阶段"}.get(phase, "警报进度")
 	_update_progress(int(view.get("vaults", 0)), int(view.get("alarms", 0)), phase)
-	_update_cards(community_cards, view.get("community_cards", []), false)
+	var public_cards: Array = view.get("community_cards", [])
+	var public_card_count := mini(public_cards.size(), community_cards.get_child_count())
+	if public_card_count < _known_community_count:
+		_pending_community_cards.clear()
+		_active_community_card = -1
+		_community_dealing = false
+		_known_community_count = 0
+	_update_community_cards(public_cards)
+	if _community_animation_pending and public_card_count > _known_community_count:
+		for index in range(_known_community_count, public_card_count):
+			if index not in _pending_community_cards:
+				_pending_community_cards.append(index)
+		_community_animation_pending = false
+	_known_community_count = public_card_count
+	_apply_community_deal_visibility()
 	var status := str(view.get("status", "playing"))
 	var reveal_hole_cards := status == "round_complete" or status == "finished"
 
@@ -317,6 +135,12 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 	_update_seat($Background/LeftPlayer, others[0] if others.size() > 0 else {}, false, reveal_hole_cards)
 	_update_seat($Background/RightPlayer, others[1] if others.size() > 1 else {}, false, reveal_hole_cards)
 	_update_seat($Background/BottomPlayer, mine, true, reveal_hole_cards)
+	if _dealing:
+		_apply_deal_visibility()
+	elif _deal_animation_pending and status == "playing" and players.size() >= 3:
+		_deal_animation_pending = false
+		_start_deal_animation()
+	_start_pending_community_deal()
 
 	_my_id = my_id
 	_locked_ranks.clear()
@@ -327,6 +151,14 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 			if locked_rank > 0:
 				_locked_ranks.append(locked_rank)
 	_selected_rank = int(mine.get("chip", 0))
+	if status == "playing":
+		var confirmed_by_server := bool(mine.get("confirmed", false))
+		if confirmed_by_server:
+			_prediction_submit_pending = false
+		_prediction_locked = confirmed_by_server or _prediction_submit_pending
+	else:
+		_prediction_submit_pending = false
+		_prediction_locked = false
 	_refresh_prediction_buttons()
 
 	if status == "round_complete":
@@ -350,17 +182,25 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 			submit_label.text = "再来一局" if int(view.get("host_id", 0)) == my_id else "等待房主再来一局"
 		status_label.text = "帮派获胜" if str(view.get("winner", "")) == "gang" else "警报方获胜"
 	else:
-		submit_label.text = "提交预测"
-		status_label.text = ""
+		if _prediction_locked and _selected_rank > 0:
+			submit_label.text = "已锁定 · 第%d名" % _selected_rank
+			status_label.text = "预测已锁定，等待其他玩家"
+		else:
+			submit_label.text = "提交预测"
+			status_label.text = ""
+	submit_button.disabled = status == "playing" and _prediction_locked
 
 
 func show_events(events: Array) -> void:
 	for event in events:
 		var event_data := event as Dictionary
 		match str(event_data.get("event", "")):
+			"game_started", "hole_dealt":
+				arm_new_round_animation()
 			"chip_claimed":
 				_cache_claimed_chip(int(event_data.get("player_id", 0)), int(event_data.get("rank", 0)))
 			"phase_changed":
+				arm_community_animation()
 				status_label.text = "进入下一阶段"
 			"round_settled":
 				var total := int(event_data.get("vaults", 0)) + int(event_data.get("alarms", 0))
@@ -370,6 +210,291 @@ func show_events(events: Array) -> void:
 				status_label.text = "本轮结算完成"
 			"game_over":
 				status_label.text = "整局结算完成"
+
+
+func _start_deal_animation() -> void:
+	_dealing = true
+	_dealt_slot_count = 0
+	_deal_generation += 1
+	_clear_flying_cards()
+	_apply_deal_visibility()
+	deal_started.emit()
+	_play_deal_animation(_deal_generation)
+
+
+func _play_deal_animation(generation: int) -> void:
+	var targets := _deal_targets()
+	if targets.size() != 6:
+		_finish_deal_animation(generation)
+		return
+	var origin_image := $Background/DeckPile/TopCard as TextureRect
+	var layer_inverse := deal_animation_layer.get_global_transform().affine_inverse()
+	var origin_center := origin_image.get_global_rect().get_center()
+	var origin_local := layer_inverse * origin_center
+	var card_back := load(CARD_BACK) as Texture2D
+	for index in targets.size():
+		if generation != _deal_generation or not is_instance_valid(deal_animation_layer):
+			return
+		var target := targets[index] as TextureRect
+		var flying_card := TextureRect.new()
+		flying_card.name = "FlyingCard%d" % (index + 1)
+		flying_card.texture = card_back
+		flying_card.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		flying_card.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		flying_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		deal_animation_layer.add_child(flying_card)
+		await _animate_flying_card(flying_card, origin_local, target, index)
+		if generation != _deal_generation:
+			if is_instance_valid(flying_card):
+				flying_card.queue_free()
+			return
+		_dealt_slot_count = index + 1
+		_apply_deal_visibility()
+		_play_landing_bounce(target)
+		var seat := target.get_parent().get_parent().get_parent() as Control
+		card_dealt.emit(seat.name, index / 3)
+		flying_card.queue_free()
+		if deal_card_gap > 0.0 and index < targets.size() - 1:
+			await get_tree().create_timer(deal_card_gap).timeout
+	_finish_deal_animation(generation)
+
+
+func _deal_targets() -> Array[TextureRect]:
+	var seats: Array[Control] = [
+		$Background/LeftPlayer,
+		$Background/RightPlayer,
+		$Background/BottomPlayer,
+	]
+	var targets: Array[TextureRect] = []
+	for card_index in 2:
+		for seat in seats:
+			targets.append(seat.get_node("HoleCards/Card%d/Image" % (card_index + 1)) as TextureRect)
+	return targets
+
+
+func _apply_deal_visibility() -> void:
+	var targets := _deal_targets()
+	for index in targets.size():
+		targets[index].visible = not _dealing or index < _dealt_slot_count
+
+
+func _finish_deal_animation(generation: int) -> void:
+	if generation != _deal_generation:
+		return
+	_dealing = false
+	_dealt_slot_count = 6
+	_apply_deal_visibility()
+	_clear_flying_cards()
+	_start_pending_community_deal()
+
+
+func _clear_flying_cards() -> void:
+	for child in deal_animation_layer.get_children():
+		child.queue_free()
+
+
+func _start_pending_community_deal() -> void:
+	if _dealing or _community_dealing or _pending_community_cards.is_empty():
+		return
+	_community_dealing = true
+	_play_community_deal_animation()
+
+
+func _play_community_deal_animation() -> void:
+	var card_back := load(CARD_BACK) as Texture2D
+	while not _pending_community_cards.is_empty():
+		var card_index: int = _pending_community_cards.pop_front()
+		_active_community_card = card_index
+		_apply_community_deal_visibility()
+		var target := community_cards.get_child(card_index).get_node("Image") as TextureRect
+		var layer_inverse := deal_animation_layer.get_global_transform().affine_inverse()
+		var origin := $Background/DeckPile/TopCard as TextureRect
+		var origin_local := layer_inverse * origin.get_global_rect().get_center()
+		var flying_card := TextureRect.new()
+		flying_card.name = "FlyingCommunityCard%d" % (card_index + 1)
+		flying_card.texture = card_back
+		flying_card.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		flying_card.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		flying_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		deal_animation_layer.add_child(flying_card)
+		await _animate_flying_card(flying_card, origin_local, target, card_index)
+		_active_community_card = -1
+		target.visible = true
+		_play_landing_bounce(target)
+		community_card_dealt.emit(card_index)
+		flying_card.queue_free()
+		if deal_card_gap > 0.0 and not _pending_community_cards.is_empty():
+			await get_tree().create_timer(deal_card_gap).timeout
+	_community_dealing = false
+	_apply_community_deal_visibility()
+
+
+func _animate_flying_card(
+	flying_card: TextureRect,
+	origin_local: Vector2,
+	target: TextureRect,
+	variation: int
+) -> void:
+	var layer_inverse := deal_animation_layer.get_global_transform().affine_inverse()
+	var target_frame := target.get_parent() as Control
+	var target_global_center := target_frame.get_global_transform() * (target_frame.size * 0.5)
+	var target_center := layer_inverse * target_global_center
+	var target_size := target_frame.size
+	var start_size := target_size * 0.62
+	var distance := origin_local.distance_to(target_center)
+	var curve_height := clampf(distance * 0.16, 65.0, 180.0)
+	var curve_control := origin_local.lerp(target_center, 0.46) + Vector2(0.0, -curve_height)
+	var start_rotation := deg_to_rad(-11.0 if variation % 2 == 0 else 11.0)
+	var sway_rotation := deg_to_rad(4.0 if variation % 2 == 0 else -4.0)
+	flying_card.position = origin_local - start_size * 0.5
+	flying_card.size = start_size
+	flying_card.pivot_offset = start_size * 0.5
+	flying_card.rotation = start_rotation
+	flying_card.modulate.a = 0.88
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_method(
+		func(progress: float) -> void:
+			if not is_instance_valid(flying_card):
+				return
+			var inverse_progress := 1.0 - progress
+			var center := (
+				origin_local * inverse_progress * inverse_progress
+				+ curve_control * 2.0 * inverse_progress * progress
+				+ target_center * progress * progress
+			)
+			var current_size := start_size.lerp(target_size, progress)
+			flying_card.size = current_size
+			flying_card.pivot_offset = current_size * 0.5
+			flying_card.position = center - current_size * 0.5
+			flying_card.rotation = lerpf(start_rotation, 0.0, progress) + sin(progress * PI) * sway_rotation
+			flying_card.modulate.a = lerpf(0.88, 1.0, progress),
+		0.0,
+		1.0,
+		deal_card_duration
+	)
+	await tween.finished
+
+
+func _play_landing_bounce(target: TextureRect) -> void:
+	target.pivot_offset = target.size * 0.5
+	target.scale = Vector2(0.94, 0.94)
+	var landing := create_tween()
+	landing.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	landing.tween_property(target, "scale", Vector2.ONE, 0.14)
+
+
+func _setup_card_interactions() -> void:
+	var interactive_cards := _deal_targets()
+	for slot in community_cards.get_children():
+		interactive_cards.append(slot.get_node("Image") as TextureRect)
+	for card in interactive_cards:
+		var material := ShaderMaterial.new()
+		material.shader = CARD_PERSPECTIVE_SHADER
+		material.set_shader_parameter("rect_size", card.size)
+		material.set_shader_parameter("x_rot", 0.0)
+		material.set_shader_parameter("y_rot", 0.0)
+		material.set_shader_parameter("fov", 70.0)
+		material.set_shader_parameter("inset", 0.12)
+		card.material = material
+		card.mouse_filter = Control.MOUSE_FILTER_STOP
+		card.resized.connect(_sync_card_shader_size.bind(card))
+		card.mouse_entered.connect(_on_card_mouse_entered.bind(card))
+		card.mouse_exited.connect(_on_card_mouse_exited.bind(card))
+		card.gui_input.connect(_on_card_gui_input.bind(card))
+
+
+func _apply_hole_card_fan() -> void:
+	for seat in [$Background/LeftPlayer, $Background/RightPlayer, $Background/BottomPlayer]:
+		var first := seat.get_node("HoleCards/Card1") as PanelContainer
+		var second := seat.get_node("HoleCards/Card2") as PanelContainer
+		var angle := deg_to_rad(3.0 if seat.name == "BottomPlayer" else 4.0)
+		first.pivot_offset = Vector2(first.size.x * 0.5, first.size.y)
+		second.pivot_offset = Vector2(second.size.x * 0.5, second.size.y)
+		first.rotation = -angle
+		second.rotation = angle
+
+
+func _apply_community_card_spread() -> void:
+	var angles := [-2.8, -1.4, 0.0, 1.4, 2.8]
+	var vertical_offsets := [11.0, 4.0, 0.0, 4.0, 11.0]
+	for index in community_cards.get_child_count():
+		var card := community_cards.get_child(index) as PanelContainer
+		card.pivot_offset = Vector2(card.size.x * 0.5, card.size.y)
+		card.rotation = deg_to_rad(float(angles[index]))
+		card.position.y = (community_cards.size.y - card.size.y) * 0.5 + float(vertical_offsets[index])
+
+
+func _sync_card_shader_size(card: TextureRect) -> void:
+	var material := card.material as ShaderMaterial
+	if material != null:
+		material.set_shader_parameter("rect_size", card.size)
+
+
+func _on_card_mouse_entered(card: TextureRect) -> void:
+	card.z_index = 20
+	_tween_card_scale(card, Vector2(1.035, 1.035), 0.12)
+
+
+func _on_card_mouse_exited(card: TextureRect) -> void:
+	card.z_index = 0
+	_tween_card_scale(card, Vector2.ONE, 0.16)
+	var material := card.material as ShaderMaterial
+	if material == null:
+		return
+	var start_x := float(material.get_shader_parameter("x_rot"))
+	var start_y := float(material.get_shader_parameter("y_rot"))
+	var reset := create_tween()
+	reset.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	reset.tween_method(
+		func(progress: float) -> void:
+			if not is_instance_valid(material):
+				return
+			material.set_shader_parameter("x_rot", lerpf(start_x, 0.0, progress))
+			material.set_shader_parameter("y_rot", lerpf(start_y, 0.0, progress)),
+		0.0,
+		1.0,
+		0.18
+	)
+
+
+func _on_card_gui_input(event: InputEvent, card: TextureRect) -> void:
+	if not event is InputEventMouseMotion or card.size.x <= 0.0 or card.size.y <= 0.0:
+		return
+	var mouse_event := event as InputEventMouseMotion
+	var normalized := mouse_event.position / card.size
+	var material := card.material as ShaderMaterial
+	if material == null:
+		return
+	var target_y := clampf((normalized.x - 0.5) * 16.0, -8.0, 8.0)
+	var target_x := clampf((0.5 - normalized.y) * 14.0, -7.0, 7.0)
+	var current_y := float(material.get_shader_parameter("y_rot"))
+	var current_x := float(material.get_shader_parameter("x_rot"))
+	material.set_shader_parameter("y_rot", lerpf(current_y, target_y, 0.42))
+	material.set_shader_parameter("x_rot", lerpf(current_x, target_x, 0.42))
+
+
+func _tween_card_scale(card: TextureRect, target_scale: Vector2, duration: float) -> void:
+	var key := card.get_instance_id()
+	if _card_hover_tweens.has(key):
+		var previous := _card_hover_tweens[key] as Tween
+		if previous != null and previous.is_valid():
+			previous.kill()
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(card, "scale", target_scale, duration)
+	_card_hover_tweens[key] = tween
+
+
+func _apply_community_deal_visibility() -> void:
+	for index in community_cards.get_child_count():
+		var image := community_cards.get_child(index).get_node("Image") as TextureRect
+		if index >= _known_community_count:
+			image.visible = false
+		elif index == _active_community_card or index in _pending_community_cards:
+			image.visible = false
+		else:
+			image.visible = true
 
 
 func _cache_claimed_chip(player_id: int, rank: int) -> void:
@@ -394,21 +519,14 @@ func _update_seat(seat: Control, player: Dictionary, is_me: bool, reveal_hole_ca
 	var initial := seat.get_node("AvatarFrame/InitialLabel") as Label
 	initial.text = name.left(1).to_upper()
 	var avatar_id := int(player.get("avatar", 0))
-	var icon := seat.get_node_or_null("AvatarFrame/AvatarIcon") as TextureRect
+	var icon := seat.get_node("AvatarFrame/AvatarIcon") as TextureRect
 	if avatar_id >= 1 and avatar_id <= Avatars.PATHS.size():
-		if icon == null:
-			icon = TextureRect.new()
-			icon.name = "AvatarIcon"
-			icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			seat.get_node("AvatarFrame").add_child(icon)
 		icon.texture = load(Avatars.path_for(avatar_id))
+		icon.visible = true
 		initial.visible = false
 	else:
-		if icon != null:
-			icon.texture = null
+		icon.texture = null
+		icon.visible = false
 		initial.visible = true
 	var state_text := "已确认" if bool(player.get("confirmed", false)) else "预测排名"
 	if str(_state.get("status", "")) == "round_complete":
@@ -453,17 +571,20 @@ func _update_cards(container: Container, cards: Array, hidden: bool) -> void:
 		var slot := slots[index] as PanelContainer
 		var label := slot.get_node("Label") as Label
 		label.visible = false
-		var image := slot.get_node_or_null("Image") as TextureRect
-		if image == null:
-			image = TextureRect.new()
-			image.name = "Image"
-			image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			image.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			image.stretch_mode = TextureRect.STRETCH_SCALE
-			slot.add_child(image)
-			slot.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		var image := slot.get_node("Image") as TextureRect
 		if index < cards.size() and not hidden:
+			image.texture = load(_card_asset_path(cards[index] as Dictionary)) as Texture2D
+		else:
+			image.texture = load(CARD_BACK) as Texture2D
+
+
+func _update_community_cards(cards: Array) -> void:
+	var slots := community_cards.get_children()
+	for index in slots.size():
+		var slot := slots[index] as PanelContainer
+		(slot.get_node("Label") as Label).visible = false
+		var image := slot.get_node("Image") as TextureRect
+		if index < cards.size():
 			image.texture = load(_card_asset_path(cards[index] as Dictionary)) as Texture2D
 		else:
 			image.texture = load(CARD_BACK) as Texture2D
@@ -484,15 +605,7 @@ func _render_progress_results() -> void:
 	for index in progress_slots.get_child_count():
 		var slot := progress_slots.get_child(index) as Label
 		slot.text = ""
-		var icon := slot.get_node_or_null("ResultIcon") as TextureRect
-		if icon == null:
-			icon = TextureRect.new()
-			icon.name = "ResultIcon"
-			icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			icon.stretch_mode = TextureRect.STRETCH_SCALE
-			slot.add_child(icon)
+		var icon := slot.get_node("ResultIcon") as TextureRect
 		icon.visible = index < _round_results.size()
 		if icon.visible:
 			icon.texture = _win_mark_texture if _round_results[index] else _loss_mark_texture
@@ -512,7 +625,7 @@ func _cropped_texture(path: String) -> Texture2D:
 
 
 func _select_rank(rank: int) -> void:
-	if rank == _selected_rank or rank in _locked_ranks:
+	if _prediction_locked or rank == _selected_rank or rank in _locked_ranks:
 		return
 	_selected_rank = rank
 	_refresh_prediction_buttons()
@@ -524,8 +637,10 @@ func _refresh_prediction_buttons() -> void:
 		var button := prediction_buttons[index]
 		var rank := index + 1
 		var locked := rank in _locked_ranks
-		button.disabled = locked
-		if locked:
+		button.disabled = locked or _prediction_locked
+		if _prediction_locked:
+			button.modulate = Color(1.28, 1.12, 1.42, 1.0) if rank == _selected_rank else Color(0.38, 0.35, 0.42, 0.58)
+		elif locked:
 			button.modulate = Color(0.45, 0.42, 0.38, 0.55)
 		else:
 			button.modulate = Color(1.28, 1.12, 1.42, 1.0) if rank == _selected_rank else Color.WHITE
@@ -542,11 +657,18 @@ func _on_submit_pressed() -> void:
 			elif int(_state.get("host_id", 0)) == _my_id:
 				rematch_requested.emit()
 		_:
+			if _prediction_locked:
+				return
 			if _selected_rank == 0:
 				status_label.text = "请先选择预测排名"
 				return
+			_prediction_submit_pending = true
+			_prediction_locked = true
+			_refresh_prediction_buttons()
+			submit_button.disabled = true
+			submit_label.text = "已锁定 · 第%d名" % _selected_rank
+			status_label.text = "预测已锁定，等待其他玩家"
 			prediction_submitted.emit(_selected_rank)
-			status_label.text = "排名预测已提交"
 
 
 func _card_asset_path(card: Dictionary) -> String:

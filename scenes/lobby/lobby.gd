@@ -12,6 +12,7 @@ const SUPPORTED_PLAYER_COUNT := 3
 
 @onready var name_label: Label = $Background/Header/NameLabel
 @onready var balance_label: Label = $Background/Header/BalanceLabel
+@onready var avatar_icon: TextureRect = $Background/Header/AvatarFrame/AvatarIcon
 @onready var logout_button: Button = $Background/Header/LogoutButton
 @onready var quick_match_button: TextureButton = $Background/Actions/QuickMatchButton
 @onready var quick_match_label: Label = $Background/Actions/QuickMatchButton/Label
@@ -48,6 +49,13 @@ func _render_user() -> void:
 		display_name = "游客" if Session.is_guest() else "玩家"
 	name_label.text = display_name
 	balance_label.text = _format_balance(int(Session.user.get("balance", 0)))
+	_set_avatar(int(Session.user.get("avatar", 0)))
+
+
+func _set_avatar(avatar_id: int) -> void:
+	var valid := avatar_id >= 1 and avatar_id <= Avatars.PATHS.size()
+	avatar_icon.texture = load(Avatars.path_for(avatar_id)) if valid else null
+	avatar_icon.visible = valid
 
 
 ## 回大厅时重拉余额,对局派彩/扣费后展示不再是登录时的旧快照。
