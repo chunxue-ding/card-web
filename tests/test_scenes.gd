@@ -118,7 +118,7 @@ func _check_lobby() -> void:
 	count6.pressed.emit()
 	h.check(page.player_count == 4, "lobby 禁用人数不能改变对局人数")
 	page.get_node("Background/Actions/QuickMatchButton").pressed.emit()
-	h.check("快速匹配中" in page.get_node("Background/StatusLabel").text, "lobby 快速匹配进入匹配态")
+	h.check(int(page.get("_match_player_count")) == 4, "lobby 快速匹配进入所选 4 人队列")
 	h.check(page.has_method("_set_match_mode"), "lobby 匹配态切换存在")
 	page.queue_free()
 	await process_frame

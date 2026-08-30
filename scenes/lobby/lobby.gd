@@ -1,5 +1,5 @@
 extends Control
-## 登录后的主页：选择对局人数（用于好友建房），快速匹配（后端固定 3 人成桌）或好友同玩。
+## 登录后的主页：选择对局人数，并用于对应人数的快速匹配或好友建房。
 
 signal game_mode_selected(mode: String, player_count: int)
 
@@ -23,10 +23,13 @@ const SUPPORTED_PLAYER_COUNTS := [3, 4]
 var player_count := DEFAULT_PLAYER_COUNT
 var _hover_tweens: Dictionary = {}
 var _matching := false
+var _match_player_count := DEFAULT_PLAYER_COUNT
 
 
 func _ready() -> void:
 	Music.stop()
+	if Session.pending_player_count in SUPPORTED_PLAYER_COUNTS:
+		player_count = Session.pending_player_count
 	_render_user()
 	_refresh_user()
 	for count in range(3, 7):
@@ -86,10 +89,12 @@ func _on_quick_match_pressed() -> void:
 
 func _start_match() -> void:
 	_set_match_mode(true)
-	game_mode_selected.emit("quick_match", DEFAULT_PLAYER_COUNT)
-	status_label.text = "快速匹配中…（固定3人）"
+	_match_player_count = player_count
+	Session.pending_player_count = _match_player_count
+	game_mode_selected.emit("quick_match", _match_player_count)
+	status_label.text = "正在匹配 %d 人局…" % _match_player_count
 	while _matching:
-		var res: Variant = await Session.card().match_wait(Session.token)
+		var res: Variant = await Session.card().match_wait(Session.token, _match_player_count)
 		if not is_inside_tree():
 			return
 		if res is ApiError:
@@ -107,7 +112,7 @@ func _start_match() -> void:
 			return
 		var match_status := str(res.get("status", ""))
 		if match_status == "queued":
-			status_label.text = "快速匹配中…（队列第 %d 位）" % int(res.get("position", 0))
+			status_label.text = "正在匹配 %d 人局…（队列第 %d 位）" % [_match_player_count, int(res.get("position", 0))]
 		elif match_status == "dropped":
 			_stop_match(Endpoints.match_drop_message(str(res.get("reason", ""))))
 			return

@@ -1,7 +1,7 @@
 class_name CardApi
 extends Node
 ## card 服务（:8890）HTTP 业务：建房/加入/查询/匹配长轮询/取消。
-## 匹配固定 3 人桌；/match 后端长轮询最长 25s，用 30s 超时；queued 由调用方续约重发。
+## 匹配按 max_players 进入对应人数队列；/match 后端长轮询最长 25s，用 30s 超时。
 ## match_wait 使用专用 ApiClient 实例：长轮询在飞时不得阻塞取消/建房等其他请求。
 
 const MATCH_TIMEOUT_SEC := 30.0
@@ -32,8 +32,8 @@ func get_room(token: String, room_code: String) -> Variant:
 	return _unwrap_room(res)
 
 
-func match_wait(token: String) -> Variant:
-	var res: Dictionary = await _match_client.post_json(Endpoints.CARD_MATCH, {}, token)
+func match_wait(token: String, max_players := 3) -> Variant:
+	var res: Dictionary = await _match_client.post_json(Endpoints.CARD_MATCH, {"max_players": max_players}, token)
 	if not res["ok"]:
 		return res["error"]
 	return res["data"]

@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://d3dn7j8deemhr"]
 
-[ext_resource type="Texture2D" path="res://assets/login/login_bg.png" id="1_bg"]
-[ext_resource type="Theme" path="res://themes/main_theme.tres" id="2_theme"]
-[ext_resource type="Script" path="res://scenes/login/login.gd" id="3_script"]
+[ext_resource type="Texture2D" uid="uid://jjet4gw1ufe8" path="res://assets/login/login_bg.png" id="1_bg"]
+[ext_resource type="Theme" uid="uid://ckuqgtpmitv7e" path="res://themes/main_theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://xi2q3rr5vo7" path="res://scenes/login/login.gd" id="3_script"]
 
-[node name="Login" type="Control"]
+[node name="Login" type="Control" unique_id=1344923503]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,18 +14,18 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("3_script")
 
-[node name="Background" type="TextureRect" parent="."]
-texture = ExtResource("1_bg")
+[node name="Background" type="TextureRect" parent="." unique_id=1980520711]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("1_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Center" type="CenterContainer" parent="Background"]
+[node name="Center" type="CenterContainer" parent="Background" unique_id=1737355157]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.62
@@ -35,62 +35,62 @@ anchor_bottom = 1.026667
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Background/Center"]
+[node name="VBox" type="VBoxContainer" parent="Background/Center" unique_id=1215797777]
+layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="EmailInput" type="LineEdit" parent="Background/Center/VBox"]
+[node name="EmailInput" type="LineEdit" parent="Background/Center/VBox" unique_id=954420846]
 custom_minimum_size = Vector2(560, 82)
 layout_mode = 2
-theme_type_variation = "EmailInput"
+theme_type_variation = &"EmailInput"
 placeholder_text = "邮箱"
 
-[node name="PasswordInput" type="LineEdit" parent="Background/Center/VBox"]
+[node name="PasswordInput" type="LineEdit" parent="Background/Center/VBox" unique_id=1251872394]
 custom_minimum_size = Vector2(560, 82)
 layout_mode = 2
-theme_type_variation = "PasswordInput"
+theme_type_variation = &"PasswordInput"
 placeholder_text = "密码"
 secret = true
 
-[node name="ForgotPasswordButton" type="LinkButton" parent="Background/Center/VBox"]
+[node name="ForgotPasswordButton" type="LinkButton" parent="Background/Center/VBox" unique_id=1088868920]
 custom_minimum_size = Vector2(0, 29)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "忘记密码？"
 underline = 1
 
-[node name="LoginButton" type="Button" parent="Background/Center/VBox"]
+[node name="LoginButton" type="Button" parent="Background/Center/VBox" unique_id=1854491803]
 custom_minimum_size = Vector2(440, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "登 录"
 
-[node name="GuestGap" type="Control" parent="Background/Center/VBox"]
+[node name="GuestGap" type="Control" parent="Background/Center/VBox" unique_id=144243398]
 custom_minimum_size = Vector2(0, 1)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="GuestButton" type="Button" parent="Background/Center/VBox"]
+[node name="GuestButton" type="Button" parent="Background/Center/VBox" unique_id=1719168526]
 custom_minimum_size = Vector2(440, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_type_variation = "SecondaryButton"
+theme_type_variation = &"SecondaryButton"
 text = "游客一键登录"
 
-[node name="CreateAccountButton" type="LinkButton" parent="Background/Center/VBox"]
+[node name="CreateAccountButton" type="LinkButton" parent="Background/Center/VBox" unique_id=1819580180]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "新建账号"
 underline = 1
 
-[node name="ErrorLabel" type="Label" parent="Background/Center/VBox"]
+[node name="ErrorLabel" type="Label" parent="Background/Center/VBox" unique_id=1925708434]
 custom_minimum_size = Vector2(560, 30)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.909804, 0.298039, 0.235294, 1)
 theme_override_font_sizes/font_size = 22
-text = ""
 horizontal_alignment = 1
 
-[connection signal="pressed" from="Background/Center/VBox/CreateAccountButton" to="." method="_on_create_account_pressed"]
 [connection signal="pressed" from="Background/Center/VBox/LoginButton" to="." method="_on_login_pressed"]
 [connection signal="pressed" from="Background/Center/VBox/GuestButton" to="." method="_on_guest_pressed"]
+[connection signal="pressed" from="Background/Center/VBox/CreateAccountButton" to="." method="_on_create_account_pressed"]

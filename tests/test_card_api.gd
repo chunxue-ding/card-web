@@ -13,7 +13,7 @@ func _initialize() -> void:
 	var api := CardApi.new()
 	root.add_child(api)
 	await process_frame
-	var res: Variant = await api.match_wait("fake-token")
+	var res: Variant = await api.match_wait("fake-token", 4)
 	h.check(res is ApiError and res.is_network_error, "card 不可达 match_wait → 网络错误")
 	var room: Variant = await api.create_room("fake-token", 3)
 	h.check(room is ApiError and room.is_network_error, "card 不可达 create_room → 网络错误")
