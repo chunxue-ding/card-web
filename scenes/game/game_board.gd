@@ -634,8 +634,9 @@ func _update_seat(seat: Control, player: Dictionary, is_me: bool, reveal_hole_ca
 	initial.text = name.left(1).to_upper()
 	var avatar_id := int(player.get("avatar", 0))
 	var icon := seat.get_node("AvatarFrame/AvatarIcon") as TextureRect
-	if avatar_id >= 1 and avatar_id <= Avatars.PATHS.size():
-		icon.texture = load(Avatars.path_for(avatar_id))
+	var avatar_path := Avatars.game_player_path(avatar_id, bool(player.get("is_bot", false)))
+	if not avatar_path.is_empty():
+		icon.texture = load(avatar_path)
 		icon.visible = true
 		initial.visible = false
 	else:

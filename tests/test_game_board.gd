@@ -204,7 +204,10 @@ func _initialize() -> void:
 	h.check(left_avatar.size.x > 0.0 and left_avatar.size.y > 0.0, "game 头像使用场景文件中的可编辑布局")
 	h.check(left_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "game 头像保持比例不拉伸")
 	h.check(not board.get_node("Background/LeftPlayer/AvatarFrame/InitialLabel").visible, "game 有头像时隐藏首字母占位")
-	h.check(board.get_node("Background/RightPlayer/AvatarFrame/InitialLabel").visible, "game 无头像玩家保留首字母占位")
+	var right_avatar := board.get_node("Background/RightPlayer/AvatarFrame/AvatarIcon") as TextureRect
+	h.check(right_avatar.visible and right_avatar.texture.resource_path.ends_with("克苏鲁游客头像.png"), "game 未设置头像的游客使用专属头像")
+	board.call("_update_seat", board.get_node("Background/RightPlayer"), {"id": -1, "name": "Cultist 1", "is_bot": true, "hole_cards": []}, false, false)
+	h.check(right_avatar.visible and right_avatar.texture.resource_path.ends_with("克苏鲁机器人头像.png"), "game 机器人使用专属头像")
 	board.apply_state({
 		"status": "playing",
 		"phase": "white",

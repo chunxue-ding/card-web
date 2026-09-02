@@ -17,10 +17,11 @@
 [ext_resource type="Texture2D" path="res://game/玩家四轮预测排名区域.png" id="16_873an"]
 [ext_resource type="Texture2D" path="res://game/提交预测按钮底框无文字.png" id="17_0sp7b"]
 [ext_resource type="Texture2D" path="res://title/克苏鲁Q版头像3 古老者 1.png" id="18_mbu0h"]
-[ext_resource type="Texture2D" path="res://title/克苏鲁Q版头像6 犹格索托斯.png" id="19_usly8"]
 [ext_resource type="Texture2D" path="res://game/胜利标记.png" id="20_progress_preview"]
 [ext_resource type="Texture2D" path="res://game/排名预测圆形按钮4.png" id="21_rank4"]
 [ext_resource type="Texture2D" path="res://game/本轮排名预测背景框 4人版.png" id="22_prediction4"]
+[ext_resource type="Texture2D" path="res://title/克苏鲁机器人头像.png" id="23_bot_avatar"]
+[ext_resource type="Texture2D" path="res://title/克苏鲁游客头像.png" id="24_guest_avatar"]
 
 [sub_resource type="Theme" id="GameTheme"]
 default_font = ExtResource("1_vtrdf")
@@ -1348,6 +1349,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AvatarIcon" type="TextureRect" parent="Background/BottomPlayer/AvatarFrame" unique_id=1794290647]
+editor_description = "游客头像预览；运行时会按当前用户类型替换。"
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.018310022
@@ -1359,7 +1361,7 @@ offset_bottom = -1.5258789e-05
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("19_usly8")
+texture = ExtResource("24_guest_avatar")
 expand_mode = 1
 stretch_mode = 5
 metadata/_edit_use_anchors_ = true
@@ -1648,6 +1650,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AvatarIcon" type="TextureRect" parent="Background/TopPlayer/AvatarFrame" unique_id=1984139974]
+editor_description = "机器人头像预览；运行时会按该座席玩家类型替换。"
 layout_mode = 1
 anchors_preset = -1
 anchor_left = -0.032158732
@@ -1659,7 +1662,7 @@ offset_bottom = -1.6779785
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("15_s8hbr")
+texture = ExtResource("23_bot_avatar")
 expand_mode = 1
 stretch_mode = 5
 metadata/_edit_use_anchors_ = true

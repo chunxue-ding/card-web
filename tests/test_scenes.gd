@@ -99,6 +99,9 @@ func _check_lobby() -> void:
 	page._set_avatar(2)
 	var lobby_avatar := page.get_node("Background/Header/AvatarFrame/AvatarIcon") as TextureRect
 	h.check(lobby_avatar.visible and lobby_avatar.texture != null, "lobby 用户头像显示在头像框内")
+	page._set_avatar(0, true)
+	h.check(lobby_avatar.texture.resource_path.ends_with("克苏鲁游客头像.png"), "lobby 游客显示专属头像")
+	page._set_avatar(2)
 	h.check(lobby_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "lobby 用户头像保持比例居中")
 	h.check((load("res://scenes/lobby/lobby.tscn") as PackedScene).instantiate().get_node("Background/Header/AvatarFrame/AvatarIcon").texture != null, "lobby 2D 编辑器提供头像预览")
 	var lobby_font := page.get_node("Background/Actions/QuickMatchButton/Label").get_theme_font("font") as Font
@@ -142,6 +145,9 @@ func _check_friend_room() -> void:
 	page._set_avatar(3)
 	var friend_avatar := page.get_node("Background/Header/AvatarFrame/AvatarIcon") as TextureRect
 	h.check(friend_avatar.visible and friend_avatar.texture != null, "friend_room 用户头像显示在头像框内")
+	page._set_avatar(0, true)
+	h.check(friend_avatar.texture.resource_path.ends_with("克苏鲁游客头像.png"), "friend_room 游客显示专属头像")
+	page._set_avatar(3)
 	h.check(friend_avatar.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "friend_room 用户头像保持比例居中")
 	h.check((load("res://scenes/friend_room/friend_room.tscn") as PackedScene).instantiate().get_node("Background/Header/AvatarFrame/AvatarIcon").texture != null, "friend_room 2D 编辑器提供头像预览")
 	var friend_room_font := page.get_node("Background/ActionCenter/Actions/CreateRoomButton/Label").get_theme_font("font") as Font

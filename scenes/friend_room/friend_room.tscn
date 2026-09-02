@@ -11,7 +11,7 @@
 [ext_resource type="Script" uid="uid://but6pie3aldt1" path="res://scenes/friend_room/friend_room.gd" id="9_script"]
 [ext_resource type="Texture2D" uid="uid://dt2uhqfbrns5r" path="res://assets/homepage/friend_button_frame.png" id="10_friend_frame"]
 [ext_resource type="FontFile" uid="uid://bt1ywdsco3yhl" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="11_font"]
-[ext_resource type="Texture2D" uid="uid://dwjb873tp57st" path="res://title/克苏鲁Q版头像2 深潜者.png" id="12_avatar_preview"]
+[ext_resource type="Texture2D" path="res://title/克苏鲁游客头像.png" id="12_avatar_preview"]
 
 [sub_resource type="FontVariation" id="DisplayFont"]
 base_font = ExtResource("11_font")
@@ -99,7 +99,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="AvatarFrame" type="TextureRect" parent="Background/Header" unique_id=1232516573]
-editor_description = "2D 编辑器头像预览：调整 AvatarFrame 可改变头像框整体大小；调整子节点 AvatarIcon 可改变头像在圆框中的大小和位置。"
+editor_description = "2D 编辑器游客头像预览：调整 AvatarFrame 可改变头像框整体大小；调整子节点 AvatarIcon 可改变头像在圆框中的大小和位置。运行时会替换为当前用户头像。"
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.08

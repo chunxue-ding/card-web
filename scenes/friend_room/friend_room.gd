@@ -36,13 +36,13 @@ func _render_user() -> void:
 		display_name = "游客" if Session.is_guest() else "玩家"
 	name_label.text = display_name
 	balance_label.text = _format_balance(int(Session.user.get("balance", 0)))
-	_set_avatar(int(Session.user.get("avatar", 0)))
+	_set_avatar(int(Session.user.get("avatar", 0)), Session.is_guest())
 
 
-func _set_avatar(avatar_id: int) -> void:
-	var valid := avatar_id >= 1 and avatar_id <= Avatars.PATHS.size()
-	avatar_icon.texture = load(Avatars.path_for(avatar_id)) if valid else null
-	avatar_icon.visible = valid
+func _set_avatar(avatar_id: int, guest := false) -> void:
+	var path := Avatars.user_path(avatar_id, guest)
+	avatar_icon.texture = load(path) if not path.is_empty() else null
+	avatar_icon.visible = not path.is_empty()
 
 
 func _refresh_user() -> void:
