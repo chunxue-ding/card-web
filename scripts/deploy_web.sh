@@ -22,13 +22,13 @@ du -sh export/web | awk '{print "    构建总大小: " $1}'
 echo "==> 上传(含 .gz)"
 rsync -a --delete --exclude='*.import' export/web/ "$SERVER:$REMOTE_DIR/"
 
-echo "==> 轻量校验(HEAD 大小对比,不再全量下载)"
+echo "==> 轻量校验(HEAD 大小对比,不下载正文;gz 用 Accept-Encoding 头取 Content-Length)"
 fail=0
 for f in index.pck index.wasm index.js; do
   local_size=$(stat -f%z "export/web/$f")
   remote_size=$(curl -sI --max-time 10 "$BASE_URL/$f" | awk 'tolower($1)=="content-length:"{gsub("\r","");print $2}')
   gz_size=$(stat -f%z "export/web/$f.gz")
-  remote_gz=$(curl -s --max-time 10 -o /dev/null -w '%{size_download}' -H 'Accept-Encoding: gzip' "$BASE_URL/$f")
+  remote_gz=$(curl -sI --max-time 10 -H 'Accept-Encoding: gzip' "$BASE_URL/$f" | awk 'tolower($1)=="content-length:"{gsub("\r","");print $2}')
   if [ "$local_size" = "$remote_size" ] && [ "$gz_size" = "$remote_gz" ]; then
     echo "    ✓ $f  原始 ${local_size}B / gz ${gz_size}B"
   else
