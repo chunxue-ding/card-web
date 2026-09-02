@@ -19,6 +19,50 @@ const WIN_MARK := "res://game/胜利标记.png"
 const LOSS_MARK := "res://game/失败标记.png"
 const PREDICTION_PANEL_3 := "res://game/本轮排名预测背景框.png"
 const PREDICTION_PANEL_4 := "res://game/本轮排名预测背景框 4人版.png"
+const TUTORIAL_CFG_PATH := "user://tutorial.cfg"
+const TUTORIAL_STEPS := [
+	{
+		"title": "这是你的手牌",
+		"body": "每轮你会收到两张只有自己可见的手牌。其他玩家的手牌会在本轮结算时翻开。",
+		"target": NodePath("Background/BottomPlayer/HoleCards"),
+	},
+	{
+		"title": "牌型从大到小",
+		"body": "皇家同花顺最大，高牌最小；牌型相同时再比较组成牌型的点数。",
+		"target": NodePath("Background/CommunityCards"),
+		"show_chart": true,
+	},
+	{
+		"title": "观察公共牌",
+		"body": "一轮共有四次预测：翻牌前、前三张公共牌发出后、第四张发出后，以及第五张发出后。",
+		"target": NodePath("Background/CommunityCards"),
+	},
+	{
+		"title": "选择预测排名",
+		"body": "根据手牌和当前公共牌，预测自己最终会排第几名。三人局可选 1–3，四人局可选 1–4。",
+		"target": NodePath("Background/PredictionPanel"),
+	},
+	{
+		"title": "提交并锁定",
+		"body": "选好排名后点击提交预测。锁定后本次预测不能修改，需要等待其他玩家完成选择。",
+		"target": NodePath("Background/SubmitButton"),
+	},
+	{
+		"title": "警报进度",
+		"body": "每轮结算后，胜利或失败标记会依次填入圆槽，方便观察整场对局进度。",
+		"target": NodePath("Background/Progress"),
+	},
+	{
+		"title": "关注金库",
+		"body": "这里显示当前金库金额。结合牌面、对手选择和风险决定你的排名预测。",
+		"target": NodePath("Background/Vault"),
+	},
+	{
+		"title": "回顾四次预测",
+		"body": "每位玩家下方会记录本轮四个阶段的预测。现在可以开始你的第一局了。",
+		"target": NodePath("Background/BottomPlayer/PredictionHistory"),
+	},
+]
 const RANK_BUTTON_ASSETS := [
 	"res://game/排名预测圆形按钮1.png",
 	"res://game/排名预测圆形按钮2.png",
@@ -45,6 +89,16 @@ const RANK_BUTTON_ASSETS := [
 @onready var submit_label: Label = $Background/SubmitButton/Label
 @onready var status_label: Label = $Background/StatusLabel
 @onready var deal_animation_layer: Control = $Background/DealAnimationLayer
+@onready var tutorial_help_button: Button = $Background/TutorialHelpButton
+@onready var tutorial_overlay: Control = $TutorialOverlay
+@onready var tutorial_highlight: Panel = $TutorialOverlay/Highlight
+@onready var tutorial_guide_panel: PanelContainer = $TutorialOverlay/GuidePanel
+@onready var tutorial_title: Label = $TutorialOverlay/GuidePanel/Margin/VBox/Title
+@onready var tutorial_body: Label = $TutorialOverlay/GuidePanel/Margin/VBox/Body
+@onready var tutorial_chart: TextureRect = $TutorialOverlay/GuidePanel/Margin/VBox/HandRankingChart
+@onready var tutorial_step_label: Label = $TutorialOverlay/GuidePanel/Margin/VBox/Footer/Step
+@onready var tutorial_previous_button: Button = $TutorialOverlay/GuidePanel/Margin/VBox/Footer/Previous
+@onready var tutorial_next_button: Button = $TutorialOverlay/GuidePanel/Margin/VBox/Footer/Next
 
 var _selected_rank := 0
 var _my_id := 0
@@ -71,6 +125,8 @@ var _card_hover_tweens: Dictionary = {}
 var _progress_result_tweens: Dictionary = {}
 var _prediction_submit_pending := false
 var _prediction_locked := false
+var _tutorial_step := 0
+var _tutorial_auto_checked := false
 
 
 func _ready() -> void:
@@ -96,6 +152,11 @@ func _ready() -> void:
 	call_deferred("_apply_community_card_spread")
 	_configure_player_count(3)
 	_refresh_prediction_buttons()
+	tutorial_help_button.pressed.connect(start_tutorial.bind(true))
+	$TutorialOverlay/GuidePanel/Margin/VBox/Footer/Skip.pressed.connect(_on_tutorial_skip_pressed)
+	tutorial_previous_button.pressed.connect(_on_tutorial_previous_pressed)
+	tutorial_next_button.pressed.connect(_on_tutorial_next_pressed)
+	tutorial_overlay.resized.connect(_layout_tutorial)
 	var music := get_node_or_null("/root/Music")
 	if music != null:
 		music.call("play_game")
@@ -207,6 +268,9 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 	_known_community_count = public_card_count
 	_apply_community_deal_visibility()
 	var status := str(view.get("status", "playing"))
+	if status == "playing" and not _tutorial_auto_checked:
+		_tutorial_auto_checked = true
+		call_deferred("_maybe_show_tutorial")
 	var reveal_hole_cards := status == "round_complete" or status == "finished"
 
 	var players: Array = view.get("players", [])
@@ -779,6 +843,129 @@ func _cropped_texture(path: String) -> Texture2D:
 	cropped.atlas = source
 	cropped.region = Rect2(used_rect)
 	return cropped
+
+
+func _maybe_show_tutorial() -> void:
+	var config := ConfigFile.new()
+	var completed := config.load(TUTORIAL_CFG_PATH) == OK and bool(config.get_value("game", _tutorial_storage_key(), false))
+	if not completed:
+		start_tutorial(false)
+
+
+func start_tutorial(_force := true) -> void:
+	_tutorial_step = 0
+	tutorial_overlay.visible = true
+	_show_tutorial_step()
+
+
+func close_tutorial(mark_completed := false) -> void:
+	tutorial_overlay.visible = false
+	if mark_completed:
+		var config := ConfigFile.new()
+		config.load(TUTORIAL_CFG_PATH)
+		config.set_value("game", _tutorial_storage_key(), true)
+		var error := config.save(TUTORIAL_CFG_PATH)
+		if error != OK:
+			push_warning("无法保存新手引导状态：%s" % error_string(error))
+
+
+func _tutorial_storage_key() -> String:
+	var session := get_node_or_null("/root/Session")
+	if session != null:
+		var session_user: Dictionary = session.get("user") as Dictionary
+		var user_id := int(session_user.get("id", 0))
+		if user_id != 0:
+			return "completed_user_%d" % user_id
+	return "completed_device"
+
+
+func _show_tutorial_step() -> void:
+	if not tutorial_overlay.visible or TUTORIAL_STEPS.is_empty():
+		return
+	_tutorial_step = clampi(_tutorial_step, 0, TUTORIAL_STEPS.size() - 1)
+	var step: Dictionary = TUTORIAL_STEPS[_tutorial_step]
+	tutorial_title.text = str(step["title"])
+	tutorial_body.text = str(step["body"])
+	var show_chart := bool(step.get("show_chart", false))
+	tutorial_body.visible = not show_chart
+	tutorial_chart.visible = show_chart
+	tutorial_step_label.text = "%d / %d" % [_tutorial_step + 1, TUTORIAL_STEPS.size()]
+	tutorial_previous_button.disabled = _tutorial_step == 0
+	tutorial_next_button.text = "开始游戏" if _tutorial_step == TUTORIAL_STEPS.size() - 1 else "下一步"
+	_layout_tutorial()
+
+
+func _layout_tutorial() -> void:
+	if not tutorial_overlay.visible or _tutorial_step >= TUTORIAL_STEPS.size():
+		return
+	var step: Dictionary = TUTORIAL_STEPS[_tutorial_step]
+	var show_chart := bool(step.get("show_chart", false))
+	var target := get_node_or_null(step["target"] as NodePath) as Control
+	if target == null:
+		return
+	var overlay_rect := tutorial_overlay.get_global_rect()
+	var target_rect := target.get_global_rect()
+	var padding := 18.0
+	var focus := Rect2(target_rect.position - overlay_rect.position - Vector2.ONE * padding, target_rect.size + Vector2.ONE * padding * 2.0)
+	focus.position.x = clampf(focus.position.x, 8.0, tutorial_overlay.size.x - 16.0)
+	focus.position.y = clampf(focus.position.y, 8.0, tutorial_overlay.size.y - 16.0)
+	focus.size.x = minf(focus.size.x, tutorial_overlay.size.x - focus.position.x - 8.0)
+	focus.size.y = minf(focus.size.y, tutorial_overlay.size.y - focus.position.y - 8.0)
+	tutorial_highlight.visible = not show_chart
+	tutorial_highlight.position = focus.position
+	tutorial_highlight.size = focus.size
+
+	var dim_top := $TutorialOverlay/DimTop as ColorRect
+	var dim_bottom := $TutorialOverlay/DimBottom as ColorRect
+	var dim_left := $TutorialOverlay/DimLeft as ColorRect
+	var dim_right := $TutorialOverlay/DimRight as ColorRect
+	if show_chart:
+		dim_top.position = Vector2.ZERO
+		dim_top.size = tutorial_overlay.size
+		for dim in [dim_bottom, dim_left, dim_right]:
+			dim.size = Vector2.ZERO
+	else:
+		dim_top.position = Vector2.ZERO
+		dim_top.size = Vector2(tutorial_overlay.size.x, focus.position.y)
+		dim_bottom.position = Vector2(0.0, focus.end.y)
+		dim_bottom.size = Vector2(tutorial_overlay.size.x, maxf(0.0, tutorial_overlay.size.y - focus.end.y))
+		dim_left.position = Vector2(0.0, focus.position.y)
+		dim_left.size = Vector2(focus.position.x, focus.size.y)
+		dim_right.position = Vector2(focus.end.x, focus.position.y)
+		dim_right.size = Vector2(maxf(0.0, tutorial_overlay.size.x - focus.end.x), focus.size.y)
+
+	var guide_width := minf(640.0 if show_chart else 660.0, tutorial_overlay.size.x - 32.0)
+	var guide_height := minf(1040.0, tutorial_overlay.size.y - 24.0) if show_chart else 252.0
+	var guide_x := (tutorial_overlay.size.x - guide_width) * 0.5
+	var target_center_y := focus.position.y + focus.size.y * 0.5
+	var guide_y := (tutorial_overlay.size.y - guide_height) * 0.5 if show_chart else (tutorial_overlay.size.y - guide_height - 32.0 if target_center_y < tutorial_overlay.size.y * 0.52 else 32.0)
+	tutorial_guide_panel.set_anchor(SIDE_LEFT, 0.0)
+	tutorial_guide_panel.set_anchor(SIDE_TOP, 0.0)
+	tutorial_guide_panel.set_anchor(SIDE_RIGHT, 0.0)
+	tutorial_guide_panel.set_anchor(SIDE_BOTTOM, 0.0)
+	tutorial_guide_panel.offset_left = guide_x
+	tutorial_guide_panel.offset_top = guide_y
+	tutorial_guide_panel.offset_right = guide_x + guide_width
+	tutorial_guide_panel.offset_bottom = guide_y + guide_height
+
+
+func _on_tutorial_previous_pressed() -> void:
+	if _tutorial_step <= 0:
+		return
+	_tutorial_step -= 1
+	_show_tutorial_step()
+
+
+func _on_tutorial_next_pressed() -> void:
+	if _tutorial_step >= TUTORIAL_STEPS.size() - 1:
+		close_tutorial(true)
+		return
+	_tutorial_step += 1
+	_show_tutorial_step()
+
+
+func _on_tutorial_skip_pressed() -> void:
+	close_tutorial(true)
 
 
 func _select_rank(rank: int) -> void:

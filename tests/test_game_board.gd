@@ -32,6 +32,18 @@ func _initialize() -> void:
 	await process_frame
 	var runtime_node_count := board.find_children("*", "", true, false).size()
 	h.check(runtime_node_count == editor_node_count, "game 运行时不再新增布局节点")
+	h.check(board.has_node("Background/TutorialHelpButton") and board.has_node("TutorialOverlay/GuidePanel"), "game 新手指引与手动重看入口固定在场景文件")
+	board.start_tutorial(true)
+	await process_frame
+	var tutorial_overlay := board.get_node("TutorialOverlay") as Control
+	var tutorial_highlight := board.get_node("TutorialOverlay/Highlight") as Panel
+	h.check(tutorial_overlay.visible and tutorial_highlight.size.x > 0.0 and tutorial_highlight.size.y > 0.0, "game 新手指引遮罩会高亮当前目标")
+	board.call("_on_tutorial_next_pressed")
+	var tutorial_chart := board.get_node("TutorialOverlay/GuidePanel/Margin/VBox/HandRankingChart") as TextureRect
+	h.check((board.get_node("TutorialOverlay/GuidePanel/Margin/VBox/Footer/Step") as Label).text == "2 / 8", "game 新手指引支持分步切换")
+	h.check(tutorial_chart.visible and tutorial_chart.texture.resource_path.ends_with("德州扑克牌型大小说明图.png"), "game 新手指引包含可随时重看的牌型说明图")
+	board.close_tutorial(false)
+	h.check(not tutorial_overlay.visible, "game 新手指引可以关闭且测试不会写入完成状态")
 	var music_node := root.get_node("Music")
 	var music_player := music_node.get("_player") as AudioStreamPlayer
 	var game_music := music_player.stream as AudioStreamMP3
