@@ -20,6 +20,9 @@ func _initialize() -> void:
 	h.check(background_import.load("res://game/游戏桌面底图.png.import") == OK and int(background_import.get_value("params", "process/size_limit", 0)) == 2048, "game Web 桌面底图限制导入尺寸降低移动端显存")
 	h.check(progress_import.load("res://game/进度报警上图.png.import") == OK and int(progress_import.get_value("params", "process/size_limit", 0)) == 1024, "game 警报图限制导入尺寸降低移动端显存")
 	h.check(not GameBoard.should_use_card_perspective(true, true) and GameBoard.should_use_card_perspective(true, false), "game Web 触屏设备禁用高成本透视 Shader")
+	var settlement_preview := (load("res://scenes/game/round_settlement.tscn") as PackedScene).instantiate() as Control
+	h.check(settlement_preview.visible and (settlement_preview.get_node("Panel/ResultTitle") as TextureRect).texture != null and (settlement_preview.get_node("Panel/Rows/Row1/BestCards/Card1/Image") as TextureRect).texture != null, "game 结算页在 Godot 2D 编辑器中提供完整可调预览")
+	settlement_preview.queue_free()
 	var scene := load("res://scenes/game/game_board.tscn") as PackedScene
 	var board := scene.instantiate() as Control
 	var editor_node_count := board.find_children("*", "", true, false).size()
@@ -143,6 +146,10 @@ func _initialize() -> void:
 	h.check(second_result.visible and second_result.texture != null, "game 失败图标填入进度圆槽")
 	var progress_result_tweens: Dictionary = board.get("_progress_result_tweens")
 	h.check(progress_result_tweens.size() == 2 and first_result.scale.x < 1.0 and second_result.modulate.a < 1.0, "game 新胜负标记播放淡入旋转回弹特效")
+	var settlement := board.get_node("RoundSettlement") as Control
+	h.check(settlement.visible, "game 每轮结束显示独立结算页面")
+	var basic_result_title := settlement.get_node("Panel/ResultTitle") as TextureRect
+	h.check(basic_result_title.texture is AtlasTexture and (basic_result_title.texture as AtlasTexture).atlas.resource_path.ends_with("结算胜利标题.png"), "game 成功轮次显示胜利结算标题")
 	board.show_events([{"event": "round_settled", "succeeded": true, "vaults": 2, "alarms": 1}])
 	var third_result := board.get_node("Background/Progress/Slots/Slot3/ResultIcon") as TextureRect
 	var third_atlas := third_result.texture as AtlasTexture
@@ -173,6 +180,40 @@ func _initialize() -> void:
 	var third_prediction := history.get_node("Round3Icon") as TextureRect
 	h.check(history.texture is AtlasTexture and third_prediction.visible and third_prediction.texture is AtlasTexture, "game 玩家四次预测使用按钮图片记录")
 	h.check((right_history.get_node("Round1Icon") as TextureRect).visible and (right_history.get_node("Round4Icon") as TextureRect).visible, "game 两位对手的预测历史同时显示")
+	var royal_cards := [
+		{"rank": 14, "suit": 3}, {"rank": 13, "suit": 3}, {"rank": 12, "suit": 3},
+		{"rank": 11, "suit": 3}, {"rank": 10, "suit": 3},
+	]
+	var full_house_cards := [
+		{"rank": 9, "suit": 0}, {"rank": 9, "suit": 1}, {"rank": 9, "suit": 2},
+		{"rank": 4, "suit": 0}, {"rank": 4, "suit": 3},
+	]
+	var pair_cards := [
+		{"rank": 7, "suit": 0}, {"rank": 7, "suit": 1}, {"rank": 14, "suit": 2},
+		{"rank": 11, "suit": 0}, {"rank": 8, "suit": 3},
+	]
+	var rich_result_players := [
+		{"id": 2, "name": "对手甲", "balance": 2300, "chip": 1, "best_hand": {"category": 8, "tiebreak": [14], "cards": royal_cards}, "hole_cards": []},
+		{"id": 3, "name": "对手乙", "balance": 1780, "chip": 3, "best_hand": {"category": 1, "tiebreak": [7, 14, 11, 8], "cards": pair_cards}, "hole_cards": []},
+		{"id": 1, "name": "本人", "balance": 1950, "chip": 2, "best_hand": {"category": 6, "tiebreak": [9, 4], "cards": full_house_cards}, "hole_cards": []},
+	]
+	board.apply_state({"status": "round_complete", "phase": "red", "round_succeeded": true, "host_id": 1, "players": rich_result_players}, 1)
+	var result_row1 := settlement.get_node("Panel/Rows/Row1") as Control
+	var result_row2 := settlement.get_node("Panel/Rows/Row2") as Control
+	h.check(not result_row1.has_node("Balance") and (result_row1.get_node("Name") as Label).horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER, "game 结算页移除金币并让玩家名称居中")
+	h.check((result_row1.get_node("PredictedRank/Label") as Label).text == "1" and (result_row1.get_node("ActualRank/Label") as Label).text == "1", "game 结算页同时显示玩家预测排名与实际排名")
+	var result_hand_type := result_row1.get_node("HandType") as Label
+	h.check(result_hand_type.text == "皇家同花顺" and result_hand_type.anchor_right < 0.85 and (result_row1.get_node("BestCards/Card5/Image") as TextureRect).texture != null, "game 结算页在牌框内靠左显示牌型名称与完整五张最佳成牌")
+	var correct_frame := result_row1.get_node("PredictedRank") as TextureRect
+	h.check(correct_frame.texture is AtlasTexture and (correct_frame.texture as AtlasTexture).atlas.resource_path.ends_with("排名圆框金色正确态.png"), "game 猜中排名使用金色正确态")
+	rich_result_players[1]["chip"] = 2
+	rich_result_players[2]["chip"] = 3
+	board.apply_state({"status": "round_complete", "phase": "red", "round_succeeded": false, "host_id": 1, "players": rich_result_players}, 1)
+	var failure_title := settlement.get_node("Panel/ResultTitle") as TextureRect
+	var wrong_predicted_frame := result_row2.get_node("PredictedRank") as TextureRect
+	var wrong_actual_frame := result_row2.get_node("ActualRank") as TextureRect
+	h.check((failure_title.texture as AtlasTexture).atlas.resource_path.ends_with("结算失败标题.png"), "game 失败轮次显示失败结算标题")
+	h.check((wrong_predicted_frame.texture as AtlasTexture).atlas.resource_path.ends_with("排名圆框紫色预测态.png") and (wrong_actual_frame.texture as AtlasTexture).atlas.resource_path.ends_with("排名圆框红色错误态.png"), "game 猜错时以紫色预测态和红色实际态清楚区分")
 	board.apply_state({
 		"status": "playing",
 		"phase": "white",

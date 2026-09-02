@@ -24,6 +24,7 @@
 [ext_resource type="Texture2D" path="res://title/克苏鲁机器人头像.png" id="23_bot_avatar"]
 [ext_resource type="Texture2D" path="res://title/克苏鲁游客头像.png" id="24_guest_avatar"]
 [ext_resource type="Texture2D" path="res://game/德州扑克牌型大小说明图.png" id="26_hand_ranking"]
+[ext_resource type="PackedScene" path="res://scenes/game/round_settlement.tscn" id="27_round_settlement"]
 
 [sub_resource type="Theme" id="GameTheme"]
 default_font = ExtResource("1_vtrdf")
@@ -1987,6 +1988,9 @@ anchor_right = 0.8796
 anchor_bottom = 0.816
 mouse_filter = 2
 expand_mode = 1
+
+[node name="RoundSettlement" parent="." instance=ExtResource("27_round_settlement")]
+visible = false
 
 [node name="TutorialOverlay" type="Control" parent="."]
 visible = false

@@ -1,0 +1,210 @@
+[gd_scene format=3 uid="uid://ihn8q2366in8"]
+
+[ext_resource type="Script" uid="uid://hx0ynapjmio3" path="res://scenes/game/round_settlement.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dikaoa4f5a338" path="res://game/end/结算面板底图.png" id="2_panel"]
+[ext_resource type="PackedScene" uid="uid://b8ja20uywc3mj" path="res://scenes/game/round_result_row.tscn" id="3_row"]
+[ext_resource type="Texture2D" uid="uid://dem8hayaan3dj" path="res://game/end/结算失败标题.png" id="4_failure_title"]
+
+[sub_resource type="AtlasTexture" id="AtlasFailurePreview"]
+atlas = ExtResource("4_failure_title")
+region = Rect2(51, 93, 926, 439)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxContinue"]
+bg_color = Color(0.035, 0.09, 0.075, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.48, 0.18, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxContinueHover"]
+bg_color = Color(0.12, 0.18, 0.11, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.98, 0.72, 0.28, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxContinueDisabled"]
+bg_color = Color(0.025, 0.05, 0.045, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.27, 0.2, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="RoundSettlement" type="Control" unique_id=518089551]
+z_index = 150
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1246899597]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.008, 0.008, 0.94)
+
+[node name="Panel" type="TextureRect" parent="." unique_id=997538146]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.025
+anchor_right = 0.9
+anchor_bottom = 0.975
+mouse_filter = 2
+texture = ExtResource("2_panel")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RoundLabel" type="Label" parent="Panel" unique_id=1344121053]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.36
+anchor_top = 0.022
+anchor_right = 0.64
+anchor_bottom = 0.09
+theme_override_colors/font_color = Color(0.91, 0.7, 0.34, 1)
+theme_override_font_sizes/font_size = 40
+text = "本轮结算"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultTitle" type="TextureRect" parent="Panel" unique_id=1515220275]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.35
+anchor_top = 0.08
+anchor_right = 0.65
+anchor_bottom = 0.215
+mouse_filter = 2
+texture = SubResource("AtlasFailurePreview")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeaderPlayer" type="Label" parent="Panel" unique_id=246254477]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.245
+anchor_right = 0.31
+anchor_bottom = 0.292
+theme_override_colors/font_color = Color(0.92, 0.72, 0.37, 1)
+theme_override_font_sizes/font_size = 23
+text = "玩家"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderPrediction" type="Label" parent="Panel" unique_id=207677702]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.245
+anchor_right = 0.45
+anchor_bottom = 0.292
+theme_override_colors/font_color = Color(0.92, 0.72, 0.37, 1)
+theme_override_font_sizes/font_size = 23
+text = "预测排名"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderActual" type="Label" parent="Panel" unique_id=216610350]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.47
+anchor_top = 0.245
+anchor_right = 0.59
+anchor_bottom = 0.292
+theme_override_colors/font_color = Color(0.92, 0.72, 0.37, 1)
+theme_override_font_sizes/font_size = 23
+text = "实际排名"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderHand" type="Label" parent="Panel" unique_id=963110855]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.64
+anchor_top = 0.245
+anchor_right = 0.96
+anchor_bottom = 0.292
+theme_override_colors/font_color = Color(0.92, 0.72, 0.37, 1)
+theme_override_font_sizes/font_size = 23
+text = "最终牌型（最佳五张）"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Rows" type="Control" parent="Panel" unique_id=1452501544]
+layout_mode = 1
+anchor_left = 0.085
+anchor_top = 0.292
+anchor_right = 0.915
+anchor_bottom = 0.875
+
+[node name="Row1" parent="Panel/Rows" unique_id=2085594759 instance=ExtResource("3_row")]
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 0.25
+
+[node name="Row2" parent="Panel/Rows" unique_id=963857716 instance=ExtResource("3_row")]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.25
+anchor_bottom = 0.5
+
+[node name="Row3" parent="Panel/Rows" unique_id=455748989 instance=ExtResource("3_row")]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_bottom = 0.75
+
+[node name="Row4" parent="Panel/Rows" unique_id=296326619 instance=ExtResource("3_row")]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.75
+
+[node name="ContinueButton" type="Button" parent="Panel" unique_id=176394911]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.41
+anchor_top = 0.895
+anchor_right = 0.59
+anchor_bottom = 0.958
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxContinue")
+theme_override_styles/pressed = SubResource("StyleBoxContinue")
+theme_override_styles/hover = SubResource("StyleBoxContinueHover")
+theme_override_styles/disabled = SubResource("StyleBoxContinueDisabled")
+
+[node name="Label" type="Label" parent="Panel/ContinueButton" unique_id=265933422]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.97, 0.77, 0.39, 1)
+theme_override_font_sizes/font_size = 24
+text = "下一轮"
+horizontal_alignment = 1
+vertical_alignment = 1

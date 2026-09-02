@@ -89,6 +89,7 @@ const RANK_BUTTON_ASSETS := [
 @onready var submit_label: Label = $Background/SubmitButton/Label
 @onready var status_label: Label = $Background/StatusLabel
 @onready var deal_animation_layer: Control = $Background/DealAnimationLayer
+@onready var round_settlement: Control = $RoundSettlement
 @onready var tutorial_help_button: Button = $Background/TutorialHelpButton
 @onready var tutorial_overlay: Control = $TutorialOverlay
 @onready var tutorial_highlight: Panel = $TutorialOverlay/Highlight
@@ -157,6 +158,7 @@ func _ready() -> void:
 	tutorial_previous_button.pressed.connect(_on_tutorial_previous_pressed)
 	tutorial_next_button.pressed.connect(_on_tutorial_next_pressed)
 	tutorial_overlay.resized.connect(_layout_tutorial)
+	round_settlement.continue_requested.connect(_on_round_settlement_continue_requested)
 	var music := get_node_or_null("/root/Music")
 	if music != null:
 		music.call("play_game")
@@ -340,7 +342,13 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 		else:
 			submit_label.text = "提交预测"
 			status_label.text = ""
-	submit_button.disabled = status == "playing" and _prediction_locked
+	submit_button.disabled = status != "playing" or _prediction_locked
+	if status in ["round_complete", "finished"]:
+		if tutorial_overlay.visible:
+			close_tutorial(false)
+		round_settlement.show_result(view, my_id)
+	else:
+		round_settlement.hide_result()
 
 
 func show_events(events: Array) -> void:
@@ -1013,6 +1021,11 @@ func _on_submit_pressed() -> void:
 			submit_label.text = "已锁定 · 第%d名" % _selected_rank
 			status_label.text = "预测已锁定，等待其他玩家"
 			prediction_submitted.emit(_selected_rank)
+
+
+func _on_round_settlement_continue_requested() -> void:
+	round_settlement.set_continue_pending()
+	_on_submit_pressed()
 
 
 func _card_asset_path(card: Dictionary) -> String:
