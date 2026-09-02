@@ -143,7 +143,17 @@ func _initialize() -> void:
 	var left_info := board.get_node("Background/LeftPlayer/InfoFrame") as TextureRect
 	var right_info := board.get_node("Background/RightPlayer/InfoFrame") as TextureRect
 	h.check(left_info.texture is AtlasTexture and not left_info.flip_h, "game 玩家信息使用裁剪后的组合素材")
-	h.check(not right_info.flip_h and right_info.anchor_left > 0.69, "game 右侧玩家信息保持参考图方向")
+	var right_info_atlas := right_info.texture as AtlasTexture
+	var right_avatar_frame := board.get_node("Background/RightPlayer/AvatarFrame") as TextureRect
+	var right_hole_cards := board.get_node("Background/RightPlayer/HoleCards") as HBoxContainer
+	h.check(right_info_atlas != null and right_info_atlas.atlas.resource_path.ends_with("个人信息组合镜像.png") and not right_info.flip_h, "game 右侧玩家使用独立镜像组合素材")
+	h.check(right_hole_cards.anchor_right < right_avatar_frame.anchor_left, "game 右侧玩家手牌位于头像左侧")
+	var top_info := board.get_node("Background/TopPlayer/InfoFrame") as TextureRect
+	var top_info_atlas := top_info.texture as AtlasTexture
+	var top_avatar_frame := board.get_node("Background/TopPlayer/AvatarFrame") as TextureRect
+	var top_hole_cards := board.get_node("Background/TopPlayer/HoleCards") as HBoxContainer
+	h.check(top_info_atlas != null and top_info_atlas.atlas.resource_path.ends_with("个人信息组合镜像.png"), "game 右上玩家使用独立镜像组合素材")
+	h.check(top_hole_cards.anchor_right < top_avatar_frame.anchor_left, "game 右上玩家手牌位于头像左侧")
 	var coin_icon := board.get_node("Background/LeftPlayer/CoinIcon") as TextureRect
 	h.check(coin_icon.texture is AtlasTexture, "game 金币圆圈使用主页金币图标")
 	var history := board.get_node("Background/LeftPlayer/PredictionHistory") as TextureRect

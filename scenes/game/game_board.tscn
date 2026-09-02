@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" path="res://game/排名预测圆形按钮2.png" id="12_dpu0g"]
 [ext_resource type="Texture2D" path="res://game/排名预测圆形按钮3.png" id="13_nw3ox"]
 [ext_resource type="Texture2D" path="res://game/个人信息组合.png" id="14_vv8cv"]
+[ext_resource type="Texture2D" path="res://game/个人信息组合镜像.png" id="25_right_info"]
 [ext_resource type="Texture2D" path="res://title/克苏鲁Q版头像2 深潜者.png" id="15_s8hbr"]
 [ext_resource type="Texture2D" path="res://game/玩家四轮预测排名区域.png" id="16_873an"]
 [ext_resource type="Texture2D" path="res://game/提交预测按钮底框无文字.png" id="17_0sp7b"]
@@ -73,6 +74,10 @@ region = Rect2(133, 99, 985, 999)
 [sub_resource type="AtlasTexture" id="AtlasTexture_w3hwl"]
 atlas = ExtResource("14_vv8cv")
 region = Rect2(116, 122, 1438, 650)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_right_info"]
+atlas = ExtResource("25_right_info")
+region = Rect2(117, 121, 1436, 652)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7sf6p"]
 
@@ -1011,16 +1016,16 @@ anchor_top = 0.11
 anchor_right = 1.3
 anchor_bottom = 0.565
 mouse_filter = 2
-texture = SubResource("AtlasTexture_w3hwl")
+texture = SubResource("AtlasTexture_right_info")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="NameFrame" type="TextureRect" parent="Background/RightPlayer" unique_id=402379170]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.935
+anchor_left = 0.735
 anchor_top = 0.185
-anchor_right = 1.265
+anchor_right = 1.065
 anchor_bottom = 0.365
 expand_mode = 1
 stretch_mode = 5
@@ -1041,9 +1046,9 @@ vertical_alignment = 1
 [node name="AvatarFrame" type="TextureRect" parent="Background/RightPlayer" unique_id=720970803]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.7
+anchor_left = 1.024
 anchor_top = 0.11
-anchor_right = 0.976
+anchor_right = 1.3
 anchor_bottom = 0.565
 expand_mode = 1
 stretch_mode = 5
@@ -1079,9 +1084,9 @@ metadata/_edit_use_anchors_ = true
 [node name="MoneyFrame" type="TextureRect" parent="Background/RightPlayer" unique_id=841129306]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.97
+anchor_left = 0.78
 anchor_top = 0.39
-anchor_right = 1.22
+anchor_right = 1.03
 anchor_bottom = 0.565
 expand_mode = 1
 stretch_mode = 5
@@ -1172,9 +1177,9 @@ expand_mode = 1
 [node name="CoinIcon" type="TextureRect" parent="Background/RightPlayer" unique_id=880652110]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.946
+anchor_left = 0.97
 anchor_top = 0.404
-anchor_right = 1.03
+anchor_right = 1.054
 anchor_bottom = 0.554
 offset_left = 1.0383301
 offset_top = 1.0335693
@@ -1591,21 +1596,21 @@ anchor_bottom = 0.45
 
 [node name="InfoFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=346774617]
 layout_mode = 0
-anchor_left = 0.011
+anchor_left = 0.38
 anchor_top = 0.11
-anchor_right = 0.611
+anchor_right = 0.98
 anchor_bottom = 0.565
 mouse_filter = 2
-texture = SubResource("AtlasTexture_w3hwl")
+texture = SubResource("AtlasTexture_right_info")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="NameFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=214262877]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.246
+anchor_left = 0.415
 anchor_top = 0.185
-anchor_right = 0.576
+anchor_right = 0.745
 anchor_bottom = 0.365
 expand_mode = 1
 stretch_mode = 5
@@ -1626,9 +1631,9 @@ vertical_alignment = 1
 [node name="AvatarFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=2087575514]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.011
+anchor_left = 0.704
 anchor_top = 0.11
-anchor_right = 0.287
+anchor_right = 0.98
 anchor_bottom = 0.565
 offset_top = 1.1640015
 offset_bottom = -1.5258789e-05
@@ -1670,9 +1675,9 @@ metadata/_edit_use_anchors_ = true
 [node name="MoneyFrame" type="TextureRect" parent="Background/TopPlayer" unique_id=6878855]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.281
+anchor_left = 0.46
 anchor_top = 0.39
-anchor_right = 0.531
+anchor_right = 0.71
 anchor_bottom = 0.565
 expand_mode = 1
 stretch_mode = 5
@@ -1694,9 +1699,9 @@ vertical_alignment = 1
 visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.08
+anchor_left = 0.671
 anchor_top = 0.65
-anchor_right = 0.32
+anchor_right = 0.911
 anchor_bottom = 0.77
 text = "预测排名"
 horizontal_alignment = 1
@@ -1705,9 +1710,9 @@ horizontal_alignment = 1
 visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.08
+anchor_left = 0.671
 anchor_top = 0.8
-anchor_right = 0.32
+anchor_right = 0.911
 anchor_bottom = 0.92
 text = "尚未选择"
 horizontal_alignment = 1
@@ -1715,9 +1720,9 @@ horizontal_alignment = 1
 [node name="HoleCards" type="HBoxContainer" parent="Background/TopPlayer" unique_id=1542303875]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.68
+anchor_left = 0.011
 anchor_top = 0.155
-anchor_right = 0.98
+anchor_right = 0.311
 anchor_bottom = 0.587
 theme_override_constants/separation = -42
 alignment = 1
@@ -1763,9 +1768,9 @@ expand_mode = 1
 [node name="CoinIcon" type="TextureRect" parent="Background/TopPlayer" unique_id=1780292109]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.257
+anchor_left = 0.65
 anchor_top = 0.404
-anchor_right = 0.341
+anchor_right = 0.734
 anchor_bottom = 0.554
 offset_left = 2.2128067
 offset_top = -0.56640625
@@ -1778,9 +1783,9 @@ stretch_mode = 5
 
 [node name="PredictionHistory" type="TextureRect" parent="Background/TopPlayer" unique_id=1340947247]
 layout_mode = 0
-anchor_left = 0.005
+anchor_left = 0.376
 anchor_top = 0.61
-anchor_right = 0.615
+anchor_right = 0.986
 anchor_bottom = 0.99
 mouse_filter = 2
 texture = SubResource("AtlasTexture_o54c1")
