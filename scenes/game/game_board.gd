@@ -39,7 +39,7 @@ const TUTORIAL_STEPS := [
 	},
 	{
 		"title": "选择预测排名",
-		"body": "根据手牌和当前公共牌，预测自己最终会排第几名。三人局可选 1–3，四人局可选 1–4。",
+		"body": "根据手牌和当前公共牌，预测自己最终会排第几名。1 代表牌最小，三人局的 3、四人局的 4 代表牌最大。",
 		"target": NodePath("Background/PredictionPanel"),
 	},
 	{

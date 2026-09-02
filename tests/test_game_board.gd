@@ -180,34 +180,35 @@ func _initialize() -> void:
 	var third_prediction := history.get_node("Round3Icon") as TextureRect
 	h.check(history.texture is AtlasTexture and third_prediction.visible and third_prediction.texture is AtlasTexture, "game 玩家四次预测使用按钮图片记录")
 	h.check((right_history.get_node("Round1Icon") as TextureRect).visible and (right_history.get_node("Round4Icon") as TextureRect).visible, "game 两位对手的预测历史同时显示")
-	var royal_cards := [
-		{"rank": 14, "suit": 3}, {"rank": 13, "suit": 3}, {"rank": 12, "suit": 3},
-		{"rank": 11, "suit": 3}, {"rank": 10, "suit": 3},
-	]
-	var full_house_cards := [
-		{"rank": 9, "suit": 0}, {"rank": 9, "suit": 1}, {"rank": 9, "suit": 2},
-		{"rank": 4, "suit": 0}, {"rank": 4, "suit": 3},
+	var higher_pair_cards := [
+		{"rank": 10, "suit": 0}, {"rank": 10, "suit": 1}, {"rank": 14, "suit": 2},
+		{"rank": 12, "suit": 0}, {"rank": 9, "suit": 3},
 	]
 	var pair_cards := [
 		{"rank": 7, "suit": 0}, {"rank": 7, "suit": 1}, {"rank": 14, "suit": 2},
 		{"rank": 11, "suit": 0}, {"rank": 8, "suit": 3},
 	]
+	var two_pair_cards := [
+		{"rank": 14, "suit": 0}, {"rank": 14, "suit": 1}, {"rank": 10, "suit": 2},
+		{"rank": 10, "suit": 3}, {"rank": 9, "suit": 0},
+	]
 	var rich_result_players := [
-		{"id": 2, "name": "对手甲", "balance": 2300, "chip": 1, "best_hand": {"category": 8, "tiebreak": [14], "cards": royal_cards}, "hole_cards": []},
-		{"id": 3, "name": "对手乙", "balance": 1780, "chip": 3, "best_hand": {"category": 1, "tiebreak": [7, 14, 11, 8], "cards": pair_cards}, "hole_cards": []},
-		{"id": 1, "name": "本人", "balance": 1950, "chip": 2, "best_hand": {"category": 6, "tiebreak": [9, 4], "cards": full_house_cards}, "hole_cards": []},
+		{"id": 2, "name": "对手甲", "balance": 2300, "chip": 2, "best_hand": {"category": 1, "tiebreak": [10, 14, 12, 9], "cards": higher_pair_cards}, "hole_cards": []},
+		{"id": 3, "name": "对手乙", "balance": 1780, "chip": 1, "best_hand": {"category": 1, "tiebreak": [7, 14, 11, 8], "cards": pair_cards}, "hole_cards": []},
+		{"id": 1, "name": "本人", "balance": 1950, "chip": 3, "best_hand": {"category": 2, "tiebreak": [14, 10, 9], "cards": two_pair_cards}, "hole_cards": []},
 	]
 	board.apply_state({"status": "round_complete", "phase": "red", "round_succeeded": true, "host_id": 1, "players": rich_result_players}, 1)
 	var result_row1 := settlement.get_node("Panel/Rows/Row1") as Control
 	var result_row2 := settlement.get_node("Panel/Rows/Row2") as Control
+	var result_row3 := settlement.get_node("Panel/Rows/Row3") as Control
 	h.check(not result_row1.has_node("Balance") and (result_row1.get_node("Name") as Label).horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER, "game 结算页移除金币并让玩家名称居中")
-	h.check((result_row1.get_node("PredictedRank/Label") as Label).text == "1" and (result_row1.get_node("ActualRank/Label") as Label).text == "1", "game 结算页同时显示玩家预测排名与实际排名")
-	var result_hand_type := result_row1.get_node("HandType") as Label
-	h.check(result_hand_type.text == "皇家同花顺" and result_hand_type.anchor_right < 0.85 and (result_row1.get_node("BestCards/Card5/Image") as TextureRect).texture != null, "game 结算页在牌框内靠左显示牌型名称与完整五张最佳成牌")
+	h.check((result_row3.get_node("PredictedRank/Label") as Label).text == "3" and (result_row3.get_node("ActualRank/Label") as Label).text == "3", "game 结算排名与后端一致：三人局两对强于两个一对，因此排名为 3")
+	var result_hand_type := result_row3.get_node("HandType") as Label
+	h.check(result_hand_type.text == "两对" and (result_row3.get_node("BestCards/Card5/Image") as TextureRect).texture != null, "game 结算页显示牌型名称与完整五张最佳成牌")
 	var correct_frame := result_row1.get_node("PredictedRank") as TextureRect
 	h.check(correct_frame.texture is AtlasTexture and (correct_frame.texture as AtlasTexture).atlas.resource_path.ends_with("排名圆框金色正确态.png"), "game 猜中排名使用金色正确态")
+	rich_result_players[0]["chip"] = 1
 	rich_result_players[1]["chip"] = 2
-	rich_result_players[2]["chip"] = 3
 	board.apply_state({"status": "round_complete", "phase": "red", "round_succeeded": false, "host_id": 1, "players": rich_result_players}, 1)
 	var failure_title := settlement.get_node("Panel/ResultTitle") as TextureRect
 	var wrong_predicted_frame := result_row2.get_node("PredictedRank") as TextureRect

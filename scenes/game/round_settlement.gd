@@ -135,7 +135,8 @@ func _actual_ranks(players: Array) -> Dictionary:
 	ordered.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
 		var compared := _compare_hands(left.get("best_hand", {}) as Dictionary, right.get("best_hand", {}) as Dictionary)
 		if compared != 0:
-			return compared > 0
+			# 后端 chip/rank 的语义是从小到大：1 最弱，人数编号最大者最强。
+			return compared < 0
 		var left_chip := int(left.get("chip", 0))
 		var right_chip := int(right.get("chip", 0))
 		if left_chip != right_chip:
