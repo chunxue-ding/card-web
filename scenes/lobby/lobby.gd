@@ -10,6 +10,8 @@ const QUICK_MATCH_LABEL_TEXT := "快速匹配"
 const CANCEL_MATCH_LABEL_TEXT := "取消匹配"
 const DEFAULT_PLAYER_COUNT := 3
 const SUPPORTED_PLAYER_COUNTS := [3, 4]
+const CONFIRM_TIMEOUT_SECONDS := 15
+const CONFIRM_POLL_INTERVAL := 0.6
 
 @onready var name_label: Label = $Background/Header/NameLabel
 @onready var balance_label: Label = $Background/Header/BalanceLabel
@@ -19,11 +21,21 @@ const SUPPORTED_PLAYER_COUNTS := [3, 4]
 @onready var quick_match_label: Label = $Background/Actions/QuickMatchButton/Label
 @onready var friend_play_button: TextureButton = $Background/Actions/FriendPlayButton
 @onready var status_label: Label = $Background/StatusLabel
+@onready var match_confirmation: Control = $MatchConfirmation
+@onready var match_dim: ColorRect = $MatchConfirmation/Dim
+@onready var match_panel: TextureRect = $MatchConfirmation/Panel
+@onready var match_state_label: Label = $MatchConfirmation/Panel/StateLabel
+@onready var confirm_button: TextureButton = $MatchConfirmation/Panel/Buttons/ConfirmButton
+@onready var decline_button: TextureButton = $MatchConfirmation/Panel/Buttons/DeclineButton
 
 var player_count := DEFAULT_PLAYER_COUNT
 var _hover_tweens: Dictionary = {}
 var _matching := false
 var _match_player_count := DEFAULT_PLAYER_COUNT
+var _match_id := ""
+var _confirmation_generation := 0
+var _confirming := false
+var _transitioning := false
 
 
 func _ready() -> void:
@@ -108,13 +120,20 @@ func _start_match() -> void:
 			return
 		if res.has("room_code"):
 			Session.pending_room_code = str(res["room_code"])
-			_goto_room()
+			await _transition_to_room()
 			return
 		var match_status := str(res.get("status", ""))
 		if match_status == "queued":
 			status_label.text = "正在匹配 %d 人局…（队列第 %d 位）" % [_match_player_count, int(res.get("position", 0))]
+		elif match_status == "found" or match_status == "starting":
+			_show_match_confirmation(res)
+			return
 		elif match_status == "dropped":
 			_stop_match(Endpoints.match_drop_message(str(res.get("reason", ""))))
+			return
+		elif match_status == "cancelled":
+			var reason := str(res.get("reason", ""))
+			_stop_match(Endpoints.card_message_for(reason) if not reason.is_empty() else "本次匹配已取消")
 			return
 		else:
 			_stop_match("")
@@ -123,6 +142,9 @@ func _start_match() -> void:
 
 
 func _cancel_match() -> void:
+	if not _match_id.is_empty():
+		_on_match_decline_pressed()
+		return
 	_matching = false
 	_set_match_mode(false)
 	status_label.text = "正在取消匹配…"
@@ -136,6 +158,7 @@ func _cancel_match() -> void:
 
 
 func _stop_match(message: String) -> void:
+	_matching = false
 	_set_match_mode(false)
 	status_label.text = message
 
@@ -160,7 +183,10 @@ func _on_friend_play_pressed() -> void:
 func _on_logout_pressed() -> void:
 	logout_button.disabled = true
 	if _matching:
-		Session.card().match_cancel(Session.token)  # fire-and-forget：不 await，尽力清服务端队列
+		if _match_id.is_empty():
+			Session.card().match_cancel(Session.token)  # fire-and-forget：尽力清服务端队列
+		else:
+			Session.card().match_decline(Session.token, _match_id)
 	await Session.logout()
 	var error := get_tree().change_scene_to_file(LOGIN_SCENE)
 	if error != OK:
@@ -172,6 +198,143 @@ func _goto_room() -> void:
 	if error != OK:
 		_stop_match("无法进入房间")
 		push_error("无法进入房间场景：%s" % error_string(error))
+
+
+func _show_match_confirmation(res: Dictionary) -> void:
+	_match_id = str(res.get("match_id", ""))
+	if _match_id.is_empty():
+		_stop_match("匹配信息异常，请重新匹配")
+		return
+	_confirmation_generation += 1
+	var generation := _confirmation_generation
+	_confirming = false
+	confirm_button.disabled = false
+	decline_button.disabled = false
+	_update_confirmation_state(res, CONFIRM_TIMEOUT_SECONDS)
+	match_confirmation.visible = true
+	match_panel.pivot_offset = match_panel.size * 0.5
+	match_panel.scale = Vector2.ONE * 0.9
+	match_panel.modulate = Color(1, 1, 1, 0)
+	match_dim.color = Color(0, 0, 0, 0)
+	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(match_panel, "scale", Vector2.ONE, 0.28)
+	tween.tween_property(match_panel, "modulate", Color.WHITE, 0.2)
+	tween.tween_property(match_dim, "color", Color(0, 0, 0, 0.72), 0.22)
+	_run_confirmation_countdown(generation)
+
+
+func _run_confirmation_countdown(generation: int) -> void:
+	for seconds_left in range(CONFIRM_TIMEOUT_SECONDS, 0, -1):
+		if generation != _confirmation_generation or not is_inside_tree() or not match_confirmation.visible:
+			return
+		if not _confirming:
+			match_state_label.text = "已找到 %d 人局，请在 %d 秒内确认" % [_match_player_count, seconds_left]
+		await get_tree().create_timer(1.0).timeout
+	if generation != _confirmation_generation or not is_inside_tree() or not match_confirmation.visible:
+		return
+	if not _confirming:
+		await _decline_match("确认超时，已返回主页")
+
+
+func _update_confirmation_state(res: Dictionary, seconds_left := -1) -> void:
+	var confirmed := int(res.get("confirmed", 0))
+	var required := int(res.get("required", _match_player_count))
+	if _confirming:
+		match_state_label.text = "已确认，等待其他玩家…（%d/%d）" % [confirmed, required]
+	elif seconds_left >= 0:
+		match_state_label.text = "已找到 %d 人局，请在 %d 秒内确认" % [_match_player_count, seconds_left]
+	else:
+		match_state_label.text = "已找到 %d 人局，请确认是否进入" % _match_player_count
+
+
+func _on_match_confirm_pressed() -> void:
+	if _confirming or _transitioning or _match_id.is_empty():
+		return
+	_confirming = true
+	confirm_button.disabled = true
+	decline_button.disabled = true
+	match_state_label.text = "已确认，等待其他玩家…"
+	var generation := _confirmation_generation
+	while _matching and generation == _confirmation_generation:
+		var res: Variant = await Session.card().match_confirm(Session.token, _match_id)
+		if not is_inside_tree() or generation != _confirmation_generation:
+			return
+		if res is ApiError:
+			_confirming = false
+			confirm_button.disabled = false
+			decline_button.disabled = false
+			match_state_label.text = res.message
+			return
+		if res.has("room_code"):
+			Session.pending_room_code = str(res["room_code"])
+			await _transition_to_room()
+			return
+		var state := str(res.get("status", ""))
+		if state == "cancelled":
+			await _hide_match_confirmation()
+			_stop_match(Endpoints.card_message_for(str(res.get("reason", ""))))
+			return
+		if state == "dropped":
+			await _hide_match_confirmation()
+			_stop_match(Endpoints.match_drop_message(str(res.get("reason", ""))))
+			return
+		_update_confirmation_state(res)
+		await get_tree().create_timer(CONFIRM_POLL_INTERVAL).timeout
+
+
+func _on_match_decline_pressed() -> void:
+	await _decline_match("已拒绝本次对局")
+
+
+func _decline_match(message: String) -> void:
+	if _transitioning or _match_id.is_empty():
+		return
+	var declined_match_id := _match_id
+	_confirmation_generation += 1
+	_matching = false
+	_confirming = false
+	confirm_button.disabled = true
+	decline_button.disabled = true
+	match_state_label.text = "正在返回主页…"
+	var res: Variant = await Session.card().match_decline(Session.token, declined_match_id)
+	if not is_inside_tree():
+		return
+	if not (res is ApiError) and res.has("room_code"):
+		Session.pending_room_code = str(res["room_code"])
+		await _transition_to_room()
+		return
+	await _hide_match_confirmation()
+	_match_id = ""
+	_stop_match(res.message if res is ApiError else message)
+
+
+func _hide_match_confirmation() -> void:
+	if not match_confirmation.visible:
+		return
+	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(match_panel, "scale", Vector2.ONE * 0.94, 0.16)
+	tween.tween_property(match_panel, "modulate", Color(1, 1, 1, 0), 0.16)
+	tween.tween_property(match_dim, "color", Color(0, 0, 0, 0), 0.16)
+	await tween.finished
+	match_confirmation.visible = false
+
+
+func _transition_to_room() -> void:
+	if _transitioning:
+		return
+	_transitioning = true
+	_matching = false
+	_confirmation_generation += 1
+	confirm_button.disabled = true
+	decline_button.disabled = true
+	match_state_label.text = "全员已确认，即将进入对局…"
+	if match_confirmation.visible:
+		var tween := create_tween().set_parallel().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(match_panel, "scale", Vector2.ONE * 1.04, 0.36)
+		tween.tween_property(match_panel, "modulate", Color(1, 1, 1, 0), 0.36)
+		tween.tween_property(match_dim, "color", Color(0, 0, 0, 1), 0.36)
+		await tween.finished
+	_goto_room()
 
 
 func _setup_action_feedback(button: TextureButton) -> void:

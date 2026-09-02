@@ -38,6 +38,8 @@ func _initialize() -> void:
 	h.check(Endpoints.match_drop_message("whatever") == "匹配失败，请重试", "dropped 未知兜底")
 	h.check(Endpoints.ws_error_message("room not found or not joined") == "房间不存在或未加入", "ws error 文案")
 	h.check(Endpoints.CARD_MATCH == "/api/v1/match", "CARD_MATCH 路径")
+	h.check(Endpoints.CARD_MATCH_CONFIRM == "/api/v1/match/confirm", "CARD_MATCH_CONFIRM 路径")
+	h.check(Endpoints.CARD_MATCH_DECLINE == "/api/v1/match/decline", "CARD_MATCH_DECLINE 路径")
 	h.check(Endpoints.CARD_WS_PATH == "/api/v1/ws", "CARD_WS_PATH 路径")
 	h.check((Endpoints.CARD_ROOM_JOIN % "ABC123") == "/api/v1/rooms/ABC123/join", "CARD_ROOM_JOIN 格式化")
 	h.check((Endpoints.CARD_ROOM_GET % "ABC123") == "/api/v1/rooms/ABC123", "CARD_ROOM_GET 格式化")

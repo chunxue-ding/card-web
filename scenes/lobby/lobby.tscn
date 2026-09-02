@@ -13,6 +13,8 @@
 [ext_resource type="Script" uid="uid://b6vi7y77h376y" path="res://scenes/lobby/lobby.gd" id="12_script"]
 [ext_resource type="FontFile" uid="uid://bt1ywdsco3yhl" path="res://assets/fonts/NotoSansSC-Regular.ttf" id="13_font"]
 [ext_resource type="Texture2D" path="res://title/克苏鲁游客头像.png" id="14_avatar_preview"]
+[ext_resource type="Texture2D" path="res://assets/room/room_code_frame.png" id="15_match_frame"]
+[ext_resource type="Texture2D" path="res://profile/确认按钮底框无文字.png" id="16_confirm_button"]
 
 [sub_resource type="FontVariation" id="DisplayFont"]
 base_font = ExtResource("13_font")
@@ -495,6 +497,136 @@ theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="MatchConfirmation" type="Control" parent="."]
+visible = false
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="MatchConfirmation"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.72)
+
+[node name="Panel" type="TextureRect" parent="MatchConfirmation"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.245
+anchor_top = 0.34
+anchor_right = 0.755
+anchor_bottom = 0.66
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("15_match_frame")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Title" type="Label" parent="MatchConfirmation/Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.13
+anchor_right = 0.88
+anchor_bottom = 0.34
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.82, 0.49, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 34
+text = "匹配成功"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StateLabel" type="Label" parent="MatchConfirmation/Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.32
+anchor_right = 0.88
+anchor_bottom = 0.53
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.88, 0.79, 0.65, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 20
+text = "已找到对局，请确认是否进入"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="MatchConfirmation/Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.17
+anchor_top = 0.49
+anchor_right = 0.83
+anchor_bottom = 0.94
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="ConfirmButton" type="TextureButton" parent="MatchConfirmation/Panel/Buttons"]
+custom_minimum_size = Vector2(250, 112)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("16_confirm_button")
+texture_pressed = ExtResource("16_confirm_button")
+texture_hover = ExtResource("16_confirm_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="MatchConfirmation/Panel/Buttons/ConfirmButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.91, 0.72, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 27
+text = "确认"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DeclineButton" type="TextureButton" parent="MatchConfirmation/Panel/Buttons"]
+modulate = Color(0.83, 0.53, 0.55, 1)
+custom_minimum_size = Vector2(250, 112)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("16_confirm_button")
+texture_pressed = ExtResource("16_confirm_button")
+texture_hover = ExtResource("16_confirm_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="MatchConfirmation/Panel/Buttons/DeclineButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.89, 0.77, 1)
+theme_override_fonts/font = SubResource("DisplayFont")
+theme_override_font_sizes/font_size = 27
+text = "拒绝"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [connection signal="pressed" from="Background/Header/LogoutButton" to="." method="_on_logout_pressed"]
 [connection signal="pressed" from="Background/Actions/QuickMatchButton" to="." method="_on_quick_match_pressed"]
 [connection signal="pressed" from="Background/Actions/FriendPlayButton" to="." method="_on_friend_play_pressed"]
+[connection signal="pressed" from="MatchConfirmation/Panel/Buttons/ConfirmButton" to="." method="_on_match_confirm_pressed"]
+[connection signal="pressed" from="MatchConfirmation/Panel/Buttons/DeclineButton" to="." method="_on_match_decline_pressed"]

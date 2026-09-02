@@ -33,7 +33,10 @@ func get_room(token: String, room_code: String) -> Variant:
 
 
 func match_wait(token: String, max_players := 3) -> Variant:
-	var res: Dictionary = await _match_client.post_json(Endpoints.CARD_MATCH, {"max_players": max_players}, token)
+	var res: Dictionary = await _match_client.post_json(Endpoints.CARD_MATCH, {
+		"max_players": max_players,
+		"require_confirmation": true,
+	}, token)
 	if not res["ok"]:
 		return res["error"]
 	return res["data"]
@@ -43,8 +46,23 @@ func match_cancel(token: String) -> Variant:
 	return await _request_data(Endpoints.CARD_MATCH_CANCEL, token)
 
 
+func match_confirm(token: String, match_id: String) -> Variant:
+	return await _request_data_with_body(Endpoints.CARD_MATCH_CONFIRM, {"match_id": match_id}, token)
+
+
+func match_decline(token: String, match_id: String) -> Variant:
+	return await _request_data_with_body(Endpoints.CARD_MATCH_DECLINE, {"match_id": match_id}, token)
+
+
 func _request_data(path: String, token: String, timeout := 0.0) -> Variant:
 	var res: Dictionary = await _client.post_json(path, {}, token, timeout)
+	if not res["ok"]:
+		return res["error"]
+	return res["data"]
+
+
+func _request_data_with_body(path: String, body: Dictionary, token: String, timeout := 0.0) -> Variant:
+	var res: Dictionary = await _client.post_json(path, body, token, timeout)
 	if not res["ok"]:
 		return res["error"]
 	return res["data"]

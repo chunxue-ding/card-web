@@ -43,6 +43,8 @@ const CARD_ROOM_JOIN := "/api/v1/rooms/%s/join"
 const CARD_ROOM_GET := "/api/v1/rooms/%s"
 const CARD_MATCH := "/api/v1/match"
 const CARD_MATCH_CANCEL := "/api/v1/match/cancel"
+const CARD_MATCH_CONFIRM := "/api/v1/match/confirm"
+const CARD_MATCH_DECLINE := "/api/v1/match/decline"
 const CARD_WS_PATH := "/api/v1/ws"
 
 
@@ -66,6 +68,10 @@ static func card_message_for(message: String) -> String:
 			return "还有玩家未准备"
 		"account service unavailable":
 			return "账号服务暂不可用"
+		"confirm timeout":
+			return "确认超时，本次匹配已取消"
+		"declined":
+			return "有玩家拒绝，本次匹配已取消"
 		_:
 			return ""
 

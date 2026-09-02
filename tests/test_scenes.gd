@@ -110,6 +110,12 @@ func _check_lobby() -> void:
 	h.check(page.has_method("_on_quick_match_pressed"), "lobby 快速匹配回调存在")
 	h.check(page.has_method("_on_friend_play_pressed"), "lobby 好友同玩回调存在")
 	h.check(page.has_method("_set_action_hover"), "lobby 操作按钮悬停反馈存在")
+	var confirmation := page.get_node_or_null("MatchConfirmation") as Control
+	h.check(confirmation != null and not confirmation.visible, "lobby 匹配成功确认框存在且默认隐藏")
+	h.check(page.get_node_or_null("MatchConfirmation/Panel/Buttons/ConfirmButton") != null, "lobby 匹配确认按钮存在")
+	h.check(page.get_node_or_null("MatchConfirmation/Panel/Buttons/DeclineButton") != null, "lobby 匹配拒绝按钮存在")
+	h.check(page.has_method("_on_match_confirm_pressed") and page.has_method("_on_match_decline_pressed"), "lobby 匹配确认与拒绝回调存在")
+	h.check(page.has_method("_transition_to_room"), "lobby 确认后平滑入场过渡存在")
 	var count3 := page.get_node("Background/CountCenter/PlayerCountPanel/Count3Button") as Button
 	var count6 := page.get_node("Background/CountCenter/PlayerCountPanel/Count6Button") as Button
 	var count4 := page.get_node("Background/CountCenter/PlayerCountPanel/Count4Button") as Button
