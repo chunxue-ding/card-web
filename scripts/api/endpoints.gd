@@ -89,6 +89,10 @@ static func match_drop_message(reason: String) -> String:
 
 
 static func ws_error_message(error: String) -> String:
+	if "chip is already submitted" in error:
+		return "该排名已被其他玩家锁定"
+	if "claim a chip first" in error:
+		return "该排名已被其他玩家抢先选择"
 	match error:
 		"unauthorized":
 			return "登录已过期，请重新登录"

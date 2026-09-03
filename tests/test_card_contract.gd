@@ -37,6 +37,8 @@ func _initialize() -> void:
 	h.check(Endpoints.match_drop_message("expired") == "匹配超时，请重试", "dropped expired 文案")
 	h.check(Endpoints.match_drop_message("whatever") == "匹配失败，请重试", "dropped 未知兜底")
 	h.check(Endpoints.ws_error_message("room not found or not joined") == "房间不存在或未加入", "ws error 文案")
+	h.check(Endpoints.ws_error_message("invalid move: chip is already submitted") == "该排名已被其他玩家锁定", "ws 已锁排名冲突使用中文提示")
+	h.check(Endpoints.ws_error_message("invalid move: claim a chip first") == "该排名已被其他玩家抢先选择", "ws 预测被抢后使用中文提示")
 	h.check(Endpoints.CARD_MATCH == "/api/v1/match", "CARD_MATCH 路径")
 	h.check(Endpoints.CARD_MATCH_CONFIRM == "/api/v1/match/confirm", "CARD_MATCH_CONFIRM 路径")
 	h.check(Endpoints.CARD_MATCH_DECLINE == "/api/v1/match/decline", "CARD_MATCH_DECLINE 路径")

@@ -231,4 +231,7 @@ func _check_room() -> void:
 	page._on_rank_selected(2)
 	page._on_prediction_submitted(2)
 	h.check(prediction_socket.claim_count == 1 and prediction_socket.confirm_count == 1, "room 预测选择和提交各发送一次 claim/confirm，不重复抢占排名")
+	page._on_state({"version": 20, "status": "lobby", "players": []})
+	page._on_state({"version": 19, "status": "playing", "players": []})
+	h.check(int(page._view.get("version", 0)) == 20, "room 丢弃并发广播中后到达的旧版本快照")
 	page.queue_free()

@@ -298,6 +298,10 @@ func _initialize() -> void:
 	h.check(board.get_node("Background/SubmitButton").disabled and "已锁定" in board.get_node("Background/SubmitButton/Label").text, "game 提交预测后按钮显示已锁定并禁止重复提交")
 	h.check("等待其他玩家" in board.get_node("Background/StatusLabel").text, "game 锁定预测后显示持续状态反馈")
 	h.check(board.get_node("Background/PredictionPanel/ButtonLayer/Rank1").modulate.a < 0.7 and board.get_node("Background/PredictionPanel/ButtonLayer/Rank2").modulate.a == 1.0, "game 锁定后保留所选排名高亮并淡化其他选项")
+	h.check(board.has_method("reject_pending_prediction"), "game 支持回滚被服务端拒绝的预测提交")
+	if board.has_method("reject_pending_prediction"):
+		board.reject_pending_prediction("该排名已被其他玩家锁定")
+		h.check(not board.get_node("Background/SubmitButton").disabled and "重新选择" in board.get_node("Background/StatusLabel").text, "game 同名次冲突后解除本地假锁并提示重选")
 	var finished_players := [
 		{"id": 2, "name": "对手甲", "balance": 2300, "hole_cards": []},
 		{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},

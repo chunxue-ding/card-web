@@ -999,6 +999,19 @@ func _refresh_prediction_buttons() -> void:
 		button.scale = Vector2.ONE
 
 
+func reject_pending_prediction(message: String) -> bool:
+	if not _prediction_submit_pending:
+		return false
+	_prediction_submit_pending = false
+	_prediction_locked = false
+	_selected_rank = 0
+	_refresh_prediction_buttons()
+	submit_button.disabled = str(_state.get("status", "playing")) != "playing"
+	submit_label.text = "提交预测"
+	status_label.text = "%s，请重新选择" % message
+	return true
+
+
 func _on_submit_pressed() -> void:
 	match str(_state.get("status", "playing")):
 		"round_complete":

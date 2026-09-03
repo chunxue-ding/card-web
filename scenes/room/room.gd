@@ -20,6 +20,7 @@ var _view: Dictionary = {}
 var _my_id := 0
 var _room_code := ""
 var _leaving := false
+var _latest_state_version := -1
 
 
 func _ready() -> void:
@@ -60,6 +61,11 @@ func _on_authenticated() -> void:
 
 
 func _on_state(view: Dictionary) -> void:
+	var incoming_version := int(view.get("version", -1))
+	if incoming_version >= 0 and incoming_version < _latest_state_version:
+		return
+	if incoming_version >= 0:
+		_latest_state_version = incoming_version
 	var previous_status := str(_view.get("status", ""))
 	var next_status := str(view.get("status", ""))
 	var starts_new_round := (
@@ -185,6 +191,7 @@ func _on_socket_error(message: String) -> void:
 		disconnect_bar.visible = true
 	status_label.text = message
 	_render()
+	game_board.reject_pending_prediction(message)
 
 
 func _on_closed() -> void:
