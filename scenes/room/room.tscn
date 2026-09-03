@@ -164,5 +164,8 @@ grow_vertical = 2
 [connection signal="next_round_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_next_round_requested"]
 [connection signal="prediction_submitted" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_prediction_submitted"]
 [connection signal="rank_selected" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_rank_selected"]
+[connection signal="rank_dispute_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_rank_dispute_requested"]
+[connection signal="rank_dispute_response" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_rank_dispute_response"]
+[connection signal="rank_dispute_cancelled" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_rank_dispute_cancelled"]
 [connection signal="rematch_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_rematch_requested"]
 [connection signal="quick_match_requested" from="Background/GameStartedOverlay/GameBoard" to="." method="_on_quick_match_requested"]

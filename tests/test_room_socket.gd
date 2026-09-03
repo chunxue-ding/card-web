@@ -22,5 +22,6 @@ func _initialize() -> void:
 	h.check(sock.has_signal("state_received") and sock.has_signal("events_received") and sock.has_signal("closed") and sock.has_signal("socket_error"), "信号齐全")
 	h.check(sock.has_method("connect_room") and sock.has_method("poll") and sock.has_method("close"), "连接方法齐全")
 	h.check(sock.has_method("set_ready") and sock.has_method("add_bot") and sock.has_method("remove_bot") and sock.has_method("start_game"), "指令方法齐全")
+	h.check(sock.has_method("request_rank_dispute") and sock.has_method("respond_rank_dispute") and sock.has_method("cancel_rank_dispute"), "排名争夺指令齐全")
 	sock.free()
 	h.finish(self)

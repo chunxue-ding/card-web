@@ -6,6 +6,9 @@ const Helper = preload("res://tests/test_helper.gd")
 var h := Helper.new()
 var submitted_rank := 0
 var selected_rank := 0
+var disputed_rank := 0
+var dispute_response_id := 0
+var dispute_response_accept := false
 var rematch_count := 0
 var quick_match_fired := false
 var deal_started_count := 0
@@ -260,9 +263,19 @@ func _initialize() -> void:
 		],
 	}, 1)
 	var rank_buttons := board.get_node("Background/PredictionPanel/ButtonLayer")
-	h.check(rank_buttons.get_node("Rank2").disabled, "game 已确认的排名不可再选")
+	board.rank_dispute_requested.connect(func(rank: int) -> void: disputed_rank = rank)
+	board.rank_dispute_response.connect(func(request_id: int, accept: bool) -> void:
+		dispute_response_id = request_id
+		dispute_response_accept = accept
+	)
+	h.check(not rank_buttons.get_node("Rank2").disabled, "game 已确认的排名仍可点击发起争夺")
 	h.check(not rank_buttons.get_node("Rank1").disabled and not rank_buttons.get_node("Rank3").disabled, "game 未锁排名保持可选")
 	h.check(not rank_buttons.get_node("Rank3").modulate.is_equal_approx(Color.WHITE), "game 本人选择高亮跟随服务端 chip")
+	rank_buttons.get_node("Rank2").pressed.emit()
+	h.check(board.get_node("RankDisputeOverlay").visible and "对手甲" in board.get_node("RankDisputeOverlay/Panel/Margin/VBox/Body").text, "game 点击已锁排名先显示争夺确认")
+	board.get_node("RankDisputeOverlay/Panel/Margin/VBox/Buttons/Primary").pressed.emit()
+	h.check(disputed_rank == 2, "game 确认后发送排名争夺请求")
+	board.show_rank_dispute_error("当前已有排名争夺正在处理")
 	var left_avatar := board.get_node("Background/LeftPlayer/AvatarFrame/AvatarIcon") as TextureRect
 	h.check(left_avatar.visible and left_avatar.texture != null, "game 有头像的玩家座席显示头像图")
 	h.check(left_avatar.size.x > 0.0 and left_avatar.size.y > 0.0, "game 头像使用场景文件中的可编辑布局")
@@ -302,6 +315,18 @@ func _initialize() -> void:
 	if board.has_method("reject_pending_prediction"):
 		board.reject_pending_prediction("该排名已被其他玩家锁定")
 		h.check(not board.get_node("Background/SubmitButton").disabled and "重新选择" in board.get_node("Background/StatusLabel").text, "game 同名次冲突后解除本地假锁并提示重选")
+	board.apply_state({
+		"status": "playing", "phase": "white",
+		"rank_dispute": {"id": 77, "rank": 2, "challenger_id": 2, "challenger_name": "对手甲", "holder_id": 1, "holder_name": "本人", "expires_at": int(Time.get_unix_time_from_system() * 1000.0) + 10000},
+		"players": [
+			{"id": 2, "name": "对手甲", "chip": 0, "confirmed": false, "hole_cards": []},
+			{"id": 3, "name": "对手乙", "chip": 3, "confirmed": true, "hole_cards": []},
+			{"id": 1, "name": "本人", "chip": 2, "confirmed": true, "hole_cards": []},
+		],
+	}, 1)
+	h.check(board.get_node("RankDisputeOverlay").visible and "请求你让出" in board.get_node("RankDisputeOverlay/Panel/Margin/VBox/Body").text, "game 被争夺者收到让位选择")
+	board.get_node("RankDisputeOverlay/Panel/Margin/VBox/Buttons/Primary").pressed.emit()
+	h.check(dispute_response_id == 77 and dispute_response_accept, "game 同意让出发送带请求编号的响应")
 	var finished_players := [
 		{"id": 2, "name": "对手甲", "balance": 2300, "hole_cards": []},
 		{"id": 3, "name": "对手乙", "balance": 1780, "hole_cards": []},

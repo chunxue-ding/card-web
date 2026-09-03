@@ -166,6 +166,21 @@ func _on_rank_selected(rank: int) -> void:
 	_socket.claim_chip(rank)
 
 
+func _on_rank_dispute_requested(rank: int) -> void:
+	if _socket != null:
+		_socket.request_rank_dispute(rank)
+
+
+func _on_rank_dispute_response(request_id: int, accept: bool) -> void:
+	if _socket != null:
+		_socket.respond_rank_dispute(request_id, accept)
+
+
+func _on_rank_dispute_cancelled(request_id: int) -> void:
+	if _socket != null:
+		_socket.cancel_rank_dispute(request_id)
+
+
 func _on_next_round_requested() -> void:
 	if _socket != null:
 		_socket.next_round()
@@ -192,6 +207,7 @@ func _on_socket_error(message: String) -> void:
 	status_label.text = message
 	_render()
 	game_board.reject_pending_prediction(message)
+	game_board.show_rank_dispute_error(message)
 
 
 func _on_closed() -> void:

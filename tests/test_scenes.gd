@@ -7,12 +7,26 @@ const Helper = preload("res://tests/test_helper.gd")
 class PredictionSocket extends RoomSocket:
 	var claim_count := 0
 	var confirm_count := 0
+	var dispute_rank := 0
+	var dispute_response_id := 0
+	var dispute_response_accept := false
+	var dispute_cancel_id := 0
 
 	func claim_chip(_rank: int) -> void:
 		claim_count += 1
 
 	func confirm_phase() -> void:
 		confirm_count += 1
+
+	func request_rank_dispute(rank: int) -> void:
+		dispute_rank = rank
+
+	func respond_rank_dispute(request_id: int, accept: bool) -> void:
+		dispute_response_id = request_id
+		dispute_response_accept = accept
+
+	func cancel_rank_dispute(request_id: int) -> void:
+		dispute_cancel_id = request_id
 
 var h := Helper.new()
 
@@ -198,6 +212,7 @@ func _check_room() -> void:
 	h.check(page.has_method("_on_reconnect_pressed"), "room 重连回调存在")
 	h.check(page.has_method("_on_prediction_submitted"), "room 排名预测回调存在")
 	h.check(page.has_method("_on_rank_selected"), "room 选择排名回调存在")
+	h.check(page.has_method("_on_rank_dispute_requested") and page.has_method("_on_rank_dispute_response") and page.has_method("_on_rank_dispute_cancelled"), "room 排名争夺回调存在")
 	h.check(page.has_method("_on_rematch_requested"), "room 再来一局回调存在")
 	page._my_id = 1
 	page._on_state({
@@ -231,6 +246,10 @@ func _check_room() -> void:
 	page._on_rank_selected(2)
 	page._on_prediction_submitted(2)
 	h.check(prediction_socket.claim_count == 1 and prediction_socket.confirm_count == 1, "room 预测选择和提交各发送一次 claim/confirm，不重复抢占排名")
+	page._on_rank_dispute_requested(3)
+	page._on_rank_dispute_response(9, true)
+	page._on_rank_dispute_cancelled(10)
+	h.check(prediction_socket.dispute_rank == 3 and prediction_socket.dispute_response_id == 9 and prediction_socket.dispute_response_accept and prediction_socket.dispute_cancel_id == 10, "room 转发争夺发起、响应和取消指令")
 	page._on_state({"version": 20, "status": "lobby", "players": []})
 	page._on_state({"version": 19, "status": "playing", "players": []})
 	h.check(int(page._view.get("version", 0)) == 20, "room 丢弃并发广播中后到达的旧版本快照")

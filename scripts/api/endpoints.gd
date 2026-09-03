@@ -93,6 +93,20 @@ static func ws_error_message(error: String) -> String:
 		return "该排名已被其他玩家锁定"
 	if "claim a chip first" in error:
 		return "该排名已被其他玩家抢先选择"
+	if "rank dispute already pending" in error:
+		return "当前已有排名争夺正在处理"
+	if "rank dispute is cooling down" in error:
+		return "刚刚已被拒绝，请稍后再发起争夺"
+	if "confirmed player cannot challenge" in error:
+		return "已锁定预测后不能发起争夺"
+	if "rank is not challengeable" in error:
+		return "该排名当前无法发起争夺"
+	if "rank dispute is no longer active" in error or "rank dispute expired" in error:
+		return "争夺请求已结束"
+	if "rank dispute state changed" in error:
+		return "排名状态已变化，请重新选择"
+	if "rank dispute is pending" in error:
+		return "请先处理当前排名争夺"
 	match error:
 		"unauthorized":
 			return "登录已过期，请重新登录"

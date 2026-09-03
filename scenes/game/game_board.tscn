@@ -2117,5 +2117,99 @@ theme_override_styles/hover = SubResource("StyleBoxTutorialButtonHover")
 theme_override_styles/pressed = SubResource("StyleBoxTutorialButtonPressed")
 text = "下一步"
 
+[node name="RankDisputeOverlay" type="Control" parent="."]
+visible = false
+z_index = 120
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Dim" type="ColorRect" parent="RankDisputeOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0.015, 0.014, 0.72)
+
+[node name="Panel" type="PanelContainer" parent="RankDisputeOverlay"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31
+anchor_top = 0.31
+anchor_right = 0.69
+anchor_bottom = 0.69
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTutorialPanel")
+
+[node name="Margin" type="MarginContainer" parent="RankDisputeOverlay/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="RankDisputeOverlay/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Title" type="Label" parent="RankDisputeOverlay/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.76, 0.36, 1)
+theme_override_font_sizes/font_size = 30
+text = "预测排名争夺"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="RankDisputeOverlay/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.91, 0.88, 0.77, 1)
+theme_override_font_sizes/font_size = 22
+text = "是否发起争夺？"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Countdown" type="Label" parent="RankDisputeOverlay/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.65, 0.52, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="RankDisputeOverlay/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="Secondary" type="Button" parent="RankDisputeOverlay/Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(180, 54)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.78, 0.74, 0.66, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTutorialButton")
+theme_override_styles/hover = SubResource("StyleBoxTutorialButtonHover")
+theme_override_styles/pressed = SubResource("StyleBoxTutorialButtonPressed")
+text = "取消"
+
+[node name="Primary" type="Button" parent="RankDisputeOverlay/Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(180, 54)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.98, 0.8, 0.43, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTutorialButton")
+theme_override_styles/hover = SubResource("StyleBoxTutorialButtonHover")
+theme_override_styles/pressed = SubResource("StyleBoxTutorialButtonPressed")
+text = "确认"
+
 [connection signal="pressed" from="Background/ExitButton" to="." method="_on_exit_pressed"]
 [connection signal="pressed" from="Background/SubmitButton" to="." method="_on_submit_pressed"]

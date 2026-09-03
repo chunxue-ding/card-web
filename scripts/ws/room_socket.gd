@@ -84,6 +84,18 @@ func confirm_phase() -> void:
 	_send_json({"type": "confirm_phase"})
 
 
+func request_rank_dispute(rank: int) -> void:
+	_send_json({"type": "request_rank_dispute", "rank": rank})
+
+
+func respond_rank_dispute(request_id: int, accept: bool) -> void:
+	_send_json({"type": "respond_rank_dispute", "request_id": request_id, "accept": accept})
+
+
+func cancel_rank_dispute(request_id: int) -> void:
+	_send_json({"type": "cancel_rank_dispute", "request_id": request_id})
+
+
 func next_round() -> void:
 	_send_json({"type": "next_round"})
 

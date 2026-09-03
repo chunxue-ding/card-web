@@ -5,6 +5,9 @@ extends Control
 signal exit_requested
 signal prediction_submitted(rank: int)
 signal rank_selected(rank: int)
+signal rank_dispute_requested(rank: int)
+signal rank_dispute_response(request_id: int, accept: bool)
+signal rank_dispute_cancelled(request_id: int)
 signal next_round_requested
 signal rematch_requested
 signal quick_match_requested
@@ -100,10 +103,17 @@ const RANK_BUTTON_ASSETS := [
 @onready var tutorial_step_label: Label = $TutorialOverlay/GuidePanel/Margin/VBox/Footer/Step
 @onready var tutorial_previous_button: Button = $TutorialOverlay/GuidePanel/Margin/VBox/Footer/Previous
 @onready var tutorial_next_button: Button = $TutorialOverlay/GuidePanel/Margin/VBox/Footer/Next
+@onready var rank_dispute_overlay: Control = $RankDisputeOverlay
+@onready var rank_dispute_title: Label = $RankDisputeOverlay/Panel/Margin/VBox/Title
+@onready var rank_dispute_body: Label = $RankDisputeOverlay/Panel/Margin/VBox/Body
+@onready var rank_dispute_countdown: Label = $RankDisputeOverlay/Panel/Margin/VBox/Countdown
+@onready var rank_dispute_primary: Button = $RankDisputeOverlay/Panel/Margin/VBox/Buttons/Primary
+@onready var rank_dispute_secondary: Button = $RankDisputeOverlay/Panel/Margin/VBox/Buttons/Secondary
 
 var _selected_rank := 0
 var _my_id := 0
 var _locked_ranks: Array[int] = []
+var _challengeable_locked_ranks: Array[int] = []
 var _state: Dictionary = {}
 var _round_results: Array[bool] = []
 var _win_mark_texture: Texture2D
@@ -128,6 +138,14 @@ var _prediction_submit_pending := false
 var _prediction_locked := false
 var _tutorial_step := 0
 var _tutorial_auto_checked := false
+var _rank_dispute_mode := ""
+var _rank_dispute_id := 0
+var _rank_dispute_rank := 0
+var _rank_dispute_challenger_id := 0
+var _rank_dispute_holder_id := 0
+var _rank_dispute_expires_at_ms := 0
+var _rank_dispute_request_pending := false
+var _rank_dispute_feedback := ""
 
 
 func _ready() -> void:
@@ -159,9 +177,19 @@ func _ready() -> void:
 	tutorial_next_button.pressed.connect(_on_tutorial_next_pressed)
 	tutorial_overlay.resized.connect(_layout_tutorial)
 	round_settlement.continue_requested.connect(_on_round_settlement_continue_requested)
+	rank_dispute_primary.pressed.connect(_on_rank_dispute_primary_pressed)
+	rank_dispute_secondary.pressed.connect(_on_rank_dispute_secondary_pressed)
 	var music := get_node_or_null("/root/Music")
 	if music != null:
 		music.call("play_game")
+
+
+func _process(_delta: float) -> void:
+	if not rank_dispute_overlay.visible or _rank_dispute_expires_at_ms <= 0:
+		return
+	var now_ms := int(Time.get_unix_time_from_system() * 1000.0)
+	var seconds_left := maxi(0, ceili(float(_rank_dispute_expires_at_ms - now_ms) / 1000.0))
+	rank_dispute_countdown.text = "%d 秒后自动拒绝" % seconds_left
 
 
 func _exit_tree() -> void:
@@ -243,6 +271,7 @@ func arm_community_animation() -> void:
 
 func apply_state(view: Dictionary, my_id: int) -> void:
 	_state = view
+	_my_id = my_id
 	pot_label.text = _format_number(int(view.get("pot", 0)))
 	var phase := str(view.get("phase", "white"))
 	var phase_changed := phase != _current_phase
@@ -296,14 +325,16 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 		_start_deal_animation()
 	_start_pending_community_deal()
 
-	_my_id = my_id
 	_locked_ranks.clear()
+	_challengeable_locked_ranks.clear()
 	for raw_player in players:
 		var player := raw_player as Dictionary
 		if int(player.get("id", 0)) != my_id and bool(player.get("confirmed", false)):
 			var locked_rank := int(player.get("chip", 0))
 			if locked_rank > 0:
 				_locked_ranks.append(locked_rank)
+				if not bool(player.get("is_bot", false)) and not bool(player.get("abandoned", false)):
+					_challengeable_locked_ranks.append(locked_rank)
 	_selected_rank = int(mine.get("chip", 0))
 	if status == "playing":
 		var confirmed_by_server := bool(mine.get("confirmed", false))
@@ -313,6 +344,7 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 	else:
 		_prediction_submit_pending = false
 		_prediction_locked = false
+	_apply_rank_dispute(view.get("rank_dispute", {}))
 	_refresh_prediction_buttons()
 
 	if status == "round_complete":
@@ -342,6 +374,9 @@ func apply_state(view: Dictionary, my_id: int) -> void:
 		else:
 			submit_label.text = "提交预测"
 			status_label.text = ""
+	if _rank_dispute_feedback != "":
+		status_label.text = _rank_dispute_feedback
+		_rank_dispute_feedback = ""
 	submit_button.disabled = status != "playing" or _prediction_locked
 	if status in ["round_complete", "finished"]:
 		if tutorial_overlay.visible:
@@ -362,6 +397,8 @@ func show_events(events: Array) -> void:
 			"phase_changed":
 				arm_community_animation()
 				status_label.text = "进入下一阶段"
+			"rank_dispute_resolved":
+				_show_rank_dispute_result(event_data)
 			"round_settled":
 				var total := int(event_data.get("vaults", 0)) + int(event_data.get("alarms", 0))
 				if _round_results.size() < total:
@@ -977,7 +1014,15 @@ func _on_tutorial_skip_pressed() -> void:
 
 
 func _select_rank(rank: int) -> void:
-	if _prediction_locked or rank == _selected_rank or rank in _locked_ranks:
+	if _prediction_locked or _rank_dispute_request_pending or _is_rank_dispute_participant():
+		return
+	if rank == _selected_rank:
+		return
+	if rank in _locked_ranks:
+		if rank not in _challengeable_locked_ranks:
+			status_label.text = "机器人或离线玩家锁定的排名不能争夺"
+			return
+		_show_rank_dispute_offer(rank)
 		return
 	_selected_rank = rank
 	_refresh_prediction_buttons()
@@ -989,14 +1034,172 @@ func _refresh_prediction_buttons() -> void:
 		var button := prediction_buttons[index]
 		var rank := index + 1
 		var locked := rank in _locked_ranks
-		button.disabled = locked or _prediction_locked
+		var challengeable := rank in _challengeable_locked_ranks
+		button.disabled = _prediction_locked or _rank_dispute_request_pending or _is_rank_dispute_participant() or (locked and not challengeable)
 		if _prediction_locked:
 			button.modulate = Color(1.28, 1.12, 1.42, 1.0) if rank == _selected_rank else Color(0.38, 0.35, 0.42, 0.58)
 		elif locked:
-			button.modulate = Color(0.45, 0.42, 0.38, 0.55)
+			button.modulate = Color(0.72, 0.65, 0.58, 0.82)
 		else:
 			button.modulate = Color(1.28, 1.12, 1.42, 1.0) if rank == _selected_rank else Color.WHITE
 		button.scale = Vector2.ONE
+
+
+func _show_rank_dispute_offer(rank: int) -> void:
+	var holder_name := _rank_holder_name(rank)
+	_rank_dispute_mode = "offer"
+	_rank_dispute_rank = rank
+	_rank_dispute_id = 0
+	_rank_dispute_expires_at_ms = 0
+	rank_dispute_title.text = "发起排名争夺"
+	rank_dispute_body.text = "第%d名已被 %s 锁定。是否请求对方让出？" % [rank, holder_name]
+	rank_dispute_countdown.text = "对方同意后，你将自动锁定该名次"
+	rank_dispute_primary.text = "发起争夺"
+	rank_dispute_primary.visible = true
+	rank_dispute_primary.disabled = false
+	rank_dispute_secondary.text = "取消"
+	rank_dispute_secondary.disabled = false
+	rank_dispute_overlay.visible = true
+
+
+func _apply_rank_dispute(raw_dispute: Variant) -> void:
+	if not (raw_dispute is Dictionary) or (raw_dispute as Dictionary).is_empty():
+		if _rank_dispute_id > 0 or _rank_dispute_mode in ["incoming", "waiting", "responding", "cancelling"]:
+			_reset_rank_dispute_ui()
+		return
+	var dispute := raw_dispute as Dictionary
+	_rank_dispute_request_pending = false
+	_rank_dispute_id = int(dispute.get("id", 0))
+	_rank_dispute_rank = int(dispute.get("rank", 0))
+	_rank_dispute_challenger_id = int(dispute.get("challenger_id", 0))
+	_rank_dispute_holder_id = int(dispute.get("holder_id", 0))
+	var expires_in_ms := int(dispute.get("expires_in_ms", 0))
+	_rank_dispute_expires_at_ms = (
+		int(Time.get_unix_time_from_system() * 1000.0) + expires_in_ms
+		if expires_in_ms > 0
+		else int(dispute.get("expires_at", 0))
+	)
+	if _rank_dispute_holder_id == _my_id:
+		if tutorial_overlay.visible:
+			close_tutorial(false)
+		_rank_dispute_mode = "incoming"
+		rank_dispute_title.text = "收到排名争夺"
+		rank_dispute_body.text = "%s 请求你让出第%d名。是否同意？" % [str(dispute.get("challenger_name", "其他玩家")), _rank_dispute_rank]
+		rank_dispute_primary.text = "同意让出"
+		rank_dispute_primary.visible = true
+		rank_dispute_primary.disabled = false
+		rank_dispute_secondary.text = "拒绝"
+		rank_dispute_secondary.disabled = false
+		rank_dispute_overlay.visible = true
+	elif _rank_dispute_challenger_id == _my_id:
+		_rank_dispute_mode = "waiting"
+		rank_dispute_title.text = "等待对方处理"
+		rank_dispute_body.text = "已向 %s 发起第%d名争夺请求" % [str(dispute.get("holder_name", "其他玩家")), _rank_dispute_rank]
+		rank_dispute_primary.visible = false
+		rank_dispute_secondary.text = "取消争夺"
+		rank_dispute_secondary.disabled = false
+		rank_dispute_overlay.visible = true
+	else:
+		_reset_rank_dispute_ui()
+
+
+func _on_rank_dispute_primary_pressed() -> void:
+	match _rank_dispute_mode:
+		"offer":
+			_rank_dispute_request_pending = true
+			_rank_dispute_mode = "sending"
+			rank_dispute_body.text = "正在发送第%d名争夺请求…" % _rank_dispute_rank
+			rank_dispute_primary.disabled = true
+			rank_dispute_secondary.disabled = true
+			_refresh_prediction_buttons()
+			rank_dispute_requested.emit(_rank_dispute_rank)
+		"incoming":
+			_rank_dispute_mode = "responding"
+			rank_dispute_primary.disabled = true
+			rank_dispute_secondary.disabled = true
+			rank_dispute_body.text = "正在让出第%d名…" % _rank_dispute_rank
+			rank_dispute_response.emit(_rank_dispute_id, true)
+
+
+func _on_rank_dispute_secondary_pressed() -> void:
+	match _rank_dispute_mode:
+		"offer":
+			_reset_rank_dispute_ui()
+		"incoming":
+			_rank_dispute_mode = "responding"
+			rank_dispute_primary.disabled = true
+			rank_dispute_secondary.disabled = true
+			rank_dispute_body.text = "正在拒绝争夺请求…"
+			rank_dispute_response.emit(_rank_dispute_id, false)
+		"waiting":
+			_rank_dispute_mode = "cancelling"
+			rank_dispute_secondary.disabled = true
+			rank_dispute_body.text = "正在取消争夺…"
+			rank_dispute_cancelled.emit(_rank_dispute_id)
+
+
+func _reset_rank_dispute_ui() -> void:
+	_rank_dispute_mode = ""
+	_rank_dispute_id = 0
+	_rank_dispute_rank = 0
+	_rank_dispute_challenger_id = 0
+	_rank_dispute_holder_id = 0
+	_rank_dispute_expires_at_ms = 0
+	_rank_dispute_request_pending = false
+	rank_dispute_overlay.visible = false
+	rank_dispute_primary.visible = true
+	rank_dispute_primary.disabled = false
+	rank_dispute_secondary.disabled = false
+	_refresh_prediction_buttons()
+
+
+func _is_rank_dispute_participant() -> bool:
+	return _rank_dispute_id > 0 and _my_id in [_rank_dispute_challenger_id, _rank_dispute_holder_id]
+
+
+func _rank_holder_name(rank: int) -> String:
+	for raw_player in _state.get("players", []):
+		var player := raw_player as Dictionary
+		if int(player.get("chip", 0)) == rank and bool(player.get("confirmed", false)):
+			return str(player.get("name", "其他玩家"))
+	return "其他玩家"
+
+
+func _show_rank_dispute_result(event_data: Dictionary) -> void:
+	var dispute_variant: Variant = event_data.get("dispute", {})
+	if not (dispute_variant is Dictionary):
+		return
+	var dispute := dispute_variant as Dictionary
+	var challenger_id := int(dispute.get("challenger_id", 0))
+	var holder_id := int(dispute.get("holder_id", 0))
+	var rank := int(dispute.get("rank", 0))
+	var reason := str(event_data.get("reason", ""))
+	if challenger_id == _my_id:
+		match reason:
+			"accepted":
+				_rank_dispute_feedback = "对方已同意，你已锁定第%d名" % rank
+			"expired":
+				_rank_dispute_feedback = "对方未在时限内处理，争夺已自动拒绝"
+			"cancelled":
+				_rank_dispute_feedback = "已取消排名争夺"
+			"disconnected":
+				_rank_dispute_feedback = "对方已离线，争夺已取消"
+			_:
+				_rank_dispute_feedback = "对方拒绝让出第%d名" % rank
+	elif holder_id == _my_id:
+		if reason == "accepted":
+			_rank_dispute_feedback = "你已让出第%d名，请重新选择" % rank
+		elif reason == "rejected":
+			_rank_dispute_feedback = "已拒绝争夺，你仍锁定第%d名" % rank
+	_reset_rank_dispute_ui()
+
+
+func show_rank_dispute_error(message: String) -> bool:
+	if not _rank_dispute_request_pending and _rank_dispute_id == 0 and _rank_dispute_mode == "":
+		return false
+	_reset_rank_dispute_ui()
+	status_label.text = message
+	return true
 
 
 func reject_pending_prediction(message: String) -> bool:
