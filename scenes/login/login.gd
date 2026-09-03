@@ -17,6 +17,10 @@ const GUEST_NORMAL_TEXT := "游客一键登录"
 
 func _ready() -> void:
 	Music.play_ambient()
+	var remembered_email := Session.get_remembered_email()
+	if email_input.text.is_empty() and not remembered_email.is_empty():
+		email_input.text = remembered_email
+		password_input.call_deferred("grab_focus")
 
 
 func _on_login_pressed() -> void:

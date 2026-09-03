@@ -4,6 +4,7 @@ extends Node
 ## 注意：不要声明 class_name Session，会与 autoload 名冲突。
 
 const DEVICE_CFG_PATH := "user://device.cfg"
+const ACCOUNT_CFG_PATH := "user://account.cfg"
 
 var token := ""
 var user: Dictionary = {}
@@ -15,6 +16,10 @@ var pending_quick_match := false
 var _api: AuthApi
 var _card: CardApi
 var _device_id := ""
+var _remembered_email := ""
+
+# 可在测试中替换，避免读写玩家真实的浏览器账号记录。
+var account_cfg_path := ACCOUNT_CFG_PATH
 
 
 func _ready() -> void:
@@ -41,12 +46,39 @@ func get_device_id() -> String:
 	return _device_id
 
 
+func get_remembered_email() -> String:
+	if _remembered_email != "":
+		return _remembered_email
+	var cfg := ConfigFile.new()
+	if cfg.load(account_cfg_path) == OK:
+		_remembered_email = str(cfg.get_value("account", "email", "")).strip_edges().to_lower()
+	return _remembered_email
+
+
+func remember_email(email: String) -> void:
+	var normalized := email.strip_edges().to_lower()
+	if normalized == "":
+		return
+	_remembered_email = normalized
+	var cfg := ConfigFile.new()
+	cfg.set_value("account", "email", normalized)
+	var save_error := cfg.save(account_cfg_path)
+	if save_error != OK:
+		push_warning("保存登录邮箱失败：%s" % error_string(save_error))
+
+
 func login(email: String, password: String) -> ApiError:
-	return _apply_auth(await _api.login(email, password))
+	var err := _apply_auth(await _api.login(email, password))
+	if err == null:
+		remember_email(email)
+	return err
 
 
 func register(email: String, password: String) -> ApiError:
-	return _apply_auth(await _api.register(email, password))
+	var err := _apply_auth(await _api.register(email, password))
+	if err == null:
+		remember_email(email)
+	return err
 
 
 func guest_login() -> ApiError:
